@@ -81,6 +81,16 @@ export const apiService = {
         return response.data;
     },
 
+    async getReportingPeriods(licenseNumber) {
+        const response = await apiClient.get(`/api/time-windows/${licenseNumber}/available`);
+        return response.data;
+    },
+
+    async analyzeTimeWindow(licenseNumber, timeWindow) {
+        const response = await apiClient.post(`/api/time-windows/${licenseNumber}/analyze`, timeWindow);
+        return response.data;
+    },
+
     // File Uploads & AI Analysis
     async uploadCPAList(file) {
         const formData = new FormData();

@@ -13,7 +13,8 @@
 }
 
 .cardHeader {
-    padding: var(--space-6);
+    padding: var(--space-8);
+    /* Increased from var(--space-6) */
     border-bottom: 1px solid var(--gray-200);
 }
 
@@ -31,11 +32,44 @@
 }
 
 .cardBody {
-    padding: var(--space-6);
+    padding: var(--space-8);
+    /* Increased from var(--space-6) */
 }
 
 .cardFooter {
-    padding: var(--space-6);
+    padding: var(--space-8);
+    /* Increased from var(--space-6) */
     border-top: 1px solid var(--gray-200);
     background: var(--gray-50);
+}
+
+/* Global card classes for backwards compatibility */
+:global(.card) {
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+}
+
+:global(.card-header) {
+    padding: var(--space-8);
+    border-bottom: 1px solid var(--gray-200);
+}
+
+:global(.card-body) {
+    padding: var(--space-8);
+}
+
+:global(.card-title) {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--gray-900);
+    margin: 0;
+}
+
+:global(.card-subtitle) {
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+    margin: var(--space-1) 0 0 0;
 }

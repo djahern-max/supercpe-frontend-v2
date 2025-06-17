@@ -1,23 +1,24 @@
-// src/components/ui/Badge.js
+// src/components/ui/Badge.js  
 import React from 'react';
-import clsx from 'clsx';
-import styles from '../../styles/components/Badge.module.css';
 
-const Badge = ({
-    children,
-    variant = 'neutral',
-    className,
-    ...props
-}) => {
+const Badge = ({ children, variant = 'primary', size = 'md', className = '' }) => {
+    const variantClass = {
+        primary: 'badge-primary',
+        success: 'badge-success',
+        warning: 'badge-warning',
+        error: 'badge-error',
+        neutral: 'badge-neutral',
+        secondary: 'badge-secondary'
+    }[variant] || 'badge-primary';
+
+    const sizeClass = {
+        sm: 'badge-sm',
+        md: 'badge-md',
+        lg: 'badge-lg'
+    }[size] || 'badge-md';
+
     return (
-        <span
-            className={clsx(
-                styles.badge,
-                styles[variant],
-                className
-            )}
-            {...props}
-        >
+        <span className={`badge ${variantClass} ${sizeClass} ${className}`}>
             {children}
         </span>
     );

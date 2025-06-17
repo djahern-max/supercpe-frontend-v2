@@ -1,6 +1,14 @@
 /* src/styles/pages/Dashboard.module.css */
 .dashboard {
-    padding: var(--space-8) 0;
+    padding: var(--space-8) var(--space-4);
+    min-height: 100vh;
+    background: var(--gray-50);
+}
+
+.dashboard .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--space-4);
 }
 
 .loading {
@@ -8,255 +16,460 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: var(--space-20);
-    text-align: center;
+    min-height: 50vh;
+    gap: var(--space-4);
+}
+
+.loading p {
+    font-size: var(--text-lg);
+    color: var(--gray-600);
+    margin: 0;
 }
 
 .error {
     text-align: center;
     padding: var(--space-16);
+    max-width: 500px;
+    margin: 0 auto;
 }
 
+.error h2 {
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    color: var(--gray-900);
+    margin: 0 0 var(--space-4) 0;
+}
+
+.error p {
+    color: var(--gray-600);
+    margin: 0 0 var(--space-6) 0;
+}
+
+/* Header */
 .header {
     margin-bottom: var(--space-8);
 }
 
 .headerContent {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: var(--space-6);
-}
-
-.title {
-    font-size: var(--text-3xl);
-    font-weight: 700;
-    color: var(--gray-900);
-    margin: 0;
-}
-
-.subtitle {
-    color: var(--gray-600);
-    margin: var(--space-2) 0 0 0;
-    font-size: var(--text-lg);
-}
-
-.headerActions {
-    flex-shrink: 0;
-}
-
-.complianceCard {
-    margin-bottom: var(--space-6);
-}
-
-.statusBadge {
-    margin-left: auto;
-}
-
-.complianceGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: var(--space-6);
-    margin-bottom: var(--space-6);
-}
-
-.complianceItem {
     text-align: center;
 }
 
-.complianceNumber {
-    font-size: var(--text-3xl);
+.title {
+    font-size: var(--text-4xl);
     font-weight: 700;
-    color: var(--primary-600);
-    margin-bottom: var(--space-1);
+    color: var(--gray-900);
+    margin: 0 0 var(--space-2) 0;
 }
 
-.complianceLabel {
+.subtitle {
+    font-size: var(--text-lg);
+    color: var(--gray-600);
+    margin: 0;
+}
+
+/* Cards */
+.explanationCard,
+.currentPeriodCard,
+.allPeriodsCard,
+.upgradeCard {
+    max-width: 900px;
+    margin: 0 auto var(--space-8) auto;
+    padding: 0;
+    /* Remove any default padding */
+}
+
+.explanationCard .card-body,
+.currentPeriodCard .card-body,
+.allPeriodsCard .card-body {
+    padding: var(--space-6);
+}
+
+.explanationCard .card-header,
+.currentPeriodCard .card-header,
+.allPeriodsCard .card-header {
+    padding: var(--space-6) var(--space-6) 0 var(--space-6);
+}
+
+/* Explanation Card */
+.explanationTitle {
+    font-size: var(--text-2xl);
+    font-weight: 600;
+    color: var(--gray-900);
+    margin: 0 0 var(--space-6) 0;
+}
+
+.ruleStatus {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+}
+
+.transitionNote {
+    font-size: var(--text-sm);
+    color: var(--orange-600);
+    font-weight: 500;
+}
+
+.explanationText {
+    font-size: var(--text-base);
+    color: var(--gray-700);
+    line-height: 1.6;
+    margin: 0 0 var(--space-6) 0;
+}
+
+.keyPoints {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.keyPoint {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    padding: var(--space-3);
+    background: var(--green-50);
+    border-radius: var(--radius-md);
+    border-left: 4px solid var(--green-500);
+    font-size: var(--text-sm);
+    color: var(--green-800);
+}
+
+.keyPoint strong {
+    color: var(--green-900);
+}
+
+/* Current Period Card */
+.currentPeriodCard {
+    border-left: 4px solid var(--primary-500);
+}
+
+.currentPeriodCard.urgent {
+    border-left-color: var(--orange-500);
+    background: var(--orange-25);
+}
+
+.currentPeriodCard.expired {
+    border-left-color: var(--red-500);
+    background: var(--red-25);
+}
+
+.periodBadge {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.currentPeriodInfo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+}
+
+.periodDates {
+    text-align: center;
+}
+
+.periodRange {
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    color: var(--primary-600);
+    margin: 0 0 var(--space-2) 0;
+}
+
+.daysRemaining {
+    font-size: var(--text-lg);
+    color: var(--gray-600);
+    margin: 0;
+    font-weight: 500;
+}
+
+/* Requirements Grid */
+.requirementsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--space-4);
+}
+
+.requirementBox {
+    text-align: center;
+    padding: var(--space-6);
+    background: white;
+    border-radius: var(--radius-lg);
+    border: 2px solid var(--primary-100);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.requirementBox:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-200);
+}
+
+.requirementNumber {
+    font-size: var(--text-4xl);
+    font-weight: 700;
+    color: var(--primary-600);
+    margin-bottom: var(--space-2);
+}
+
+.requirementLabel {
+    font-size: var(--text-sm);
+    color: var(--gray-700);
+    font-weight: 600;
+}
+
+.periodType {
+    text-align: center;
+    padding: var(--space-4);
+    background: var(--blue-50);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--blue-200);
+    font-size: var(--text-sm);
+    color: var(--blue-800);
+}
+
+/* Timeline */
+.periodsTimeline {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.periodCard {
+    padding: var(--space-6);
+    border-radius: var(--radius-lg);
+    border: 2px solid var(--gray-200);
+    background: white;
+    transition: all 0.2s ease;
+}
+
+.periodCard.active {
+    border-color: var(--primary-500);
+    background: var(--primary-25);
+    box-shadow: var(--shadow-lg);
+}
+
+.periodCard.upcoming {
+    border-color: var(--blue-300);
+    background: var(--blue-25);
+}
+
+.periodCard.urgent {
+    border-color: var(--orange-400);
+    background: var(--orange-25);
+}
+
+.periodCard.expired {
+    border-color: var(--gray-300);
+    background: var(--gray-50);
+    opacity: 0.8;
+}
+
+.periodHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-4);
+}
+
+.periodTitle {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.periodSystem {
     font-size: var(--text-sm);
     color: var(--gray-600);
     font-weight: 500;
 }
 
-.recommendations {
-    background: var(--primary-50);
-    padding: var(--space-4);
-    border-radius: var(--radius-md);
-    border: 1px solid var(--primary-200);
-}
-
-.recommendationsTitle {
-    font-size: var(--text-lg);
-    font-weight: 600;
-    color: var(--primary-700);
-    margin: 0 0 var(--space-3) 0;
-}
-
-.recommendationsList {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-.recommendationItem {
-    color: var(--primary-700);
-    margin-bottom: var(--space-2);
-    padding-left: var(--space-5);
-    position: relative;
-}
-
-.recommendationItem::before {
-    content: '→';
-    position: absolute;
-    left: 0;
-    color: var(--primary-500);
-    font-weight: bold;
-}
-
-.subscriptionCard {
-    margin-bottom: var(--space-6);
-}
-
-.activeSubscription {
+.periodDetails {
     display: flex;
     flex-direction: column;
-    gap: var(--space-4);
+    gap: var(--space-2);
 }
 
-.subscriptionStatus {
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
+.periodDates {
+    font-size: var(--text-base);
+    color: var(--gray-800);
 }
 
-.expiryDate {
-    color: var(--gray-600);
+.periodRequirements {
     font-size: var(--text-sm);
+    color: var(--gray-600);
 }
 
-.freeSubscription {
-    text-align: center;
-    padding: var(--space-4);
+.transitionNote {
+    font-size: var(--text-sm);
+    color: var(--orange-700);
+    font-weight: 500;
+    padding: var(--space-2) var(--space-3);
+    background: var(--orange-100);
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--orange-500);
 }
 
-.freeMessage {
+/* Upgrade Card */
+.upgradeCard {
+    background: linear-gradient(135deg, var(--primary-600) 0%, var(--blue-600) 100%);
+    color: white;
+    border: none;
+}
+
+.upgradeCard .card-header {
+    padding: var(--space-6);
+}
+
+.upgradeCard .card-body {
+    padding: var(--space-6);
+}
+
+.upgradeCard .card-title {
+    color: white;
+    margin: 0;
+}
+
+.upgradeDescription {
     font-size: var(--text-lg);
-    color: var(--gray-700);
-    margin-bottom: var(--space-6);
-}
-
-.features {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: var(--space-4);
-    margin-bottom: var(--space-6);
+    line-height: 1.6;
+    margin: 0 0 var(--space-6) 0;
+    color: white;
 }
 
 .upgradeFeatures {
     display: flex;
     flex-direction: column;
-    gap: var(--space-3);
-    margin-bottom: var(--space-6);
-    text-align: left;
-    max-width: 400px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.feature {
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
-}
-
-.featureIcon {
-    font-size: var(--text-lg);
-}
-
-.recordsCard {
-    margin-bottom: var(--space-6);
-}
-
-.recordsList {
-    display: flex;
-    flex-direction: column;
     gap: var(--space-4);
+    margin-bottom: var(--space-8);
 }
 
-.recordItem {
+.upgradeFeature {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--space-4);
-    background: var(--gray-50);
-    border-radius: var(--radius-md);
-    border: 1px solid var(--gray-200);
+    align-items: flex-start;
+    gap: var(--space-3);
+    font-size: var(--text-base);
+    color: white;
 }
 
-.recordInfo {
-    flex: 1;
+.upgradeFeature strong {
+    color: white;
 }
 
-.recordTitle {
-    font-size: var(--text-lg);
-    font-weight: 600;
-    color: var(--gray-900);
-    margin: 0 0 var(--space-1) 0;
-}
-
-.recordDetails {
-    color: var(--gray-600);
+.upgradeFeature p {
+    margin: var(--space-1) 0 0 0;
+    color: rgba(255, 255, 255, 0.8);
     font-size: var(--text-sm);
-    margin: 0;
 }
 
-.recordHours {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-1);
-}
-
-.hoursNumber {
-    font-size: var(--text-2xl);
-    font-weight: 700;
+.upgradeButton {
+    background: white;
     color: var(--primary-600);
-}
-
-.hoursLabel {
-    font-size: var(--text-xs);
-    color: var(--gray-500);
-    text-transform: uppercase;
     font-weight: 600;
+    font-size: var(--text-lg);
+    padding: var(--space-4) var(--space-8);
+    border-radius: var(--radius-lg);
+    border: none;
+    width: 100%;
+    transition: all 0.2s ease;
 }
 
-.ethicsBadge {
-    margin-top: var(--space-1);
+.upgradeButton:hover {
+    background: var(--primary-50);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xl);
 }
 
-.emptyState {
-    text-align: center;
-    padding: var(--space-12);
-}
-
-.emptyIcon {
-    font-size: var(--text-4xl);
-    margin-bottom: var(--space-4);
-    opacity: 0.6;
-}
-
+/* Responsive Design */
 @media (max-width: 768px) {
-    .headerContent {
-        flex-direction: column;
-        align-items: stretch;
+    .dashboard {
+        padding: var(--space-4) var(--space-2);
     }
 
-    .complianceGrid {
+    .dashboard .container {
+        padding: 0 var(--space-2);
+    }
+
+    .title {
+        font-size: var(--text-3xl);
+    }
+
+    .subtitle {
+        font-size: var(--text-base);
+    }
+
+    .explanationCard,
+    .currentPeriodCard,
+    .allPeriodsCard,
+    .upgradeCard {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .explanationCard .card-body,
+    .currentPeriodCard .card-body,
+    .allPeriodsCard .card-body,
+    .upgradeCard .card-body {
+        padding: var(--space-4);
+    }
+
+    .explanationCard .card-header,
+    .currentPeriodCard .card-header,
+    .allPeriodsCard .card-header,
+    .upgradeCard .card-header {
+        padding: var(--space-4) var(--space-4) 0 var(--space-4);
+    }
+
+    .requirementsGrid {
         grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: var(--space-3);
     }
 
-    .recordItem {
+    .requirementBox {
+        padding: var(--space-4);
+    }
+
+    .requirementNumber {
+        font-size: var(--text-3xl);
+    }
+
+    .periodHeader {
         flex-direction: column;
         align-items: flex-start;
-        gap: var(--space-3);
+        gap: var(--space-2);
+    }
+
+    .keyPoints {
+        gap: var(--space-2);
+    }
+
+    .keyPoint {
+        padding: var(--space-2);
+        font-size: var(--text-xs);
+    }
+}
+
+/* Loading spinner */
+.dashboard :global(.loading-spinner) {
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--gray-200);
+    border-top: 4px solid var(--primary-500);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
     }
 }
