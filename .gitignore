@@ -72,4 +72,4 @@ temp/
 *.ntvs*
 *.njsproj
 *.sln
-*.sw?
+*.sw?node_modules/
