@@ -1,0 +1,41 @@
+/* src/styles/components/Card.module.css */
+.card {
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+    transition: all var(--transition-fast);
+}
+
+.card:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.cardHeader {
+    padding: var(--space-6);
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.cardTitle {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--gray-900);
+    margin: 0;
+}
+
+.cardSubtitle {
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+    margin: var(--space-1) 0 0 0;
+}
+
+.cardBody {
+    padding: var(--space-6);
+}
+
+.cardFooter {
+    padding: var(--space-6);
+    border-top: 1px solid var(--gray-200);
+    background: var(--gray-50);
+}

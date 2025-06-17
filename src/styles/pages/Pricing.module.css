@@ -1,0 +1,174 @@
+/* src/styles/pages/Pricing.module.css */
+.pricing {
+    padding: var(--space-16) 0;
+}
+
+.loading {
+    text-align: center;
+    padding: var(--space-16);
+}
+
+.header {
+    text-align: center;
+    margin-bottom: var(--space-12);
+}
+
+.title {
+    font-size: var(--text-4xl);
+    font-weight: 700;
+    color: var(--gray-900);
+    margin: 0 0 var(--space-4) 0;
+}
+
+.subtitle {
+    font-size: var(--text-lg);
+    color: var(--gray-600);
+    line-height: var(--leading-relaxed);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.plansGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: var(--space-6);
+    margin-bottom: var(--space-16);
+}
+
+.planCard {
+    position: relative;
+    transition: all var(--transition-normal);
+}
+
+.planCard:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+}
+
+.planName {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--gray-900);
+    margin: 0 0 var(--space-2) 0;
+}
+
+.popularBadge {
+    margin-bottom: var(--space-3);
+}
+
+.planPrice {
+    margin-bottom: var(--space-4);
+}
+
+.priceAmount {
+    font-size: var(--text-4xl);
+    font-weight: 700;
+    color: var(--primary-600);
+}
+
+.pricePeriod {
+    font-size: var(--text-lg);
+    color: var(--gray-600);
+    margin-left: var(--space-1);
+}
+
+.featuresList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.feature {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    color: var(--gray-700);
+}
+
+.featureIcon {
+    color: var(--success-600);
+    font-weight: bold;
+    margin-top: var(--space-1);
+}
+
+.selectButton {
+    width: 100%;
+}
+
+.faq {
+    margin-bottom: var(--space-16);
+}
+
+.faqTitle {
+    text-align: center;
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--gray-900);
+    margin: 0 0 var(--space-8) 0;
+}
+
+.faqGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: var(--space-6);
+}
+
+.faqItem {
+    background: white;
+    padding: var(--space-6);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-200);
+}
+
+.faqQuestion {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--gray-900);
+    margin: 0 0 var(--space-3) 0;
+}
+
+.faqAnswer {
+    color: var(--gray-600);
+    line-height: var(--leading-relaxed);
+    margin: 0;
+}
+
+.cta {
+    text-align: center;
+    padding: var(--space-16);
+    background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-700) 100%);
+    color: white;
+    border-radius: var(--radius-2xl);
+}
+
+.ctaTitle {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    margin: 0 0 var(--space-4) 0;
+}
+
+.ctaDescription {
+    font-size: var(--text-lg);
+    opacity: 0.9;
+    margin: 0 0 var(--space-6) 0;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@media (max-width: 768px) {
+    .faqGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .plansGrid {
+        grid-template-columns: 1fr;
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}

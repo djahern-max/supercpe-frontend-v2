@@ -1,0 +1,262 @@
+/* src/styles/pages/Dashboard.module.css */
+.dashboard {
+    padding: var(--space-8) 0;
+}
+
+.loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-20);
+    text-align: center;
+}
+
+.error {
+    text-align: center;
+    padding: var(--space-16);
+}
+
+.header {
+    margin-bottom: var(--space-8);
+}
+
+.headerContent {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--space-6);
+}
+
+.title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--gray-900);
+    margin: 0;
+}
+
+.subtitle {
+    color: var(--gray-600);
+    margin: var(--space-2) 0 0 0;
+    font-size: var(--text-lg);
+}
+
+.headerActions {
+    flex-shrink: 0;
+}
+
+.complianceCard {
+    margin-bottom: var(--space-6);
+}
+
+.statusBadge {
+    margin-left: auto;
+}
+
+.complianceGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--space-6);
+    margin-bottom: var(--space-6);
+}
+
+.complianceItem {
+    text-align: center;
+}
+
+.complianceNumber {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--primary-600);
+    margin-bottom: var(--space-1);
+}
+
+.complianceLabel {
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+    font-weight: 500;
+}
+
+.recommendations {
+    background: var(--primary-50);
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--primary-200);
+}
+
+.recommendationsTitle {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--primary-700);
+    margin: 0 0 var(--space-3) 0;
+}
+
+.recommendationsList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.recommendationItem {
+    color: var(--primary-700);
+    margin-bottom: var(--space-2);
+    padding-left: var(--space-5);
+    position: relative;
+}
+
+.recommendationItem::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--primary-500);
+    font-weight: bold;
+}
+
+.subscriptionCard {
+    margin-bottom: var(--space-6);
+}
+
+.activeSubscription {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.subscriptionStatus {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.expiryDate {
+    color: var(--gray-600);
+    font-size: var(--text-sm);
+}
+
+.freeSubscription {
+    text-align: center;
+    padding: var(--space-4);
+}
+
+.freeMessage {
+    font-size: var(--text-lg);
+    color: var(--gray-700);
+    margin-bottom: var(--space-6);
+}
+
+.features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+}
+
+.upgradeFeatures {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-bottom: var(--space-6);
+    text-align: left;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.feature {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.featureIcon {
+    font-size: var(--text-lg);
+}
+
+.recordsCard {
+    margin-bottom: var(--space-6);
+}
+
+.recordsList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.recordItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-4);
+    background: var(--gray-50);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--gray-200);
+}
+
+.recordInfo {
+    flex: 1;
+}
+
+.recordTitle {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--gray-900);
+    margin: 0 0 var(--space-1) 0;
+}
+
+.recordDetails {
+    color: var(--gray-600);
+    font-size: var(--text-sm);
+    margin: 0;
+}
+
+.recordHours {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-1);
+}
+
+.hoursNumber {
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    color: var(--primary-600);
+}
+
+.hoursLabel {
+    font-size: var(--text-xs);
+    color: var(--gray-500);
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.ethicsBadge {
+    margin-top: var(--space-1);
+}
+
+.emptyState {
+    text-align: center;
+    padding: var(--space-12);
+}
+
+.emptyIcon {
+    font-size: var(--text-4xl);
+    margin-bottom: var(--space-4);
+    opacity: 0.6;
+}
+
+@media (max-width: 768px) {
+    .headerContent {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .complianceGrid {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    }
+
+    .recordItem {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-3);
+    }
+}

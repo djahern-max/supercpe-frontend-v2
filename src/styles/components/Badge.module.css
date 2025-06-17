@@ -1,0 +1,35 @@
+/* src/styles/components/Badge.module.css */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-xl);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    line-height: 1;
+}
+
+.success {
+    background: var(--success-50);
+    color: var(--success-700);
+}
+
+.warning {
+    background: var(--warning-50);
+    color: var(--warning-700);
+}
+
+.error {
+    background: var(--error-50);
+    color: var(--error-700);
+}
+
+.info {
+    background: var(--primary-50);
+    color: var(--primary-700);
+}
+
+.neutral {
+    background: var(--gray-100);
+    color: var(--gray-700);
+}
