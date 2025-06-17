@@ -1,7 +1,7 @@
 // src/services/api.js
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://nh.supercpe.com';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
 const apiClient = axios.create({
     baseURL: API_BASE_URL,
@@ -38,12 +38,23 @@ apiClient.interceptors.response.use(
             throw new Error('Request timeout. Please check your connection.');
         }
 
-        throw new Error(error.response?.data?.detail || error.message || 'An error occurred');
+        throw error;
     }
 );
 
 export const apiService = {
-    // CPA endpoints
+    // Health Check
+    async healthCheck() {
+        const response = await apiClient.get('/health');
+        return response.data;
+    },
+
+    // CPA Management
+    async getAllCPAs(skip = 0, limit = 100) {
+        const response = await apiClient.get(`/api/cpas/?skip=${skip}&limit=${limit}`);
+        return response.data;
+    },
+
     async getCPA(licenseNumber) {
         const response = await apiClient.get(`/api/cpas/${licenseNumber}`);
         return response.data;
@@ -54,16 +65,39 @@ export const apiService = {
         return response.data;
     },
 
-    // Compliance endpoints
+    async searchCPAs(query, limit = 10) {
+        const response = await apiClient.get(`/api/cpas/search?q=${encodeURIComponent(query)}&limit=${limit}`);
+        return response.data;
+    },
+
+    // Compliance Management
     async getCompliance(licenseNumber) {
         const response = await apiClient.get(`/api/compliance/${licenseNumber}`);
         return response.data;
     },
 
-    // Certificate analysis (FREE tier)
-    async analyzeCertificate(licenseNumber, file) {
+    async getTimeWindows(licenseNumber) {
+        const response = await apiClient.get(`/api/time-windows/${licenseNumber}`);
+        return response.data;
+    },
+
+    // File Uploads & AI Analysis
+    async uploadCPAList(file) {
         const formData = new FormData();
         formData.append('file', file);
+
+        const response = await apiClient.post('/api/admin/upload-cpa-list', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        return response.data;
+    },
+
+    async analyzeCertificate(licenseNumber, file, parseWithAI = true) {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('parse_with_ai', parseWithAI);
 
         const response = await apiClient.post(
             `/api/admin/analyze-certificate/${licenseNumber}`,
@@ -72,43 +106,46 @@ export const apiService = {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
-                timeout: 60000, // 60 seconds for AI analysis
             }
         );
         return response.data;
     },
 
-    // Save certificate (PREMIUM tier)
-    async saveReviewedCertificate(licenseNumber, file, reviewData) {
-        const formData = new FormData();
-        formData.append('file', file);
-
-        // Add all review data to form
-        Object.keys(reviewData).forEach(key => {
-            formData.append(key, reviewData[key]);
-        });
-
+    async saveReviewedCertificate(licenseNumber, certificateData) {
         const response = await apiClient.post(
             `/api/admin/save-reviewed-certificate/${licenseNumber}`,
-            formData,
-            {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            }
+            certificateData
         );
         return response.data;
     },
 
-    // CPE records (PREMIUM tier)
+    // Premium Features - CPE Records
     async getCPERecords(licenseNumber) {
-        const response = await apiClient.get(`/api/admin/cpe-records/${licenseNumber}`);
+        const response = await apiClient.get(`/api/cpe-records/${licenseNumber}`);
         return response.data;
     },
 
-    // Payments & subscriptions
+    async deleteCPERecord(licenseNumber, recordId) {
+        const response = await apiClient.delete(`/api/cpe-records/${licenseNumber}/${recordId}`);
+        return response.data;
+    },
+
+    // Subscription & Payment Management
     async getSubscriptionStatus(licenseNumber) {
         const response = await apiClient.get(`/api/payments/subscription-status/${licenseNumber}`);
+        return response.data;
+    },
+
+    async createSubscription(licenseNumber, paymentMethodId) {
+        const response = await apiClient.post('/api/payments/create-subscription', {
+            license_number: licenseNumber,
+            payment_method_id: paymentMethodId
+        });
+        return response.data;
+    },
+
+    async cancelSubscription(licenseNumber) {
+        const response = await apiClient.post(`/api/payments/cancel-subscription/${licenseNumber}`);
         return response.data;
     },
 
@@ -117,16 +154,22 @@ export const apiService = {
         return response.data;
     },
 
-    async createPaymentIntent(paymentData) {
-        const response = await apiClient.post('/api/payments/create-payment-intent', paymentData);
-        return response.data;
-    },
-
-    // Health check
-    async healthCheck() {
-        const response = await apiClient.get('/health');
-        return response.data;
-    },
+    // Testing helpers
+    async testConnection() {
+        try {
+            const response = await apiClient.get('/');
+            return {
+                success: true,
+                message: response.data.message || 'API connected successfully',
+                version: response.data.version
+            };
+        } catch (error) {
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    }
 };
 
 export default apiService;

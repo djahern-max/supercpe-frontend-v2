@@ -102,6 +102,13 @@
     text-align: right;
 }
 
+.changeItem {
+    color: var(--gray-300);
+    margin-bottom: var(--space-2);
+    line-height: var(--leading-relaxed);
+}
+
+
 @media (max-width: 768px) {
     .footerContent {
         grid-template-columns: 1fr;
