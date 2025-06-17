@@ -7,7 +7,8 @@ import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import Upload from './pages/Upload';
 import Pricing from './pages/Pricing';
-import Admin from './pages/Admin';
+
+import Security from './pages/SecurityPage';
 import './styles/globals.css';
 
 function App() {
@@ -20,7 +21,9 @@ function App() {
                         <Route path="/dashboard/:licenseNumber" element={<Dashboard />} />
                         <Route path="/upload/:licenseNumber" element={<Upload />} />
                         <Route path="/pricing" element={<Pricing />} />
-                        <Route path="/admin" element={<Admin />} />
+
+                        <Route path="/security" element={<Security />} />
+                        {/* Add more routes as needed */}
                     </Routes>
                 </Layout>
                 <Toaster
