@@ -7,8 +7,9 @@ import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import Upload from './pages/Upload';
 import Pricing from './pages/Pricing';
-
 import Security from './pages/SecurityPage';
+import ComplianceDashboard from './components/dashboard/ComplianceDashboard';
+
 import './styles/globals.css';
 
 function App() {
@@ -23,7 +24,7 @@ function App() {
                         <Route path="/pricing" element={<Pricing />} />
 
                         <Route path="/security" element={<Security />} />
-                        {/* Add more routes as needed */}
+                        <Route path="/compliance/:licenseNumber" element={<ComplianceDashboard />} />
                     </Routes>
                 </Layout>
                 <Toaster

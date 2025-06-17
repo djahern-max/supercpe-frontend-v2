@@ -49,6 +49,23 @@ export const apiService = {
         return response.data;
     },
 
+    // Test Connection
+    async testConnection() {
+        try {
+            const response = await apiClient.get('/health');
+            return {
+                success: true,
+                status: response.data.status,
+                version: '2.0.0'
+            };
+        } catch (error) {
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    },
+
     // CPA Management
     async getAllCPAs(skip = 0, limit = 100) {
         const response = await apiClient.get(`/api/cpas/?skip=${skip}&limit=${limit}`);
@@ -70,12 +87,40 @@ export const apiService = {
         return response.data;
     },
 
-    // Compliance Management
+    // Basic Compliance Management (existing)
     async getCompliance(licenseNumber) {
         const response = await apiClient.get(`/api/compliance/${licenseNumber}`);
         return response.data;
     },
 
+    // ===== NEW ENHANCED COMPLIANCE METHODS =====
+
+    /**
+     * Get the comprehensive enhanced compliance dashboard
+     * This is the main endpoint for the personalized dashboard
+     */
+    async getEnhancedCompliance(licenseNumber) {
+        const response = await apiClient.get(`/api/compliance/${licenseNumber}/dashboard`);
+        return response.data;
+    },
+
+    /**
+     * Get quick compliance status (for overview cards)
+     */
+    async getQuickComplianceStatus(licenseNumber) {
+        const response = await apiClient.get(`/api/compliance/${licenseNumber}/quick-status`);
+        return response.data;
+    },
+
+    /**
+     * Get detailed NH compliance rules explanation
+     */
+    async getComplianceRulesExplanation(licenseNumber) {
+        const response = await apiClient.get(`/api/compliance/${licenseNumber}/rules/explanation`);
+        return response.data;
+    },
+
+    // Time Windows (existing)
     async getTimeWindows(licenseNumber) {
         const response = await apiClient.get(`/api/time-windows/${licenseNumber}`);
         return response.data;
@@ -87,11 +132,13 @@ export const apiService = {
     },
 
     async analyzeTimeWindow(licenseNumber, timeWindow) {
-        const response = await apiClient.post(`/api/time-windows/${licenseNumber}/analyze`, timeWindow);
+        const response = await apiClient.post(`/api/time-windows/${licenseNumber}/analyze`, {
+            time_window: timeWindow
+        });
         return response.data;
     },
 
-    // File Uploads & AI Analysis
+    // Admin and Upload functionality
     async uploadCPAList(file) {
         const formData = new FormData();
         formData.append('file', file);
@@ -104,10 +151,10 @@ export const apiService = {
         return response.data;
     },
 
-    async analyzeCertificate(licenseNumber, file, parseWithAI = true) {
+    // Certificate Analysis (AI functionality)
+    async analyzeCertificate(licenseNumber, file) {
         const formData = new FormData();
         formData.append('file', file);
-        formData.append('parse_with_ai', parseWithAI);
 
         const response = await apiClient.post(
             `/api/admin/analyze-certificate/${licenseNumber}`,
@@ -129,57 +176,21 @@ export const apiService = {
         return response.data;
     },
 
-    // Premium Features - CPE Records
-    async getCPERecords(licenseNumber) {
-        const response = await apiClient.get(`/api/cpe-records/${licenseNumber}`);
-        return response.data;
-    },
-
-    async deleteCPERecord(licenseNumber, recordId) {
-        const response = await apiClient.delete(`/api/cpe-records/${licenseNumber}/${recordId}`);
-        return response.data;
-    },
-
-    // Subscription & Payment Management
+    // Payment and Subscription
     async getSubscriptionStatus(licenseNumber) {
         const response = await apiClient.get(`/api/payments/subscription-status/${licenseNumber}`);
         return response.data;
     },
 
-    async createSubscription(licenseNumber, paymentMethodId) {
-        const response = await apiClient.post('/api/payments/create-subscription', {
-            license_number: licenseNumber,
-            payment_method_id: paymentMethodId
+    async createPaymentIntent(licenseNumber) {
+        const response = await apiClient.post(`/api/payments/create-payment-intent/${licenseNumber}`);
+        return response.data;
+    },
+
+    async confirmPayment(licenseNumber, paymentIntentId) {
+        const response = await apiClient.post(`/api/payments/confirm-payment/${licenseNumber}`, {
+            payment_intent_id: paymentIntentId
         });
         return response.data;
-    },
-
-    async cancelSubscription(licenseNumber) {
-        const response = await apiClient.post(`/api/payments/cancel-subscription/${licenseNumber}`);
-        return response.data;
-    },
-
-    async getPricingPlans() {
-        const response = await apiClient.get('/api/payments/pricing');
-        return response.data;
-    },
-
-    // Testing helpers
-    async testConnection() {
-        try {
-            const response = await apiClient.get('/');
-            return {
-                success: true,
-                message: response.data.message || 'API connected successfully',
-                version: response.data.version
-            };
-        } catch (error) {
-            return {
-                success: false,
-                error: error.message
-            };
-        }
     }
 };
-
-export default apiService;
