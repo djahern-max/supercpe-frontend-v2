@@ -4,43 +4,10 @@ import { Upload, FileText, BarChart3, Clock, AlertTriangle, CheckCircle, Eye, Do
 import styles from '../../styles/components/ProfessionalCPEDashboard.module.css';
 
 const ProfessionalCPEDashboard = ({ licenseNumber }) => {
-    // Mock data based on your actual API response
-    const [dashboardData, setDashboardData] = useState({
-        cpa: { license_number: '07308', name: 'Daniel Joseph Ahern' },
-        compliance_summary: {
-            total_cpe_hours: 26.0,
-            total_ethics_hours: 0.0,
-            total_certificates: 2,
-            progress_percentage: 21.67
-        },
-        upload_status: {
-            free_uploads_used: 2,
-            free_uploads_remaining: 8,
-            premium_uploads: 0,
-            total_storage_used: 2
-        },
-        certificates: [
-            {
-                id: 2,
-                course_title: 'Understanding the Economy',
-                provider: 'MasterCPE® Professional Online',
-                cpe_credits: 8.0,
-                completion_date: '2025-06-06',
-                storage_tier: 'free',
-                confidence: 0.875
-            },
-            {
-                id: 1,
-                course_title: 'Dealing with Debt and Interest',
-                provider: 'MasterCPE® Professional Online',
-                cpe_credits: 18.0,
-                completion_date: '2025-06-02',
-                storage_tier: 'free',
-                confidence: 0.875
-            }
-        ]
-    });
-
+    // REAL STATE - NO MOCK DATA
+    const [dashboardData, setDashboardData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [uploading, setUploading] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState([]);
 
@@ -53,14 +20,56 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
 
     const loadDashboardData = async (license) => {
         try {
+            setLoading(true);
+            setError(null);
             // Import your API service
             const { apiService } = await import('../../services/api');
             const response = await apiService.getComplianceDashboard(license);
             setDashboardData(response);
+            console.log('Dashboard data loaded:', response);
         } catch (error) {
             console.error('Failed to load dashboard data:', error);
+            setError('Failed to load dashboard data. Please try again.');
+        } finally {
+            setLoading(false);
         }
     };
+
+    // Show loading state
+    if (loading) {
+        return (
+            <div className={styles.dashboard}>
+                <div className={styles.container}>
+                    <div className={styles.loadingState}>
+                        <div className={styles.spinner}></div>
+                        <h2>Loading your CPE compliance dashboard...</h2>
+                        <p>Retrieving your certificates and compliance status</p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // Show error state
+    if (error || !dashboardData) {
+        return (
+            <div className={styles.dashboard}>
+                <div className={styles.container}>
+                    <div className={styles.errorState}>
+                        <AlertTriangle className={styles.errorIcon} />
+                        <h2>Unable to Load Dashboard</h2>
+                        <p>{error || 'No dashboard data available'}</p>
+                        <button
+                            className={styles.retryButton}
+                            onClick={() => loadDashboardData(licenseNumber)}
+                        >
+                            Try Again
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     // Calculate compliance status
     const getComplianceStatus = () => {
@@ -82,49 +91,37 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
             const { apiService } = await import('../../services/api');
 
             for (const file of files) {
+                console.log('Uploading file:', file.name);
                 const result = await apiService.uploadCertificateEnhancedFree(licenseNumber, file);
-
-                // Add the new certificate to dashboard data
-                const newCertificate = {
-                    id: result.compliance_tracking?.database_record_id || Date.now(),
-                    course_title: result.parsing_result?.parsed_data?.course_title?.value || 'Unknown Course',
-                    provider: result.parsing_result?.parsed_data?.provider?.value || 'Unknown Provider',
-                    cpe_credits: result.compliance_tracking?.cpe_hours_added || 0,
-                    completion_date: result.parsing_result?.parsed_data?.completion_date?.value || new Date().toISOString().split('T')[0],
-                    storage_tier: 'free',
-                    confidence: result.parsing_result?.confidence_score || 0
-                };
-
-                setDashboardData(prev => ({
-                    ...prev,
-                    compliance_summary: {
-                        ...prev.compliance_summary,
-                        total_cpe_hours: prev.compliance_summary.total_cpe_hours + newCertificate.cpe_credits,
-                        total_certificates: prev.total_certificates + 1,
-                        progress_percentage: ((prev.compliance_summary.total_cpe_hours + newCertificate.cpe_credits) / 120) * 100
-                    },
-                    upload_status: {
-                        ...prev.upload_status,
-                        free_uploads_used: result.free_tier_status?.uploads_used || prev.upload_status.free_uploads_used + 1,
-                        free_uploads_remaining: result.free_tier_status?.remaining_uploads || prev.upload_status.free_uploads_remaining - 1,
-                        total_storage_used: prev.upload_status.total_storage_used + 1
-                    },
-                    certificates: [newCertificate, ...prev.certificates]
-                }));
+                console.log('Upload result:', result);
             }
+
+            // Reload dashboard data to get updated information
+            await loadDashboardData(licenseNumber);
+
+            console.log('Dashboard refreshed after upload');
 
         } catch (error) {
             console.error('Upload failed:', error);
-            // Handle error appropriately - maybe show a toast notification
+            setError('Failed to upload certificate. Please try again.');
         } finally {
             setUploading(false);
             setSelectedFiles([]);
         }
     };
 
-    const handleExportAudit = () => {
-        // TODO: Implement audit export functionality
-        console.log('Exporting audit report...');
+    const handleExportAudit = async () => {
+        try {
+            const { apiService } = await import('../../services/api');
+            const result = await apiService.generateAuditPresentation(licenseNumber, {
+                format: 'pdf',
+                style: 'professional'
+            });
+            console.log('Audit export:', result);
+            // Handle download/export logic here
+        } catch (error) {
+            console.error('Export failed:', error);
+        }
     };
 
     const ProgressBar = ({ percentage, label, current, total, colorClass = styles.progressBlue }) => {
@@ -142,6 +139,13 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
                 </div>
             </div>
         );
+    };
+
+    // Calculate average confidence for processing quality
+    const calculateAverageConfidence = () => {
+        if (!dashboardData.certificates || dashboardData.certificates.length === 0) return 0;
+        const total = dashboardData.certificates.reduce((sum, cert) => sum + (cert.confidence || 0), 0);
+        return (total / dashboardData.certificates.length) * 100;
     };
 
     return (
@@ -257,7 +261,7 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
                             <div className={styles.statusContent}>
                                 <div className={styles.statusRow}>
                                     <span className={styles.statusLabel}>AI Accuracy</span>
-                                    <span className={styles.statusValue}>87.5%</span>
+                                    <span className={styles.statusValue}>{Math.round(calculateAverageConfidence())}%</span>
                                 </div>
                                 <div className={styles.statusRow}>
                                     <span className={styles.statusLabel}>Documents Processed</span>
@@ -277,7 +281,7 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
                     <div className={styles.sectionHeader}>
                         <h3 className={styles.sectionTitle}>Upload CPE Certificates</h3>
                         <div className={styles.uploadNote}>
-                            Supported formats: PDF, PNG, JPG
+                            Supported formats: PDF, PNG, JPG • {dashboardData.upload_status.free_uploads_remaining} uploads remaining
                         </div>
                     </div>
 
@@ -331,66 +335,77 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
                 </div>
 
                 {/* Certificates Table */}
-                <div className={styles.certificatesSection}>
-                    <div className={styles.tableHeader}>
-                        <div className={styles.sectionHeader}>
-                            <h3 className={styles.sectionTitle}>CPE Certificate Records</h3>
-                            <button className={styles.exportButton} onClick={handleExportAudit}>
-                                <Download className={styles.buttonIcon} />
-                                Export for Audit
-                            </button>
+                {dashboardData.certificates && dashboardData.certificates.length > 0 && (
+                    <div className={styles.certificatesSection}>
+                        <div className={styles.tableHeader}>
+                            <div className={styles.sectionHeader}>
+                                <h3 className={styles.sectionTitle}>CPE Certificate Records ({dashboardData.certificates.length})</h3>
+                                <button className={styles.exportButton} onClick={handleExportAudit}>
+                                    <Download className={styles.buttonIcon} />
+                                    Export for Audit
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className={styles.tableContainer}>
+                            <table className={styles.certificatesTable}>
+                                <thead className={styles.tableHead}>
+                                    <tr>
+                                        <th className={styles.tableHeader}>Course Information</th>
+                                        <th className={styles.tableHeader}>Provider</th>
+                                        <th className={styles.tableHeader}>CPE Credits</th>
+                                        <th className={styles.tableHeader}>Completion Date</th>
+                                        <th className={styles.tableHeader}>Status</th>
+                                        <th className={styles.tableHeader}>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody className={styles.tableBody}>
+                                    {dashboardData.certificates.map((cert) => (
+                                        <tr key={cert.id} className={styles.tableRow}>
+                                            <td className={styles.tableCell}>
+                                                <div>
+                                                    <div className={styles.certTitle}>{cert.course_title}</div>
+                                                    <div className={styles.certId}>ID: {cert.id}</div>
+                                                </div>
+                                            </td>
+                                            <td className={styles.tableCell}>
+                                                <div className={styles.providerName}>{cert.provider}</div>
+                                            </td>
+                                            <td className={styles.tableCell}>
+                                                <div className={styles.creditValue}>{cert.cpe_credits}</div>
+                                            </td>
+                                            <td className={styles.tableCell}>
+                                                <div className={styles.dateValue}>{cert.completion_date}</div>
+                                            </td>
+                                            <td className={styles.tableCell}>
+                                                <div className={styles.statusContainer}>
+                                                    <span className={styles.verifiedBadge}>Verified</span>
+                                                    <span className={styles.confidenceText}>
+                                                        {Math.round((cert.confidence || 0) * 100)}% confidence
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td className={styles.tableCell}>
+                                                <button className={styles.actionButton}>
+                                                    <Eye className={styles.actionIcon} />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
+                )}
 
-                    <div className={styles.tableContainer}>
-                        <table className={styles.certificatesTable}>
-                            <thead className={styles.tableHead}>
-                                <tr>
-                                    <th className={styles.tableHeader}>Course Information</th>
-                                    <th className={styles.tableHeader}>Provider</th>
-                                    <th className={styles.tableHeader}>CPE Credits</th>
-                                    <th className={styles.tableHeader}>Completion Date</th>
-                                    <th className={styles.tableHeader}>Status</th>
-                                    <th className={styles.tableHeader}>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody className={styles.tableBody}>
-                                {dashboardData.certificates.map((cert) => (
-                                    <tr key={cert.id} className={styles.tableRow}>
-                                        <td className={styles.tableCell}>
-                                            <div>
-                                                <div className={styles.certTitle}>{cert.course_title}</div>
-                                                <div className={styles.certId}>ID: {cert.id}</div>
-                                            </div>
-                                        </td>
-                                        <td className={styles.tableCell}>
-                                            <div className={styles.providerName}>{cert.provider}</div>
-                                        </td>
-                                        <td className={styles.tableCell}>
-                                            <div className={styles.creditValue}>{cert.cpe_credits}</div>
-                                        </td>
-                                        <td className={styles.tableCell}>
-                                            <div className={styles.dateValue}>{cert.completion_date}</div>
-                                        </td>
-                                        <td className={styles.tableCell}>
-                                            <div className={styles.statusContainer}>
-                                                <span className={styles.verifiedBadge}>Verified</span>
-                                                <span className={styles.confidenceText}>
-                                                    {Math.round(cert.confidence * 100)}% confidence
-                                                </span>
-                                            </div>
-                                        </td>
-                                        <td className={styles.tableCell}>
-                                            <button className={styles.actionButton}>
-                                                <Eye className={styles.actionIcon} />
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                {/* No Certificates State */}
+                {dashboardData.certificates && dashboardData.certificates.length === 0 && (
+                    <div className={styles.emptyCertificates}>
+                        <FileText className={styles.emptyIcon} />
+                        <h3>No certificates uploaded yet</h3>
+                        <p>Upload your first CPE certificate to start tracking your compliance progress.</p>
                     </div>
-                </div>
+                )}
 
                 {/* Professional Upgrade Notice */}
                 {dashboardData.upload_status.free_uploads_remaining <= 3 && (
