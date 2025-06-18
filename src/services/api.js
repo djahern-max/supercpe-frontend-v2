@@ -346,5 +346,18 @@ export const apiService = {
         }
     },
 
+    createAccountForPayment: async (accountData) => {
+        try {
+            const response = await axios.post(
+                `/api/payments/create-account-for-payment`,
+                accountData
+            );
+            return response.data;
+        } catch (error) {
+            console.error('Error creating account for payment:', error);
+            throw error;
+        }
+    },
+
 
 };
