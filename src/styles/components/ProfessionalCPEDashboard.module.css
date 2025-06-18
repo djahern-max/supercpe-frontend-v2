@@ -1,0 +1,715 @@
+/* src/styles/components/ProfessionalCPEDashboard.module.css */
+
+.dashboard {
+    min-height: 100vh;
+    background-color: #f9fafb;
+    padding: 1.5rem;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Header */
+.header {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+    padding: 1.5rem;
+}
+
+.headerContent {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+}
+
+.cpeName {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #374151;
+    margin-top: 0.25rem;
+}
+
+.licenseInfo {
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+.headerStatus {
+    text-align: right;
+}
+
+.statusBadge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border: 1px solid;
+}
+
+.statusCompliant {
+    background-color: #f0fdf4;
+    color: #166534;
+    border-color: #bbf7d0;
+}
+
+.statusOnTrack {
+    background-color: #eff6ff;
+    color: #1e40af;
+    border-color: #bfdbfe;
+}
+
+.statusAttention {
+    background-color: #fffbeb;
+    color: #b45309;
+    border-color: #fde68a;
+}
+
+.statusRequired {
+    background-color: #fef2f2;
+    color: #b91c1c;
+    border-color: #fecaca;
+}
+
+.hoursDisplay {
+    margin-top: 0.5rem;
+}
+
+.hoursNumber {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #111827;
+}
+
+.hoursLabel {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+/* Compliance Grid */
+.complianceGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+    .complianceGrid {
+        grid-template-columns: 2fr 1fr;
+    }
+}
+
+.progressSection {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+    padding: 1.5rem;
+}
+
+.statusSidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.statusCard {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+    padding: 1.5rem;
+}
+
+.sectionHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.sectionTitle {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+}
+
+.sectionIcon {
+    width: 1.25rem;
+    height: 1.25rem;
+    color: #6b7280;
+}
+
+/* Progress Bars */
+.progressList {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.progressContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.progressHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.progressLabel {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+}
+
+.progressValue {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.progressTrack {
+    width: 100%;
+    background-color: #e5e7eb;
+    border-radius: 0.125rem;
+    height: 0.5rem;
+}
+
+.progressFill {
+    height: 0.5rem;
+    border-radius: 0.125rem;
+    transition: width 0.7s ease-out;
+}
+
+.progressBlue {
+    background-color: #2563eb;
+}
+
+.progressGreen {
+    background-color: #059669;
+}
+
+.progressGray {
+    background-color: #374151;
+}
+
+/* Annual Requirements */
+.annualRequirements {
+    padding-top: 1rem;
+    border-top: 1px solid #f3f4f6;
+}
+
+.annualTitle {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    margin: 0 0 0.75rem 0;
+}
+
+.yearGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    text-align: center;
+}
+
+.yearCard {
+    padding: 0.75rem;
+    background-color: #f9fafb;
+    border-radius: 0.375rem;
+}
+
+.yearHours {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.yearLabel {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.yearStatus {
+    font-size: 0.75rem;
+    color: #dc2626;
+    margin-top: 0.25rem;
+}
+
+/* Status Content */
+.statusContent {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.statusRow {
+    display: flex;
+    justify-content: space-between;
+}
+
+.statusLabel {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.statusValue {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.statusNote {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+/* Upload Section */
+.uploadSection {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+    padding: 1.5rem;
+}
+
+.uploadNote {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.uploadZone {
+    border: 2px dashed #d1d5db;
+    border-radius: 0.5rem;
+    padding: 2rem;
+    text-align: center;
+    background-color: #f9fafb;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.uploadZone:hover {
+    background-color: #f3f4f6;
+    border-color: #9ca3af;
+}
+
+.fileInput {
+    display: none;
+}
+
+.uploadContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.uploadIcon {
+    width: 2rem;
+    height: 2rem;
+    color: #9ca3af;
+}
+
+.uploadText {
+    text-align: center;
+}
+
+.uploadTitle {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 0 0 0.5rem 0;
+}
+
+.uploadDescription {
+    color: #6b7280;
+    margin: 0;
+}
+
+.uploadButton {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background-color: #374151;
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 0.375rem;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.uploadButton:hover {
+    background-color: #1f2937;
+}
+
+/* Upload Processing */
+.uploadProcessing {
+    border: 2px dashed #d1d5db;
+    border-radius: 0.5rem;
+    padding: 2rem;
+    text-align: center;
+    background-color: #f9fafb;
+}
+
+.spinner {
+    width: 2rem;
+    height: 2rem;
+    border: 2px solid #e5e7eb;
+    border-top: 2px solid #374151;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.processingTitle {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 0 0 0.5rem 0;
+}
+
+.processingText {
+    color: #6b7280;
+    margin: 0 0 1rem 0;
+}
+
+.processingSteps {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.processingStep {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.stepIndicator {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background-color: #e5e7eb;
+}
+
+.stepActive {
+    background-color: #059669;
+}
+
+/* Certificates Table */
+.certificatesSection {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+}
+
+.tableHeader {
+    padding: 1.5rem 1.5rem 1rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.exportButton {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background-color: #374151;
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 0.375rem;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.exportButton:hover {
+    background-color: #1f2937;
+}
+
+.buttonIcon {
+    width: 1rem;
+    height: 1rem;
+    margin-right: 0.5rem;
+}
+
+.tableContainer {
+    overflow-x: auto;
+}
+
+.certificatesTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tableHead {
+    background-color: #f9fafb;
+}
+
+.tableHeader {
+    padding: 0.75rem 1.5rem;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.tableBody {
+    background-color: white;
+}
+
+.tableRow {
+    transition: background-color 0.2s ease;
+}
+
+.tableRow:hover {
+    background-color: #f9fafb;
+}
+
+.tableCell {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.certTitle {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #111827;
+}
+
+.certId {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.providerName {
+    font-size: 0.875rem;
+    color: #111827;
+}
+
+.creditValue {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.dateValue {
+    font-size: 0.875rem;
+    color: #111827;
+}
+
+.statusContainer {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.verifiedBadge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.125rem 0.625rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    background-color: #f0fdf4;
+    color: #166534;
+}
+
+.confidenceText {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.actionButton {
+    color: #9ca3af;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem;
+    transition: color 0.2s ease;
+}
+
+.actionButton:hover {
+    color: #6b7280;
+}
+
+.actionIcon {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Professional Upgrade Notice */
+.upgradeNotice {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+    padding: 1.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.upgradeIcon {
+    flex-shrink: 0;
+}
+
+.checkIcon {
+    width: 1.5rem;
+    height: 1.5rem;
+    color: #059669;
+}
+
+.upgradeContent {
+    flex: 1;
+}
+
+.upgradeTitle {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 0 0 0.25rem 0;
+}
+
+.upgradeDescription {
+    color: #6b7280;
+    margin: 0 0 1rem 0;
+}
+
+.upgradeFeatures {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.upgradeAction {
+    margin-top: 1rem;
+}
+
+.upgradeButton {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background-color: #2563eb;
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 0.375rem;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.upgradeButton:hover {
+    background-color: #1d4ed8;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .dashboard {
+        padding: 1rem;
+    }
+
+    .container {
+        gap: 1rem;
+    }
+
+    .headerContent {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .headerStatus {
+        text-align: left;
+    }
+
+    .yearGrid {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+
+    .processingSteps {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .upgradeFeatures {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .tableContainer {
+        font-size: 0.875rem;
+    }
+
+    .tableHeader,
+    .tableCell {
+        padding: 0.5rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .title {
+        font-size: 1.25rem;
+    }
+
+    .cpeName {
+        font-size: 1rem;
+    }
+
+    .uploadContent {
+        gap: 0.75rem;
+    }
+
+    .uploadIcon {
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+
+    .uploadTitle {
+        font-size: 1rem;
+    }
+}

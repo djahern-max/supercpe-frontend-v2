@@ -195,9 +195,6 @@ export const apiService = {
     },
 
 
-    // Add these methods to your existing src/services/api.js file
-
-    // ===== NEW COMPLIANCE METHODS =====
 
     /**
      * Analyze a certificate with AI (FREE tier)
@@ -280,4 +277,56 @@ export const apiService = {
         const response = await apiClient.get(`/api/time-windows/${licenseNumber}/current-period`);
         return response.data;
     },
+    /**
+ * Upload certificate with ENHANCED FREE functionality
+ * Includes: AI Analysis + Digital Ocean Storage + Database Records + Compliance Tracking
+ */
+    async uploadCertificateEnhancedFree(licenseNumber, file) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await apiClient.post(
+            `/api/upload/upload-certificate-free/${licenseNumber}`,
+            formData,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+                timeout: 90000, // 90 seconds for full processing (AI + upload + DB)
+            }
+        );
+        return response.data;
+    },
+
+    /**
+     * Get free tier upload status and remaining uploads
+     */
+    async getFreeTierStatus(licenseNumber) {
+        const response = await apiClient.get(`/api/upload/free-tier-status/${licenseNumber}`);
+        return response.data;
+    },
+
+    /**
+     * Generate audit presentation (works for both free and premium)
+     */
+    async generateAuditPresentation(licenseNumber, options = {}) {
+        const response = await apiClient.post(`/api/compliance/generate-audit-presentation/${licenseNumber}`, {
+            include_free_tier: true,
+            include_premium: true,
+            format: options.format || 'pdf',
+            style: options.style || 'professional'
+        });
+        return response.data;
+    },
+
+    /**
+ * Get compliance dashboard data (no auth required)
+ * This calls the endpoint you successfully tested with CURL
+ */
+    async getComplianceDashboard(licenseNumber) {
+        const response = await apiClient.get(`/api/upload/compliance-dashboard/${licenseNumber}`);
+        return response.data;
+    },
+
+
 };
