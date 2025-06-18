@@ -199,11 +199,11 @@ const BasicDashboardView = ({ cpa, licenseNumber }) => {
                 </p>
             </div>
 
-            {/* Upload Action - Simple */}
+            {/* Upload Action - This should work now */}
             <div className={styles.uploadSection}>
                 <Button
                     as={Link}
-                    to={`/upload/${licenseNumber}`}
+                    to={`/compliance/${licenseNumber}`}
                     variant="primary"
                     size="lg"
                 >
@@ -211,13 +211,10 @@ const BasicDashboardView = ({ cpa, licenseNumber }) => {
                 </Button>
             </div>
 
-            {/* Current Status Card */}
             <Card className={styles.statusCard}>
                 <div className={styles.statusHeader}>
-                    <h3>Your Current Compliance Status</h3>
-                    <Badge variant={isExpiringVerySoon ? 'critical' : isExpiringSoon ? 'warning' : 'success'}>
-                        {isExpiringVerySoon ? 'URGENT' : isExpiringSoon ? 'ACTION NEEDED' : 'ON TRACK'}
-                    </Badge>
+                    <h3>Your License Status</h3>
+                    {/* Badge removed - this is just license renewal info */}
                 </div>
 
                 <div className={styles.periodInfo}>
@@ -239,6 +236,14 @@ const BasicDashboardView = ({ cpa, licenseNumber }) => {
                             </span>
                         </div>
                     </div>
+
+                    {/* Add renewal reminder if needed */}
+                    {isExpiringSoon && (
+                        <div className={styles.renewalReminder}>
+                            <p>💡 <strong>Renewal Reminder:</strong> Your license expires in {daysRemaining} days.
+                                Remember to pay your renewal fee to the NH Board of Accountancy.</p>
+                        </div>
+                    )}
                 </div>
             </Card>
 

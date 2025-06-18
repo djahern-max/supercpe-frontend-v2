@@ -1,0 +1,161 @@
+/* src/styles/pages/ComplianceDashboard.module.css */
+
+.complianceDashboard {
+    padding: var(--space-4) 0;
+    /* Reduced from var(--space-8) */
+    min-height: 100vh;
+    background: var(--gray-50);
+}
+
+/* Header Section */
+.complianceHeader {
+    margin-bottom: var(--space-4);
+    /* Reduced from var(--space-8) */
+}
+
+.breadcrumb {
+    margin-bottom: var(--space-4);
+}
+
+.backLink {
+    color: var(--primary-600);
+    text-decoration: none;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    transition: color var(--transition-fast);
+}
+
+.backLink:hover {
+    color: var(--primary-700);
+}
+
+.headerContent h1 {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--gray-900);
+    margin: 0 0 var(--space-2) 0;
+}
+
+.cpaInfo h2 {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--primary-600);
+    margin: 0 0 var(--space-1) 0;
+}
+
+.cpaInfo p {
+    font-size: var(--text-base);
+    color: var(--gray-600);
+    margin: 0;
+}
+
+/* Dashboard Content */
+.dashboardContent {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    /* Reduced from var(--space-8) */
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Getting Started Card */
+.gettingStartedCard {
+    background: linear-gradient(135deg, var(--primary-50) 0%, white 100%);
+    border-left: 4px solid var(--primary-600);
+}
+
+.gettingStartedCard h3 {
+    color: var(--gray-900);
+    margin-bottom: var(--space-4);
+}
+
+.gettingStartedCard ul {
+    margin: var(--space-4) 0;
+    padding-left: var(--space-6);
+}
+
+.gettingStartedCard li {
+    margin-bottom: var(--space-2);
+    color: var(--gray-700);
+}
+
+/* Loading State */
+.loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    text-align: center;
+}
+
+.loading p {
+    margin-top: 1rem;
+    color: var(--gray-600);
+    font-size: var(--text-lg);
+}
+
+/* Error State */
+.error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-16);
+    text-align: center;
+    background: white;
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-200);
+    margin: 2rem auto;
+    max-width: 600px;
+}
+
+.error h2 {
+    color: var(--red-600);
+    margin-bottom: var(--space-4);
+    font-size: var(--text-2xl);
+    font-weight: 600;
+}
+
+.error p {
+    color: var(--gray-600);
+    margin-bottom: var(--space-6);
+    line-height: var(--leading-relaxed);
+}
+
+.errorActions {
+    display: flex;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .complianceDashboard {
+        padding: var(--space-2) 0;
+        /* Even more compact on mobile */
+    }
+
+    .dashboardContent {
+        gap: var(--space-4);
+        /* Reduced from var(--space-6) */
+        padding: 0 var(--space-4);
+    }
+
+    .headerContent h1 {
+        font-size: var(--text-2xl);
+    }
+
+    .errorActions {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .errorActions>* {
+        width: 100%;
+        max-width: 250px;
+    }
+}

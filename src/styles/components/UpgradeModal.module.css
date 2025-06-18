@@ -1,0 +1,298 @@
+/* src/styles/components/UpgradeModal.module.css */
+
+.modalBackdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: var(--space-4);
+}
+
+.modalContent {
+    background: white;
+    border-radius: var(--radius-2xl);
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: var(--space-8);
+    position: relative;
+    box-shadow: var(--shadow-xl);
+}
+
+/* Close Button */
+.closeButton {
+    position: absolute;
+    top: var(--space-4);
+    right: var(--space-4);
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: var(--gray-500);
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all var(--transition-fast);
+}
+
+.closeButton:hover {
+    background: var(--gray-100);
+    color: var(--gray-700);
+}
+
+/* Modal Header */
+.modalHeader {
+    text-align: center;
+    margin-bottom: var(--space-6);
+    padding-right: var(--space-8);
+    /* Account for close button */
+}
+
+.modalHeader h2 {
+    margin: 0 0 var(--space-2) 0;
+    color: var(--gray-900);
+    font-size: var(--text-2xl);
+    font-weight: 700;
+}
+
+.modalHeader p {
+    margin: 0;
+    color: var(--gray-600);
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+}
+
+/* Achievements */
+.achievements {
+    margin-bottom: var(--space-6);
+}
+
+.achievements h3 {
+    margin: 0 0 var(--space-4) 0;
+    color: var(--gray-900);
+    font-size: var(--text-xl);
+    font-weight: 600;
+}
+
+.achievementsList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.achievement {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    background: linear-gradient(135deg, var(--green-50) 0%, white 100%);
+    border-radius: var(--radius-md);
+    border-left: 4px solid var(--success-600);
+}
+
+.achievementIcon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+/* Upgrade Value */
+.upgradeValue {
+    margin-bottom: var(--space-6);
+}
+
+.upgradeValue h3 {
+    margin: 0 0 var(--space-4) 0;
+    color: var(--gray-900);
+    font-size: var(--text-xl);
+    font-weight: 600;
+    text-align: center;
+}
+
+.features {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.feature {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    background: linear-gradient(135deg, var(--blue-50) 0%, white 100%);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--gray-200);
+}
+
+.featureIcon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.feature div {
+    flex: 1;
+}
+
+.feature strong {
+    display: block;
+    color: var(--gray-900);
+    font-weight: 600;
+    margin-bottom: var(--space-1);
+}
+
+.feature p {
+    margin: 0;
+    color: var(--gray-600);
+    font-size: var(--text-sm);
+    line-height: var(--leading-relaxed);
+}
+
+/* Pricing */
+.pricing {
+    margin-bottom: var(--space-6);
+    display: flex;
+    justify-content: center;
+}
+
+.priceCard {
+    background: linear-gradient(135deg, var(--primary-50) 0%, white 100%);
+    border: 2px solid var(--primary-200);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    text-align: center;
+    min-width: 250px;
+}
+
+.priceHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-4);
+}
+
+.priceHeader h4 {
+    margin: 0;
+    color: var(--gray-900);
+    font-size: var(--text-lg);
+    font-weight: 600;
+}
+
+.price {
+    margin-bottom: var(--space-2);
+}
+
+.priceAmount {
+    font-size: var(--text-4xl);
+    font-weight: 700;
+    color: var(--primary-600);
+}
+
+.pricePeriod {
+    font-size: var(--text-lg);
+    color: var(--gray-600);
+    font-weight: 500;
+}
+
+.priceNote {
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+    margin: 0;
+}
+
+/* Modal Actions */
+.modalActions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-bottom: var(--space-6);
+}
+
+.upgradeButton {
+    width: 100%;
+    padding: var(--space-4) var(--space-6);
+    font-size: var(--text-lg);
+    font-weight: 600;
+}
+
+.continueButton {
+    width: 100%;
+}
+
+/* Trust Indicator */
+.trustIndicator {
+    text-align: center;
+    padding: var(--space-4);
+    background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--gray-200);
+}
+
+.trustIndicator p {
+    margin: 0;
+    font-style: italic;
+    color: var(--gray-600);
+    font-size: var(--text-sm);
+    line-height: var(--leading-relaxed);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .modalContent {
+        padding: var(--space-6);
+        margin: var(--space-4);
+        max-height: 95vh;
+    }
+
+    .modalHeader {
+        padding-right: var(--space-6);
+    }
+
+    .modalHeader h2 {
+        font-size: var(--text-xl);
+    }
+
+    .feature {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .featureIcon {
+        align-self: center;
+    }
+
+    .priceCard {
+        min-width: auto;
+        width: 100%;
+    }
+
+    .priceAmount {
+        font-size: var(--text-3xl);
+    }
+}
+
+@media (max-width: 480px) {
+    .modalContent {
+        padding: var(--space-4);
+        margin: var(--space-2);
+    }
+
+    .achievement {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .achievementIcon {
+        align-self: center;
+    }
+}

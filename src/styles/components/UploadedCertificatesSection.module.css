@@ -1,0 +1,274 @@
+/* src/styles/components/UploadedCertificatesSection.module.css */
+
+.uploadedCertificatesSection {
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-200);
+    padding: var(--space-8);
+    border-left: 4px solid var(--success-600);
+}
+
+/* Section Header */
+.sectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-6);
+}
+
+.sectionHeader h3 {
+    margin: 0;
+    color: var(--gray-900);
+    font-size: var(--text-xl);
+    font-weight: 600;
+}
+
+/* Certificates List */
+.certificatesList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    margin-bottom: var(--space-8);
+}
+
+/* Certificate Card */
+.certificateCard {
+    background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    padding: var(--space-6);
+    transition: box-shadow var(--transition-fast);
+}
+
+.certificateCard:hover {
+    box-shadow: var(--shadow-md);
+}
+
+/* Card Header */
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--space-4);
+}
+
+.fileInfo {
+    flex: 1;
+}
+
+.fileName {
+    margin: 0 0 var(--space-1) 0;
+    color: var(--gray-900);
+    font-size: var(--text-lg);
+    font-weight: 600;
+}
+
+.fileMeta {
+    display: flex;
+    gap: var(--space-2);
+    align-items: center;
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+}
+
+/* Extracted Data */
+.extractedData {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.dataGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-4);
+}
+
+.dataItem {
+    background: white;
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    text-align: center;
+    border: 1px solid var(--gray-200);
+}
+
+.dataLabel {
+    display: block;
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+    margin-bottom: var(--space-1);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.dataValue {
+    display: block;
+    font-weight: 600;
+    color: var(--gray-900);
+    font-size: var(--text-lg);
+}
+
+/* Period Assignment - The Killer Feature */
+.periodAssignment {
+    background: linear-gradient(135deg, var(--primary-50) 0%, white 100%);
+    border-left: 4px solid var(--primary-400);
+    padding: var(--space-4);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+.assignmentHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-2);
+}
+
+.assignmentLabel {
+    font-weight: 600;
+    color: var(--primary-700);
+    font-size: var(--text-base);
+}
+
+.assignmentNote {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+    font-style: italic;
+}
+
+/* Additional Details */
+.additionalDetails {
+    background: white;
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--gray-200);
+}
+
+.additionalDetails h5 {
+    margin: 0 0 var(--space-3) 0;
+    color: var(--gray-900);
+    font-size: var(--text-base);
+    font-weight: 600;
+}
+
+.detailsList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.detail {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-2) 0;
+    border-bottom: 1px solid var(--gray-200);
+    font-size: var(--text-sm);
+}
+
+.detail:last-child {
+    border-bottom: none;
+}
+
+.detail span:first-child {
+    color: var(--gray-600);
+    font-weight: 500;
+}
+
+.detail span:last-child {
+    color: var(--gray-900);
+    font-weight: 600;
+}
+
+/* Upload Summary */
+.uploadSummary {
+    background: linear-gradient(135deg, var(--blue-50) 0%, white 100%);
+    border-left: 4px solid var(--primary-400);
+    padding: var(--space-6);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+.uploadSummary h4 {
+    margin: 0 0 var(--space-4) 0;
+    color: var(--gray-900);
+    font-size: var(--text-lg);
+    font-weight: 600;
+}
+
+.summaryStats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: var(--space-4);
+}
+
+.stat {
+    background: white;
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-200);
+}
+
+.statLabel {
+    display: block;
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+    margin-bottom: var(--space-1);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.statValue {
+    display: block;
+    font-weight: 700;
+    color: var(--primary-600);
+    font-size: var(--text-2xl);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .uploadedCertificatesSection {
+        padding: var(--space-6);
+    }
+
+    .sectionHeader {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-4);
+    }
+
+    .cardHeader {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-4);
+    }
+
+    .dataGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .assignmentHeader {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-2);
+    }
+
+    .summaryStats {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .certificatesList {
+        gap: var(--space-4);
+    }
+}
+
+@media (max-width: 480px) {
+    .summaryStats {
+        grid-template-columns: 1fr;
+    }
+}

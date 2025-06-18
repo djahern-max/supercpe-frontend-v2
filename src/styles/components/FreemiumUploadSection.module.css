@@ -1,0 +1,211 @@
+/* src/styles/components/FreemiumUploadSection.module.css */
+
+.uploadSection {
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-200);
+    padding: var(--space-8);
+}
+
+/* Upload Header */
+.uploadHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-6);
+}
+
+.uploadHeader h3 {
+    margin: 0;
+    color: var(--gray-900);
+    font-size: var(--text-xl);
+    font-weight: 600;
+}
+
+/* Upload Zone */
+.uploadZone {
+    border: 2px dashed var(--primary-300);
+    border-radius: var(--radius-lg);
+    padding: var(--space-8);
+    text-align: center;
+    background: linear-gradient(135deg, var(--primary-50) 0%, white 100%);
+    transition: all var(--transition-fast);
+    cursor: pointer;
+    margin-bottom: var(--space-6);
+}
+
+.uploadZone:hover:not(.disabled) {
+    border-color: var(--primary-400);
+    background: linear-gradient(135deg, var(--primary-100) 0%, white 100%);
+}
+
+.uploadZone.dragActive {
+    border-color: var(--primary-500);
+    background: var(--primary-100);
+}
+
+.uploadZone.disabled {
+    border-color: var(--gray-300);
+    background: var(--gray-50);
+    cursor: not-allowed;
+}
+
+/* Upload Content States */
+.uploadContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.uploadingState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.uploadingState h4 {
+    color: var(--primary-600);
+    margin: 0;
+    font-size: var(--text-lg);
+}
+
+.uploadingState p {
+    color: var(--gray-600);
+    margin: 0;
+}
+
+.disabledState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.disabledState h4 {
+    color: var(--gray-700);
+    margin: 0;
+    font-size: var(--text-lg);
+}
+
+.disabledState p {
+    color: var(--gray-600);
+    margin: 0;
+    text-align: center;
+    max-width: 400px;
+}
+
+.activeState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.uploadIcon {
+    font-size: 3rem;
+    margin-bottom: var(--space-2);
+}
+
+.activeState h4 {
+    color: var(--gray-900);
+    margin: 0;
+    font-size: var(--text-lg);
+    font-weight: 600;
+}
+
+.activeState p {
+    color: var(--gray-600);
+    margin: 0;
+}
+
+/* Progress Indicator */
+.progressIndicator {
+    margin-top: var(--space-4);
+}
+
+.progressBar {
+    width: 100%;
+    height: 8px;
+    background-color: var(--gray-200);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: var(--space-2);
+}
+
+.progressFill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-500) 0%, var(--primary-600) 100%);
+    transition: width 0.3s ease;
+}
+
+.progressIndicator p {
+    text-align: center;
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+    margin: 0;
+}
+
+/* Upload Benefits */
+.uploadBenefits {
+    background: linear-gradient(135deg, var(--green-50) 0%, white 100%);
+    border-left: 4px solid var(--success-600);
+    padding: var(--space-6);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    margin-top: var(--space-6);
+}
+
+.uploadBenefits h4 {
+    color: var(--gray-900);
+    margin: 0 0 var(--space-4) 0;
+    font-size: var(--text-lg);
+    font-weight: 600;
+}
+
+.uploadBenefits ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.uploadBenefits li {
+    padding: var(--space-2) 0;
+    color: var(--gray-700);
+    font-size: var(--text-base);
+    border-bottom: 1px solid var(--gray-200);
+    line-height: var(--leading-relaxed);
+}
+
+.uploadBenefits li:last-child {
+    border-bottom: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .uploadSection {
+        padding: var(--space-6);
+    }
+
+    .uploadHeader {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-4);
+    }
+
+    .uploadZone {
+        padding: var(--space-6);
+    }
+
+    .uploadIcon {
+        font-size: 2rem;
+    }
+
+    .activeState h4,
+    .disabledState h4,
+    .uploadingState h4 {
+        font-size: var(--text-base);
+        text-align: center;
+    }
+}

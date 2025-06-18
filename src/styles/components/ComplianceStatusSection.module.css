@@ -1,0 +1,197 @@
+/* src/styles/components/ComplianceStatusSection.module.css */
+
+.complianceStatusSection {
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-200);
+    padding: var(--space-8);
+    border-left: 4px solid var(--primary-600);
+}
+
+/* Status Header */
+.statusHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-6);
+}
+
+.statusHeader h3 {
+    margin: 0;
+    color: var(--gray-900);
+    font-size: var(--text-xl);
+    font-weight: 600;
+}
+
+/* Compliance Grid - Clean 3-column layout */
+.complianceGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    /* 3 equal columns */
+    gap: var(--space-6);
+    margin-bottom: var(--space-8);
+}
+
+/* Progress Cards */
+.progressCard {
+    background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+    padding: var(--space-6);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--gray-200);
+}
+
+.progressHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-3);
+}
+
+.label {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.value {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--primary-600);
+}
+
+.progressBar {
+    width: 100%;
+    height: 8px;
+    background-color: var(--gray-200);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: var(--space-2);
+}
+
+.progressFill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-500) 0%, var(--primary-600) 100%);
+    transition: width 0.3s ease;
+}
+
+.progressNote {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+}
+
+/* Annual Requirements - Now fits in third column */
+.annualRequirements {
+    background: linear-gradient(135deg, var(--blue-50) 0%, white 100%);
+    padding: var(--space-6);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--gray-200);
+}
+
+.annualRequirements h4 {
+    margin: 0 0 var(--space-4) 0;
+    color: var(--gray-900);
+    font-size: var(--text-lg);
+    font-weight: 600;
+}
+
+.yearGrid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.yearCard {
+    background: white;
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    text-align: center;
+    border: 1px solid var(--gray-200);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    align-items: center;
+}
+
+.yearLabel {
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.yearValue {
+    font-weight: 600;
+    color: var(--gray-900);
+    font-size: var(--text-lg);
+}
+
+/* Period Info */
+.periodInfo {
+    background: linear-gradient(135deg, var(--primary-50) 0%, white 100%);
+    border-left: 4px solid var(--primary-400);
+    padding: var(--space-4);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    margin-bottom: var(--space-6);
+}
+
+.periodInfo h4 {
+    margin: 0 0 var(--space-2) 0;
+    color: var(--gray-900);
+    font-size: var(--text-lg);
+    font-weight: 600;
+}
+
+.periodInfo p {
+    margin: 0;
+    color: var(--gray-700);
+    line-height: var(--leading-relaxed);
+}
+
+/* Status Message */
+.statusMessage {
+    background: linear-gradient(135deg, var(--green-50) 0%, white 100%);
+    border-left: 4px solid var(--success-600);
+    padding: var(--space-4);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+.statusMessage h4 {
+    margin: 0 0 var(--space-2) 0;
+    color: var(--gray-900);
+    font-size: var(--text-lg);
+    font-weight: 600;
+}
+
+.statusMessage p {
+    margin: 0;
+    color: var(--gray-700);
+    line-height: var(--leading-relaxed);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .complianceStatusSection {
+        padding: var(--space-6);
+    }
+
+    .statusHeader {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-4);
+    }
+
+    .complianceGrid {
+        grid-template-columns: 1fr;
+        /* Stack vertically on mobile */
+    }
+
+    .progressHeader {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-2);
+    }
+}

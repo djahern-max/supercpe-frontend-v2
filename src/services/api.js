@@ -192,5 +192,92 @@ export const apiService = {
             payment_intent_id: paymentIntentId
         });
         return response.data;
-    }
+    },
+
+
+    // Add these methods to your existing src/services/api.js file
+
+    // ===== NEW COMPLIANCE METHODS =====
+
+    /**
+     * Analyze a certificate with AI (FREE tier)
+     */
+    async analyzeCertificate(licenseNumber, file) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await apiClient.post(
+            `/api/upload/analyze-certificate/${licenseNumber}`,
+            formData,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+                timeout: 60000, // 60 seconds for AI processing
+            }
+        );
+        return response.data;
+    },
+
+    /**
+     * Get quick compliance status
+     */
+    async getQuickCompliance(licenseNumber) {
+        const response = await apiClient.get(`/api/compliance/${licenseNumber}/quick-status`);
+        return response.data;
+    },
+
+    /**
+     * Get enhanced compliance dashboard
+     */
+    async getEnhancedCompliance(licenseNumber) {
+        const response = await apiClient.get(`/api/compliance/${licenseNumber}/dashboard`);
+        return response.data;
+    },
+
+
+
+    /**
+     * Get current compliance period
+     */
+    async getCurrentPeriod(licenseNumber) {
+        const response = await apiClient.get(`/api/time-windows/${licenseNumber}/current-period`);
+        return response.data;
+    },
+
+    /**
+     * Check subscription status
+     */
+    async getSubscriptionStatus(licenseNumber) {
+        const response = await apiClient.get(`/api/payments/subscription-status/${licenseNumber}`);
+        return response.data;
+    },
+
+    /**
+/**
+ * Get available compliance periods for a CPA
+ */
+    async getAvailablePeriods(licenseNumber) {
+        const response = await apiClient.get(`/api/time-windows/${licenseNumber}/available`);
+        return response.data.available_windows || response.data;
+    },
+
+    /**
+     * Analyze a specific time window/period
+     */
+    async analyzeTimeWindow(licenseNumber, timeWindow) {
+        const response = await apiClient.post(`/api/time-windows/${licenseNumber}/analyze`, {
+            start_date: timeWindow.start_date,
+            end_date: timeWindow.end_date
+        });
+        return response.data;
+    },
+
+    /**
+     * Get current period analysis
+     */
+    async getCurrentPeriodAnalysis(licenseNumber) {
+        const response = await apiClient.get(`/api/time-windows/${licenseNumber}/current-period`);
+        return response.data;
+    },
 };

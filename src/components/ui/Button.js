@@ -10,24 +10,31 @@ const Button = ({
     loading = false,
     disabled = false,
     className,
+    as: Component = 'button',  // Add support for custom component
     ...props
 }) => {
+    const buttonClasses = clsx(
+        'btn-base',
+        styles.button,
+        styles[variant],
+        styles[size],
+        { [styles.loading]: loading },
+        className
+    );
+
+    // If it's a button element, we need disabled prop
+    const buttonProps = Component === 'button'
+        ? { disabled: disabled || loading, ...props }
+        : props; // For Links and other components, don't pass disabled
+
     return (
-        <button
-            className={clsx(
-                'btn-base',
-                styles.button,
-                styles[variant],
-                styles[size],
-                { [styles.loading]: loading },
-                className
-            )}
-            disabled={disabled || loading}
-            {...props}
+        <Component
+            className={buttonClasses}
+            {...buttonProps}
         >
             {loading && <span className="loading-spinner" />}
             {children}
-        </button>
+        </Component>
     );
 };
 
