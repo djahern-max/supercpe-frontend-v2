@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { toast } from 'react-hot-toast';
-import Card from '../ui/Card';
 import Badge from '../ui/Badge';
 import Button from '../ui/Button';
 import { apiService } from '../../services/api';
@@ -12,38 +11,36 @@ import styles from '../../styles/components/FreemiumUploadSection.module.css';
 const EnhancedFreemiumUploadSection = ({ licenseNumber, onUploadSuccess }) => {
     const [uploading, setUploading] = useState(false);
     const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
-    const [freeTierStatus, setFreeTierStatus] = useState(null);
+    const [userStatus, setUserStatus] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    // Maximum free uploads allowed
     const MAX_FREE_UPLOADS = 10;
 
-    // Load free tier status on component mount
     useEffect(() => {
-        loadFreeTierStatus();
+        loadUserStatus();
     }, [licenseNumber]);
 
-    const loadFreeTierStatus = async () => {
+    const loadUserStatus = async () => {
         try {
             setLoading(true);
             const status = await apiService.getFreeTierStatus(licenseNumber);
-            setFreeTierStatus(status);
+            setUserStatus(status);
         } catch (error) {
-            console.error('Error loading free tier status:', error);
+            console.error('Error loading user status:', error);
             toast.error('Failed to load upload status');
         } finally {
             setLoading(false);
         }
     };
 
-    const onDrop = async (acceptedFiles) => {
-        if (!freeTierStatus) {
+    const handleUpload = async (acceptedFiles) => {
+        if (!userStatus) {
             toast.error('Please wait for status to load');
             return;
         }
 
-        // Check if at upload limit
-        if (freeTierStatus.at_limit && !freeTierStatus.has_premium_subscription) {
+        // Check if user needs to upgrade
+        if (userStatus.at_limit && !userStatus.has_premium_subscription) {
             setShowSubscriptionModal(true);
             return;
         }
@@ -51,13 +48,12 @@ const EnhancedFreemiumUploadSection = ({ licenseNumber, onUploadSuccess }) => {
         const file = acceptedFiles[0];
         if (!file) return;
 
-        // Validate file type
+        // Basic file validation
         if (!file.type.includes('pdf') && !file.type.includes('image')) {
             toast.error('Please upload a PDF or image file');
             return;
         }
 
-        // Check file size (limit to 10MB)
         if (file.size > 10 * 1024 * 1024) {
             toast.error('File size must be less than 10MB');
             return;
@@ -65,20 +61,14 @@ const EnhancedFreemiumUploadSection = ({ licenseNumber, onUploadSuccess }) => {
 
         try {
             setUploading(true);
-            toast.loading('🚀 Processing with full functionality...', { id: 'upload' });
+            toast.loading('Processing certificate...', { id: 'upload' });
 
-            let result;
+            const result = userStatus.has_premium_subscription
+                ? await apiService.uploadCertificatePremium(licenseNumber, file)
+                : await apiService.uploadCertificateEnhancedFree(licenseNumber, file);
 
-            // Use appropriate endpoint based on subscription status
-            if (freeTierStatus.has_premium_subscription) {
-                result = await apiService.uploadCertificatePremium(licenseNumber, file);
-            } else {
-                result = await apiService.uploadCertificateEnhancedFree(licenseNumber, file);
-            }
+            toast.success('Certificate processed successfully!', { id: 'upload' });
 
-            toast.success('🎉 Certificate processed successfully!', { id: 'upload' });
-
-            // Update parent component with upload result
             onUploadSuccess({
                 id: result.compliance_tracking?.database_record_id || Date.now(),
                 fileName: file.name,
@@ -93,22 +83,20 @@ const EnhancedFreemiumUploadSection = ({ licenseNumber, onUploadSuccess }) => {
                 storedInCloud: result.storage_info?.uploaded_to_digital_ocean || false,
                 permanentStorage: result.storage_info?.permanent_storage || false,
                 databaseRecordId: result.compliance_tracking?.database_record_id,
-                tierType: freeTierStatus.has_premium_subscription ? 'PREMIUM' : 'ENHANCED_FREE'
+                tierType: userStatus.has_premium_subscription ? 'PREMIUM' : 'ENHANCED_FREE'
             });
 
-            // Refresh status after successful upload
-            await loadFreeTierStatus();
+            await loadUserStatus();
 
         } catch (error) {
             console.error('Upload failed:', error);
 
-            // Handle different error types
             if (error.response?.status === 402) {
                 const errorData = error.response.data;
                 if (errorData.detail?.error === 'Free upload limit reached') {
-                    toast.error(`🎯 You've used all ${errorData.detail.max_uploads} free uploads!`, { id: 'upload' });
+                    toast.error(`You've used all ${errorData.detail.max_uploads} free uploads!`, { id: 'upload' });
                     setShowSubscriptionModal(true);
-                    await loadFreeTierStatus(); // Refresh status
+                    await loadUserStatus();
                     return;
                 }
             }
@@ -120,156 +108,120 @@ const EnhancedFreemiumUploadSection = ({ licenseNumber, onUploadSuccess }) => {
     };
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
-        onDrop,
+        onDrop: handleUpload,
         accept: {
             'application/pdf': ['.pdf'],
             'image/*': ['.png', '.jpg', '.jpeg']
         },
         multiple: false,
-        disabled: uploading || (freeTierStatus?.at_limit && !freeTierStatus?.has_premium_subscription)
+        disabled: uploading || (userStatus?.at_limit && !userStatus?.has_premium_subscription)
     });
 
     const handleSubscriptionSuccess = async () => {
         setShowSubscriptionModal(false);
-        toast.success('🎉 Welcome to SuperCPE Professional!');
-        await loadFreeTierStatus(); // Refresh status after subscription
+        toast.success('Welcome to SuperCPE Professional!');
+        await loadUserStatus();
     };
 
+    // Loading state
     if (loading) {
         return (
-            <Card className={styles.uploadSection}>
-                <div className={styles.loading}>
-                    <p>Loading upload status...</p>
-                </div>
-            </Card>
+            <div className={styles.loading}>
+                <p>Loading upload status...</p>
+            </div>
         );
     }
 
-    if (!freeTierStatus) {
+    // Error state
+    if (!userStatus) {
         return (
-            <Card className={styles.uploadSection}>
-                <div className={styles.error}>
-                    <p>Failed to load upload status. Please refresh the page.</p>
-                </div>
-            </Card>
+            <div className={styles.error}>
+                <p>Failed to load upload status. Please refresh the page.</p>
+            </div>
         );
     }
 
-    const isAtLimit = freeTierStatus.at_limit && !freeTierStatus.has_premium_subscription;
-    const isDisabled = uploading || isAtLimit;
-    const remaining = freeTierStatus.uploads_remaining;
+    const isPremium = userStatus.has_premium_subscription;
+    const isAtLimit = userStatus.at_limit && !isPremium;
+    const remaining = userStatus.uploads_remaining;
 
     return (
         <>
-            <Card className={styles.uploadSection}>
-                {/* Header Section */}
+            {/* Simple Header - Only show for free tier */}
+            {!isPremium && (
                 <div className={styles.uploadHeader}>
-                    <h3>
-                        {freeTierStatus.has_premium_subscription
-                            ? 'SuperCPE Professional'
-                            : '10 Free Uploads'
-                        }
-                    </h3>
-                    <Badge variant={remaining > 0 || freeTierStatus.has_premium_subscription ? "success" : "warning"}>
-                        {freeTierStatus.has_premium_subscription
-                            ? "Professional Subscriber"
-                            : remaining > 0
-                                ? `${remaining} Full-Feature Uploads Remaining`
-                                : "Upgrade for Unlimited Uploads"
-                        }
+                    <Badge variant={remaining > 0 ? "success" : "warning"}>
+                        {remaining > 0 ? `${remaining} Free Uploads` : "Upgrade Required"}
                     </Badge>
+                    <div className={styles.uploadNote}>
+                        Supported formats: PDF, PNG, JPG • {remaining} uploads remaining
+                    </div>
                 </div>
+            )}
 
-                {/* Upload Zone */}
-                <div
-                    {...getRootProps()}
-                    className={`${styles.uploadZone} ${isDragActive ? styles.dragActive : ''} ${isDisabled ? styles.disabled : ''}`}
-                >
-                    <input {...getInputProps()} />
+            {/* Upload Zone */}
+            <div
+                {...getRootProps()}
+                className={`${styles.uploadZone} ${isDragActive ? styles.dragActive : ''} ${isAtLimit ? styles.disabled : ''}`}
+            >
+                <input {...getInputProps()} />
+
+                {isAtLimit ? (
+                    <div className={styles.upgradePrompt}>
+                        <h4>Upgrade to Continue</h4>
+                        <p>You've used all {MAX_FREE_UPLOADS} free uploads.</p>
+                        <Button
+                            variant="primary"
+                            onClick={() => setShowSubscriptionModal(true)}
+                            disabled={uploading}
+                        >
+                            Upgrade to Professional
+                        </Button>
+                    </div>
+                ) : (
                     <div className={styles.uploadContent}>
-                        {isAtLimit ? (
-                            <div className={styles.upgradePrompt}>
-                                <h4>🎯 Ready to Upgrade!</h4>
-                                <p>You've used all {MAX_FREE_UPLOADS} free uploads with full functionality.</p>
-                                <Button
-                                    variant="primary"
-                                    onClick={() => setShowSubscriptionModal(true)}
-                                    disabled={uploading}
-                                >
-                                    Upgrade to Professional
-                                </Button>
-                            </div>
-                        ) : (
-                            <div>
-                                <h4>
-                                    {isDragActive
-                                        ? "Drop for instant AI analysis + cloud storage!"
-                                        : freeTierStatus.has_premium_subscription
-                                            ? "Upload Unlimited Certificates"
-                                            : "Upload with FULL Professional Functionality"
-                                    }
-                                </h4>
-                                <p>
-                                    {freeTierStatus.has_premium_subscription
-                                        ? "Unlimited uploads with professional features"
-                                        : "AI Analysis + Digital Ocean Storage + Compliance Tracking"
-                                    }
-                                </p>
-                                <Button variant="outline" disabled={isDisabled}>
-                                    {uploading ? 'Processing...' : 'Click to upload certificate'}
-                                </Button>
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                {/* Progress Indicator - Only show for free tier */}
-                {!freeTierStatus.has_premium_subscription && freeTierStatus.uploads_used > 0 && (
-                    <div className={styles.progressIndicator}>
-                        <div className={styles.progressBar}>
-                            <div
-                                className={styles.progressFill}
-                                style={{ width: `${(freeTierStatus.uploads_used / MAX_FREE_UPLOADS) * 100}%` }}
-                            ></div>
-                        </div>
-                        <p>
-                            ✨ {freeTierStatus.uploads_used} of {MAX_FREE_UPLOADS} enhanced uploads used
-                            {remaining > 0 && ` (${remaining} remaining)`}
-                        </p>
-                    </div>
-                )}
-
-                {/* Benefits Section */}
-                {!freeTierStatus.has_premium_subscription && (
-                    <div className={styles.uploadBenefits}>
                         <h4>
-                            {remaining > 0
-                                ? '🎯 Your Enhanced Free Tier Includes FULL Functionality:'
-                                : '🎯 Professional Features Waiting for You:'
+                            {isDragActive
+                                ? "Drop to upload"
+                                : isPremium
+                                    ? "Upload Certificate"
+                                    : "Upload with Full Features"
                             }
                         </h4>
-
-                        {remaining > 0 ? (
-                            <div className={styles.enhancedNote}>
-                                <strong>This is the SAME functionality as our $10/month Professional tier!</strong>
-                                <br />Experience the complete system with your first {MAX_FREE_UPLOADS} certificates.
-                            </div>
-                        ) : (
-                            <div className={styles.upgradeNote}>
-                                <strong>Ready to continue with unlimited uploads?</strong>
-                                <br />All your data will be preserved when you upgrade!
-                            </div>
-                        )}
+                        <p>
+                            {isPremium
+                                ? "Unlimited uploads with all professional features"
+                                : "AI Analysis + Cloud Storage + Compliance Tracking"
+                            }
+                        </p>
+                        <Button variant="outline" disabled={uploading}>
+                            {uploading ? 'Processing...' : 'Click to upload'}
+                        </Button>
                     </div>
                 )}
-            </Card>
+            </div>
+
+            {/* Progress Bar - Only for free tier */}
+            {!isPremium && userStatus.uploads_used > 0 && (
+                <div className={styles.progressSection}>
+                    <div className={styles.progressBar}>
+                        <div
+                            className={styles.progressFill}
+                            style={{ width: `${(userStatus.uploads_used / MAX_FREE_UPLOADS) * 100}%` }}
+                        />
+                    </div>
+                    <p>{userStatus.uploads_used} of {MAX_FREE_UPLOADS} uploads used</p>
+                </div>
+            )}
+
+
 
             {/* Subscription Modal */}
             {showSubscriptionModal && (
                 <SubscriptionModal
                     licenseNumber={licenseNumber}
-                    cpaName={freeTierStatus.cpa_name}
-                    uploadsUsed={freeTierStatus.uploads_used}
+                    cpaName={userStatus.cpa_name}
+                    uploadsUsed={userStatus.uploads_used}
                     onClose={() => setShowSubscriptionModal(false)}
                     onSuccess={handleSubscriptionSuccess}
                 />

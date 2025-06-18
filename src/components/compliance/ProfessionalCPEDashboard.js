@@ -349,6 +349,45 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
                     </div>
                 </div>
 
+                {/* Upload Section */}
+                <div className={styles.uploadSection}>
+
+
+                    {uploading ? (
+                        <div className={styles.uploadProcessing}>
+                            <div className={styles.spinner}></div>
+                            <h4 className={styles.processingTitle}>Processing Certificate</h4>
+                            <p className={styles.processingText}>
+                                Analyzing document with AI and uploading to secure storage
+                            </p>
+                            <div className={styles.processingSteps}>
+                                <div className={styles.processingStep}>
+                                    <div className={`${styles.stepIndicator} ${styles.stepActive}`}></div>
+                                    <span>AI Analysis</span>
+                                </div>
+                                <div className={styles.processingStep}>
+                                    <div className={`${styles.stepIndicator} ${styles.stepActive}`}></div>
+                                    <span>Secure Upload</span>
+                                </div>
+                                <div className={styles.processingStep}>
+                                    <div className={styles.stepIndicator}></div>
+                                    <span>Database Update</span>
+                                </div>
+                            </div>
+                        </div>
+                    ) : (
+                        <EnhancedFreemiumUploadSection
+                            licenseNumber={licenseNumber}
+                            onUploadSuccess={(uploadResult) => {
+                                // Your existing refresh logic
+                                loadDashboardData(licenseNumber);
+                            }}
+                        />
+
+
+                    )}
+                </div>
+
                 {/* Compliance Overview */}
                 <div className={styles.complianceGrid}>
 
@@ -461,49 +500,7 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
                     </div>
                 </div>
 
-                {/* Upload Section */}
-                <div className={styles.uploadSection}>
-                    <div className={styles.sectionHeader}>
-                        <h3 className={styles.sectionTitle}>Upload CPE Certificates</h3>
-                        <div className={styles.uploadNote}>
-                            Supported formats: PDF, PNG, JPG • {dashboardData.upload_status.free_uploads_remaining} uploads remaining
-                        </div>
-                    </div>
 
-                    {uploading ? (
-                        <div className={styles.uploadProcessing}>
-                            <div className={styles.spinner}></div>
-                            <h4 className={styles.processingTitle}>Processing Certificate</h4>
-                            <p className={styles.processingText}>
-                                Analyzing document with AI and uploading to secure storage
-                            </p>
-                            <div className={styles.processingSteps}>
-                                <div className={styles.processingStep}>
-                                    <div className={`${styles.stepIndicator} ${styles.stepActive}`}></div>
-                                    <span>AI Analysis</span>
-                                </div>
-                                <div className={styles.processingStep}>
-                                    <div className={`${styles.stepIndicator} ${styles.stepActive}`}></div>
-                                    <span>Secure Upload</span>
-                                </div>
-                                <div className={styles.processingStep}>
-                                    <div className={styles.stepIndicator}></div>
-                                    <span>Database Update</span>
-                                </div>
-                            </div>
-                        </div>
-                    ) : (
-                        <EnhancedFreemiumUploadSection
-                            licenseNumber={licenseNumber}
-                            onUploadSuccess={(uploadResult) => {
-                                // Your existing refresh logic
-                                loadDashboardData(licenseNumber);
-                            }}
-                        />
-
-
-                    )}
-                </div>
 
                 {/* Certificates Table */}
                 {displayData.certificates && displayData.certificates.length > 0 && (

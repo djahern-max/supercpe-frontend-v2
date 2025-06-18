@@ -23,7 +23,17 @@ const Dashboard = () => {
     const [cpa, setCpa] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [useEnhanced, setUseEnhanced] = useState(false); // Start with basic view
+
+    // FIX: Get initial state from localStorage or default to enhanced view
+    const [useEnhanced, setUseEnhanced] = useState(() => {
+        const saved = localStorage.getItem('dashboard_view_preference');
+        return saved ? JSON.parse(saved) : true; // Default to enhanced (CPE Compliance)
+    });
+
+    // FIX: Save the toggle state to localStorage whenever it changes
+    useEffect(() => {
+        localStorage.setItem('dashboard_view_preference', JSON.stringify(useEnhanced));
+    }, [useEnhanced]);
 
     useEffect(() => {
         if (licenseNumber) {
@@ -44,16 +54,14 @@ const Dashboard = () => {
             console.log('CPA data loaded:', cpaData);
 
             // Ensure we have the basic required fields
-            if (!cpaData || !cpaData.license_number) {
-                throw new Error('Invalid CPA data received from API');
+            if (!cpaData?.license_number) {
+                throw new Error('Invalid CPA data received');
             }
 
             setCpa(cpaData);
-
         } catch (error) {
-            console.error('Failed to load CPA data:', error);
+            console.error('Error loading CPA data:', error);
             setError(error.message || 'Failed to load CPA information');
-            toast.error('Failed to load CPA information');
         } finally {
             setLoading(false);
         }
