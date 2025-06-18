@@ -157,236 +157,207 @@ const Dashboard = () => {
     );
 };
 
-// Basic Dashboard Component with null safety
+
 const BasicDashboardView = ({ cpa, licenseNumber }) => {
-    const [reportingPeriods, setReportingPeriods] = useState(null);
-    const [currentPeriod, setCurrentPeriod] = useState(null);
-    const [loading, setLoading] = useState(false);
-
-    useEffect(() => {
-        if (cpa && licenseNumber) {
-            loadReportingPeriods();
-        }
-    }, [cpa, licenseNumber]);
-
-    const loadReportingPeriods = async () => {
-        try {
-            setLoading(true);
-            // Try to load reporting periods (may not be implemented yet)
-            const periodsData = await apiService.getReportingPeriods(licenseNumber);
-            setReportingPeriods(periodsData);
-
-            // Find current active period
-            const current = periodsData.periods?.find(p => p.is_current);
-            if (current) {
-                setCurrentPeriod(current);
-            }
-        } catch (periodError) {
-            console.log('Reporting periods endpoint not available yet');
-            // For now, create a mock current period based on license data
-            if (cpa) {
-                const mockCurrentPeriod = createMockCurrentPeriod(cpa);
-                setCurrentPeriod(mockCurrentPeriod);
-            }
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const createMockCurrentPeriod = (cpaData) => {
-        if (!cpaData || !cpaData.license_issue_date || !cpaData.license_expiration_date) {
-            return null;
-        }
-
-        const today = new Date();
-        const licenseDate = new Date(cpaData.license_issue_date);
-        const expirationDate = new Date(cpaData.license_expiration_date);
-        const isPreRuleChange = licenseDate < new Date('2023-02-22');
-
-        // Create a mock current period
-        return {
-            start_date: isPreRuleChange ? '2025-07-01' : cpaData.license_issue_date,
-            end_date: cpaData.license_expiration_date,
-            period_type: isPreRuleChange ? 'transition' : 'biennial',
-            hours_required: 80,
-            ethics_required: 4,
-            annual_minimum: 20,
-            rule_system: isPreRuleChange ? 'transition' : 'biennial',
-            is_current: true
-        };
-    };
-
-    const getRuleSystemBadge = (system) => {
-        return system === 'biennial' ?
-            <Badge variant="info">Current Biennial System</Badge> :
-            <Badge variant="warning">Transitioning to Biennial</Badge>;
-    };
-
-    const getTimelineStatus = () => {
-        if (!currentPeriod) return 'normal';
-
-        const endDate = new Date(currentPeriod.end_date);
-        const today = new Date();
-        const daysRemaining = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
-
-        if (daysRemaining < 0) return 'expired';
-        if (daysRemaining <= 90) return 'urgent';
-        return 'normal';
-    };
-
-    const timelineStatus = getTimelineStatus();
-    const daysRemaining = currentPeriod ?
-        Math.ceil((new Date(currentPeriod.end_date) - new Date()) / (1000 * 60 * 60 * 24)) : 0;
-
-    // Null safety for CPA data
     if (!cpa) {
         return (
-            <div className={styles.basicDashboard}>
-                <Card className={styles.errorCard}>
-                    <div className="card-body">
-                        <p>CPA information not available.</p>
-                    </div>
-                </Card>
-            </div>
+            <Card className={styles.errorCard}>
+                <h3>CPA Not Found</h3>
+                <p>License number {licenseNumber} not found in our database.</p>
+            </Card>
         );
     }
 
+    // Parse dates
+    const issueDate = new Date(cpa.license_issue_date);
+    const expirationDate = new Date(cpa.license_expiration_date);
+    const ruleChangeDate = new Date('2023-02-22');
+    const today = new Date();
+
+    // Determine if licensed before rule change
+    const wasLicensedBeforeRuleChange = issueDate <= ruleChangeDate;
+
+    // Calculate current compliance period
+    const daysRemaining = Math.ceil((expirationDate - today) / (1000 * 60 * 60 * 24));
+
+    // Period start: 2 years before expiration + 1 day
+    const periodStart = new Date(expirationDate);
+    periodStart.setFullYear(periodStart.getFullYear() - 2);
+    periodStart.setDate(periodStart.getDate() + 1);
+
+    // Determine status
+    const isExpiringSoon = daysRemaining <= 90;
+    const isExpiringVerySoon = daysRemaining <= 30;
+
     return (
         <div className={styles.basicDashboard}>
-            {/* CPA Information Card */}
-            <Card className={styles.cpaInfoCard}>
-                <div className="card-header">
-                    <h2 className="card-title">CPA Information</h2>
-                </div>
-                <div className="card-body">
-                    <div className={styles.cpaDetails}>
-                        <div className={styles.cpaField}>
-                            <span className={styles.fieldLabel}>Name:</span>
-                            <span className={styles.fieldValue}>
-                                {cpa.full_name || 'Not available'}
-                            </span>
-                        </div>
-                        <div className={styles.cpaField}>
-                            <span className={styles.fieldLabel}>License Number:</span>
-                            <span className={styles.fieldValue}>
-                                {cpa.license_number || 'Not available'}
-                            </span>
-                        </div>
-                        <div className={styles.cpaField}>
-                            <span className={styles.fieldLabel}>License Issued:</span>
-                            <span className={styles.fieldValue}>
-                                {cpa.license_issue_date ?
-                                    new Date(cpa.license_issue_date).toLocaleDateString() :
-                                    'Not available'
-                                }
-                            </span>
-                        </div>
-                        <div className={styles.cpaField}>
-                            <span className={styles.fieldLabel}>License Expires:</span>
-                            <span className={styles.fieldValue}>
-                                {cpa.license_expiration_date ?
-                                    new Date(cpa.license_expiration_date).toLocaleDateString() :
-                                    'Not available'
-                                }
-                            </span>
-                        </div>
-                        <div className={styles.cpaField}>
-                            <span className={styles.fieldLabel}>Status:</span>
-                            <span className={`${styles.fieldValue} ${styles.statusActive}`}>
-                                {cpa.status || 'Active'}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </Card>
+            {/* CPA Name and Credentials at Top */}
+            <div className={styles.cpaHeader}>
+                <h1 className={styles.cpaName}>{cpa.full_name}</h1>
+                <p className={styles.cpaCredentials}>
+                    License: {cpa.license_number} • Renews: {formatDate(expirationDate)} • {daysRemaining} days remaining
+                </p>
+            </div>
 
-            {/* Current Period Information */}
-            {currentPeriod && (
-                <Card className={`${styles.currentPeriodCard} ${styles[timelineStatus]}`}>
-                    <div className="card-header">
-                        <div className={styles.periodHeader}>
-                            <h2 className="card-title">Current Reporting Period</h2>
-                            {getRuleSystemBadge(currentPeriod.rule_system)}
-                        </div>
-                    </div>
-                    <div className="card-body">
-                        <div className={styles.currentPeriodInfo}>
-                            <div className={styles.periodDates}>
-                                <h3 className={styles.periodRange}>
-                                    {new Date(currentPeriod.start_date).toLocaleDateString()} - {new Date(currentPeriod.end_date).toLocaleDateString()}
-                                </h3>
-                                <p className={styles.daysRemaining}>
-                                    {daysRemaining > 0 ?
-                                        `${daysRemaining} days remaining` :
-                                        'Period has expired'
-                                    }
-                                </p>
-                            </div>
-
-                            <div className={styles.requirementsGrid}>
-                                <div className={styles.requirement}>
-                                    <div className={styles.requirementNumber}>{currentPeriod.hours_required}</div>
-                                    <div className={styles.requirementLabel}>Total Hours Required</div>
-                                </div>
-                                <div className={styles.requirement}>
-                                    <div className={styles.requirementNumber}>{currentPeriod.ethics_required}</div>
-                                    <div className={styles.requirementLabel}>Ethics Hours Required</div>
-                                </div>
-                                <div className={styles.requirement}>
-                                    <div className={styles.requirementNumber}>{currentPeriod.annual_minimum}</div>
-                                    <div className={styles.requirementLabel}>Minimum Per Year</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </Card>
-            )}
-
-            {/* API Connection Status */}
-            <Card className={styles.statusCard}>
-                <div className="card-header">
-                    <h3 className="card-title">System Status</h3>
-                </div>
-                <div className="card-body">
-                    <div className={styles.statusInfo}>
-                        <div className={styles.statusItem}>
-                            <span className={styles.statusLabel}>API Connection:</span>
-                            <span className={styles.statusValue}>✅ Connected</span>
-                        </div>
-                        <div className={styles.statusItem}>
-                            <span className={styles.statusLabel}>Data Source:</span>
-                            <span className={styles.statusValue}>NH OPLC Database</span>
-                        </div>
-                        <div className={styles.statusItem}>
-                            <span className={styles.statusLabel}>Last Updated:</span>
-                            <span className={styles.statusValue}>
-                                {new Date().toLocaleDateString()}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </Card>
-
-            {/* Action Buttons */}
-            <div className={styles.actionButtons}>
+            {/* Upload Action - Simple */}
+            <div className={styles.uploadSection}>
                 <Button
                     as={Link}
                     to={`/upload/${licenseNumber}`}
                     variant="primary"
-                    size="large"
+                    size="lg"
                 >
                     Upload CPE Certificate
                 </Button>
-                <Button
-                    onClick={() => window.location.reload()}
-                    variant="outline"
-                    size="large"
-                >
-                    Refresh Data
-                </Button>
             </div>
+
+            {/* Current Status Card */}
+            <Card className={styles.statusCard}>
+                <div className={styles.statusHeader}>
+                    <h3>Your Current Compliance Status</h3>
+                    <Badge variant={isExpiringVerySoon ? 'critical' : isExpiringSoon ? 'warning' : 'success'}>
+                        {isExpiringVerySoon ? 'URGENT' : isExpiringSoon ? 'ACTION NEEDED' : 'ON TRACK'}
+                    </Badge>
+                </div>
+
+                <div className={styles.periodInfo}>
+                    <div className={styles.periodDates}>
+                        <div className={styles.dateItem}>
+                            <span className={styles.label}>Current Period:</span>
+                            <span className={styles.value}>
+                                {formatDate(periodStart)} - {formatDate(expirationDate)}
+                            </span>
+                        </div>
+                        <div className={styles.dateItem}>
+                            <span className={styles.label}>Renewal Date:</span>
+                            <span className={styles.value}>{formatDate(expirationDate)}</span>
+                        </div>
+                        <div className={styles.dateItem}>
+                            <span className={styles.label}>Days Remaining:</span>
+                            <span className={`${styles.value} ${isExpiringSoon ? styles.urgent : ''}`}>
+                                {daysRemaining} days
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </Card>
+
+            {/* Rule Change Explanation */}
+            <Card className={styles.ruleCard}>
+                <h3>February 2023 Rule Changes - How They Affect You</h3>
+
+                <div className={styles.yourSituation}>
+                    <strong>Your Situation:</strong> {wasLicensedBeforeRuleChange
+                        ? 'Existing CPA (licensed before February 2023)'
+                        : 'New CPA (licensed after February 2023)'}
+                </div>
+
+                <div className={styles.changesGrid}>
+                    <div className={styles.changesSection}>
+                        <h4>✓ What Changed For You</h4>
+                        <ul>
+                            {wasLicensedBeforeRuleChange ? (
+                                <>
+                                    <li>Renewal cycle reduced from 3 years to 2 years</li>
+                                    <li>Total CPE reduced from 120 hours to 80 hours</li>
+                                    <li>June 30th renewal date maintained</li>
+                                </>
+                            ) : (
+                                <>
+                                    <li>Anniversary-based renewal dates (not June 30th)</li>
+                                    <li>2-year renewal cycles from the start</li>
+                                    <li>80 hours total CPE requirement</li>
+                                </>
+                            )}
+                        </ul>
+                    </div>
+
+                    <div className={styles.changesSection}>
+                        <h4>→ What Stayed The Same</h4>
+                        <ul>
+                            <li>20 hours per year minimum requirement</li>
+                            <li>4 hours ethics requirement per renewal period</li>
+                            {wasLicensedBeforeRuleChange
+                                ? <li>June 30th renewal date</li>
+                                : <li>Anniversary renewal pattern</li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+
+                <div className={styles.explanation}>
+                    <p>
+                        {wasLicensedBeforeRuleChange
+                            ? `As a CPA licensed in ${issueDate.getFullYear()} (before February 2023), you maintain June 30th renewal dates but are now on 2-year renewal cycles instead of the previous 3-year cycles.`
+                            : `As a CPA licensed in ${issueDate.getFullYear()} (after February 2023), your renewal follows your license anniversary date with 2-year renewal cycles.`
+                        }
+                    </p>
+                </div>
+            </Card>
+
+            {/* Requirements Card */}
+            <Card className={styles.requirementsCard}>
+                <h3>Your CPE Requirements (2-Year Period)</h3>
+
+                <div className={styles.requirementsList}>
+                    <div className={styles.requirement}>
+                        <div className={styles.requirementHeader}>
+                            <span className={styles.label}>Total CPE Hours</span>
+                            <span className={styles.value}>0 / 80</span>
+                        </div>
+                        <div className={styles.progressBar}>
+                            <div className={styles.progressFill} style={{ width: '0%' }}></div>
+                        </div>
+                        <p className={styles.note}>80 hours required over 2 years</p>
+                    </div>
+
+                    <div className={styles.requirement}>
+                        <div className={styles.requirementHeader}>
+                            <span className={styles.label}>Ethics Hours</span>
+                            <span className={styles.value}>0 / 4</span>
+                        </div>
+                        <div className={styles.progressBar}>
+                            <div className={styles.progressFill} style={{ width: '0%' }}></div>
+                        </div>
+                        <p className={styles.note}>4 hours required anytime during the 2-year period</p>
+                    </div>
+
+                    <div className={styles.requirement}>
+                        <div className={styles.requirementHeader}>
+                            <span className={styles.label}>Annual Minimum</span>
+                            <span className={styles.value}>20 hours/year</span>
+                        </div>
+                        <p className={styles.note}>Must complete at least 20 hours each year</p>
+                    </div>
+                </div>
+            </Card>
+
+            {/* Key Facts */}
+            <Card className={styles.factsCard}>
+                <h3>Key Facts About New NH Rules</h3>
+                <div className={styles.factsList}>
+                    <div className={styles.fact}>
+                        <strong>Renewal Cycle:</strong> All NH CPAs are now on 2-year renewal cycles (down from 3 years)
+                    </div>
+                    <div className={styles.fact}>
+                        <strong>Total Hours:</strong> 80 CPE hours over 2 years (down from 120 over 3 years)
+                    </div>
+                    <div className={styles.fact}>
+                        <strong>Your Renewal Date:</strong> {wasLicensedBeforeRuleChange
+                            ? 'June 30th every 2 years'
+                            : `${issueDate.toLocaleDateString('en-US', { month: 'long' })} every 2 years`}
+                    </div>
+                    <div className={styles.fact}>
+                        <strong>Annual Minimum:</strong> 20 hours per year must still be completed
+                    </div>
+                    <div className={styles.fact}>
+                        <strong>Ethics Requirement:</strong> 4 hours of ethics CPE per 2-year period
+                    </div>
+                </div>
+            </Card>
         </div>
     );
 };
+
 
 export default Dashboard;

@@ -1,9 +1,8 @@
 /* src/styles/pages/Dashboard.module.css */
 
 .dashboard {
+    padding: var(--space-8) 0;
     min-height: 100vh;
-    background-color: #f8fafc;
-    padding: 2rem 0;
 }
 
 /* Loading State */
@@ -18,8 +17,27 @@
 
 .loading p {
     margin-top: 1rem;
-    color: #6b7280;
-    font-size: 1.1rem;
+    color: var(--gray-600);
+    font-size: var(--text-lg);
+}
+
+.loading .loading-spinner {
+    width: 3rem;
+    height: 3rem;
+    border: 4px solid var(--gray-200);
+    border-top: 4px solid var(--primary-600);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* Error State */
@@ -28,159 +46,451 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 4rem 2rem;
+    padding: var(--space-16);
     text-align: center;
     background: white;
-    border-radius: 1rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-200);
     margin: 2rem auto;
     max-width: 600px;
 }
 
 .error h2 {
-    color: #dc2626;
-    margin-bottom: 1rem;
-    font-size: 1.5rem;
+    color: var(--red-600);
+    margin-bottom: var(--space-4);
+    font-size: var(--text-2xl);
+    font-weight: 600;
 }
 
 .error p {
-    color: #6b7280;
-    margin-bottom: 2rem;
-    line-height: 1.6;
+    color: var(--gray-600);
+    margin-bottom: var(--space-6);
+    line-height: var(--leading-relaxed);
 }
 
 .errorActions {
     display: flex;
-    gap: 1rem;
+    gap: var(--space-4);
     flex-wrap: wrap;
     justify-content: center;
 }
 
-/* Dashboard Header */
-.dashboardHeader {
-    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
-    color: white;
-    padding: 2rem;
-    border-radius: 1rem;
-    margin-bottom: 2rem;
-    box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.1);
-}
-
-.headerInfo {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-}
-
-.pageTitle {
-    font-size: 1.75rem;
-    font-weight: 700;
-    margin: 0;
-    color: white;
-}
-
-.cpaInfo {
-    text-align: right;
+/* CPA Header - Name and Credentials at Top */
+.cpaHeader {
+    text-align: center;
+    margin-bottom: var(--space-8);
 }
 
 .cpaName {
-    font-size: 1.5rem;
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--gray-900);
+    margin: 0 0 var(--space-2) 0;
+}
+
+.cpaCredentials {
+    font-size: var(--text-base);
+    color: var(--gray-600);
+    margin: 0;
+}
+
+/* Upload Section - Simple Button */
+.uploadSection {
+    text-align: center;
+    padding: var(--space-8);
+    background: linear-gradient(135deg, var(--primary-50) 0%, white 100%);
+    border-radius: var(--radius-lg);
+    border: 2px dashed var(--primary-300);
+    margin-bottom: var(--space-8);
+}
+
+/* Clean Header - Simple and Professional */
+.dashboardHeader {
+    display: none;
+    /* Remove completely */
+}
+
+.pageTitle {
+    font-size: var(--text-4xl);
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: var(--space-2);
+}
+
+.cpaName {
+    font-size: var(--text-2xl);
     font-weight: 600;
-    margin: 0 0 0.5rem 0;
-    color: white;
+    color: var(--primary-600);
+    margin-bottom: var(--space-1);
 }
 
 .licenseNumber {
-    font-size: 1rem;
-    opacity: 0.9;
-    margin: 0 0 0.25rem 0;
-    color: white;
+    font-size: var(--text-lg);
+    color: var(--gray-600);
+    margin-bottom: var(--space-1);
 }
 
 .licenseStatus {
-    font-size: 0.9rem;
-    opacity: 0.8;
-    margin: 0;
-    color: white;
+    font-size: var(--text-base);
+    color: var(--gray-500);
 }
 
 .statusActive {
     font-weight: 600;
-    color: #fbbf24;
-}
-
-/* Dashboard Controls */
-.dashboardControls {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 2rem;
-}
-
-.controlGroup {
-    display: flex;
-    gap: 0.5rem;
-    background: white;
-    padding: 0.5rem;
-    border-radius: 0.75rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    color: var(--green-600);
 }
 
 /* Basic Dashboard Layout */
 .basicDashboard {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
-    max-width: 1200px;
+    gap: var(--space-8);
+    max-width: 1000px;
     margin: 0 auto;
 }
 
-/* CPA Info Card */
-.cpaInfoCard {
-    border: 2px solid #e5e7eb;
+/* Cards - Clean styling like Home page */
+.statusCard,
+.ruleCard,
+.requirementsCard,
+.factsCard {
     background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-200);
+    padding: var(--space-8);
+}
+
+/* Status Card */
+.statusCard {
+    border-left: 4px solid var(--primary-600);
+}
+
+.statusHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-6);
+}
+
+.statusHeader h3 {
+    margin: 0;
+    color: var(--gray-900);
+    font-size: var(--text-xl);
+    font-weight: 600;
+}
+
+.periodInfo {
+    background: linear-gradient(135deg, var(--primary-50) 0%, white 100%);
+    padding: var(--space-6);
+    border-radius: var(--radius-lg);
+}
+
+.periodDates {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-4);
+}
+
+.dateItem {
+    background-color: white;
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    text-align: center;
+    border: 1px solid var(--gray-200);
+}
+
+.label {
+    display: block;
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+    margin-bottom: var(--space-1);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.value {
+    display: block;
+    font-weight: 600;
+    color: var(--gray-900);
+    font-size: var(--text-lg);
+}
+
+.value.urgent {
+    color: var(--red-600);
+}
+
+/* Rule Changes Card */
+.ruleCard {
+    border-left: 4px solid var(--yellow-500);
+}
+
+.ruleCard h3 {
+    color: var(--gray-900);
+    font-size: var(--text-xl);
+    font-weight: 600;
+    margin-bottom: var(--space-6);
+}
+
+.yourSituation {
+    background: linear-gradient(135deg, var(--blue-50) 0%, white 100%);
+    border-left: 4px solid var(--blue-400);
+    padding: var(--space-4);
+    margin: var(--space-4) 0;
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+.yourSituation strong {
+    color: var(--blue-700);
+}
+
+.changesGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-6);
+    margin: var(--space-6) 0;
+}
+
+.changesSection {
+    background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+    padding: var(--space-6);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--gray-200);
+}
+
+.changesSection h4 {
+    color: var(--gray-800);
+    margin: 0 0 var(--space-4) 0;
+    font-size: var(--text-lg);
+    font-weight: 600;
+}
+
+.changesSection ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.changesSection li {
+    padding: var(--space-2) 0;
+    color: var(--gray-700);
+    font-size: var(--text-base);
+    border-bottom: 1px solid var(--gray-200);
+    line-height: var(--leading-relaxed);
+}
+
+.changesSection li:last-child {
+    border-bottom: none;
+}
+
+.explanation {
+    background: linear-gradient(135deg, var(--green-50) 0%, white 100%);
+    border-left: 4px solid var(--green-400);
+    padding: var(--space-4);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    margin-top: var(--space-6);
+}
+
+.explanation p {
+    margin: 0;
+    color: var(--gray-700);
+    line-height: var(--leading-relaxed);
+}
+
+/* Requirements Card */
+.requirementsCard {
+    border-left: 4px solid var(--green-500);
+}
+
+.requirementsCard h3 {
+    color: var(--gray-900);
+    font-size: var(--text-xl);
+    font-weight: 600;
+    margin-bottom: var(--space-6);
+}
+
+.requirementsList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+}
+
+.requirement {
+    background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+    padding: var(--space-6);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--gray-200);
+}
+
+.requirementHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-3);
+}
+
+.requirementHeader .label {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--gray-900);
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+.requirementHeader .value {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--primary-600);
+}
+
+.progressBar {
+    width: 100%;
+    height: 8px;
+    background-color: var(--gray-200);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: var(--space-2);
+}
+
+.progressFill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-500) 0%, var(--primary-600) 100%);
+    transition: width 0.3s ease;
+}
+
+.note {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+/* Facts Card */
+.factsCard {
+    border-left: 4px solid var(--purple-500);
+}
+
+.factsCard h3 {
+    color: var(--gray-900);
+    font-size: var(--text-xl);
+    font-weight: 600;
+    margin-bottom: var(--space-6);
+}
+
+.factsList {
+    display: grid;
+    gap: var(--space-4);
+}
+
+.fact {
+    background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    border-left: 4px solid var(--blue-400);
+    border: 1px solid var(--gray-200);
+}
+
+.fact strong {
+    color: var(--gray-900);
+}
+
+/* Actions */
+.actions {
+    text-align: center;
+    padding: var(--space-8);
+    background: linear-gradient(135deg, var(--primary-50) 0%, white 100%);
+    border-radius: var(--radius-lg);
+    border: 2px dashed var(--primary-300);
+}
+
+.actionNote {
+    margin: var(--space-4) 0 0 0;
+    color: var(--gray-600);
+    font-size: var(--text-base);
+}
+
+.actionButtons {
+    display: flex;
+    gap: var(--space-4);
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: var(--space-6);
+}
+
+/* Error Card for Basic Dashboard */
+.errorCard {
+    border: 2px solid var(--red-200);
+    background: var(--red-50);
+}
+
+/* Dashboard Controls - if ever needed */
+.dashboardControls {
+    display: flex;
+    justify-content: center;
+    margin-bottom: var(--space-8);
+}
+
+.controlGroup {
+    display: flex;
+    gap: var(--space-2);
+    background: white;
+    padding: var(--space-2);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-200);
+}
+
+/* Legacy styles for compatibility - cleaner versions */
+.cpaInfoCard {
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-200);
+    padding: var(--space-8);
 }
 
 .cpaDetails {
     display: grid;
-    gap: 1rem;
+    gap: var(--space-4);
 }
 
 .cpaField {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem;
-    background-color: #f9fafb;
-    border-radius: 0.5rem;
-    border: 1px solid #e5e7eb;
+    padding: var(--space-4);
+    background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--gray-200);
 }
 
 .fieldLabel {
     font-weight: 600;
-    color: #374151;
+    color: var(--gray-700);
 }
 
 .fieldValue {
     font-weight: 500;
-    color: #1f2937;
+    color: var(--gray-900);
 }
 
-/* Current Period Card */
 .currentPeriodCard {
-    border-left: 4px solid #3b82f6;
+    border-left: 4px solid var(--primary-600);
     background: white;
 }
 
 .currentPeriodCard.urgent {
-    border-left-color: #ef4444;
-    background: linear-gradient(135deg, #fef2f2 0%, #ffffff 100%);
+    border-left-color: var(--red-500);
+    background: linear-gradient(135deg, var(--red-50) 0%, white 100%);
 }
 
 .currentPeriodCard.expired {
-    border-left-color: #991b1b;
-    background: linear-gradient(135deg, #fee2e2 0%, #ffffff 100%);
+    border-left-color: var(--red-700);
+    background: linear-gradient(135deg, var(--red-100) 0%, white 100%);
 }
 
 .periodHeader {
@@ -188,153 +498,111 @@
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 1rem;
+    gap: var(--space-4);
 }
 
 .currentPeriodInfo {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
-}
-
-.periodDates {
-    text-align: center;
+    gap: var(--space-6);
 }
 
 .periodRange {
-    font-size: 1.25rem;
+    font-size: var(--text-xl);
     font-weight: 700;
-    color: #1f2937;
-    margin: 0 0 0.5rem 0;
+    color: var(--gray-900);
+    margin: 0 0 var(--space-2) 0;
 }
 
 .daysRemaining {
-    font-size: 1rem;
+    font-size: var(--text-lg);
     font-weight: 500;
-    color: #6b7280;
+    color: var(--gray-600);
     margin: 0;
 }
 
 .requirementsGrid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-}
-
-.requirement {
-    text-align: center;
-    padding: 1.5rem;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-    border-radius: 0.75rem;
-    border: 1px solid #e2e8f0;
+    gap: var(--space-4);
 }
 
 .requirementNumber {
-    font-size: 2rem;
+    font-size: var(--text-3xl);
     font-weight: 700;
-    color: #1e40af;
-    margin-bottom: 0.5rem;
+    color: var(--primary-600);
+    margin-bottom: var(--space-2);
 }
 
 .requirementLabel {
-    font-size: 0.875rem;
+    font-size: var(--text-sm);
     font-weight: 500;
-    color: #64748b;
+    color: var(--gray-600);
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
 
-/* Status Card */
-.statusCard {
-    border: 2px solid #d1fae5;
-    background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
-}
-
 .statusInfo {
     display: grid;
-    gap: 1rem;
+    gap: var(--space-4);
 }
 
 .statusItem {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.75rem;
-    background-color: #f9fafb;
-    border-radius: 0.5rem;
+    padding: var(--space-3);
+    background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--gray-200);
 }
 
 .statusLabel {
     font-weight: 500;
-    color: #374151;
+    color: var(--gray-700);
 }
 
 .statusValue {
     font-weight: 600;
-    color: #059669;
-}
-
-/* Action Buttons */
-.actionButtons {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    flex-wrap: wrap;
-    margin-top: 2rem;
-}
-
-/* Error Card for Basic Dashboard */
-.errorCard {
-    border: 2px solid #fca5a5;
-    background: #fef2f2;
+    color: var(--green-600);
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
     .dashboard {
-        padding: 1rem 0;
+        padding: var(--space-6) 0;
     }
 
-    .dashboardHeader {
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
+    .uploadSection {
+        padding: var(--space-8);
     }
 
-    .headerInfo {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .cpaInfo {
-        text-align: center;
-    }
-
-    .pageTitle {
-        font-size: 1.5rem;
-    }
-
-    .cpaName {
-        font-size: 1.25rem;
+    .uploadTitle {
+        font-size: var(--text-2xl);
     }
 
     .basicDashboard {
-        gap: 1.5rem;
-        padding: 0 1rem;
+        gap: var(--space-6);
+        padding: 0 var(--space-4);
+    }
+
+    .changesGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .periodDates {
+        grid-template-columns: 1fr;
+    }
+
+    .statusHeader {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-4);
     }
 
     .cpaField {
         flex-direction: column;
-        gap: 0.5rem;
-        text-align: center;
-    }
-
-    .requirementsGrid {
-        grid-template-columns: 1fr;
-    }
-
-    .statusItem {
-        flex-direction: column;
-        gap: 0.5rem;
+        gap: var(--space-2);
         text-align: center;
     }
 
@@ -357,24 +625,37 @@
         width: 100%;
         max-width: 250px;
     }
-}
 
-/* Loading Spinner */
-.loading .loading-spinner {
-    width: 3rem;
-    height: 3rem;
-    border: 4px solid #e5e7eb;
-    border-top: 4px solid #3b82f6;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
+    .requirementsGrid {
+        grid-template-columns: 1fr;
     }
 
-    100% {
-        transform: rotate(360deg);
+    .statusItem {
+        flex-direction: column;
+        gap: var(--space-2);
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .basicDashboard {
+        gap: var(--space-4);
+    }
+
+    .statusCard,
+    .ruleCard,
+    .requirementsCard,
+    .factsCard {
+        padding: var(--space-6);
+    }
+
+    .periodInfo,
+    .changesSection,
+    .requirement {
+        padding: var(--space-4);
+    }
+
+    .uploadSection {
+        padding: var(--space-6);
     }
 }
