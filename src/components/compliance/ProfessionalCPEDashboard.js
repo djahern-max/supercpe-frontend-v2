@@ -1,6 +1,7 @@
 // src/components/compliance/ProfessionalCPEDashboard.js
 import React, { useState, useEffect } from 'react';
 import { Upload, FileText, BarChart3, Clock, AlertTriangle, CheckCircle, Eye, Download, Shield, Database } from 'lucide-react';
+import PeriodSelector from './PeriodSelector';
 import styles from '../../styles/components/ProfessionalCPEDashboard.module.css';
 
 const ProfessionalCPEDashboard = ({ licenseNumber }) => {
@@ -10,6 +11,8 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
     const [error, setError] = useState(null);
     const [uploading, setUploading] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState([]);
+    const [selectedPeriod, setSelectedPeriod] = useState(null);
+    const [periodAnalysis, setPeriodAnalysis] = useState(null);
 
     // Load dashboard data on component mount
     useEffect(() => {
@@ -71,16 +74,65 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
         );
     }
 
-    // Calculate compliance status
+    // Handle period selection and analysis
+    const handlePeriodChange = (period) => {
+        setSelectedPeriod(period);
+
+        // If switching to current period, clear period analysis to use original data
+        if (period.is_current) {
+            setPeriodAnalysis(null);
+            console.log('Switched to current period - using original dashboard data');
+        } else if (period.analysis) {
+            console.log('Period analysis data:', period.analysis);
+            setPeriodAnalysis(period.analysis);
+        } else {
+            // For non-current periods without analysis, set empty analysis
+            setPeriodAnalysis({
+                total_cpe_hours: 0,
+                total_ethics_hours: 0,
+                total_certificates: 0,
+                certificates: []
+            });
+        }
+
+        console.log('Period changed:', period);
+    };
+
+    // Calculate compliance status - use period analysis if available, otherwise dashboard data
     const getComplianceStatus = () => {
-        const { total_cpe_hours } = dashboardData.compliance_summary;
-        if (total_cpe_hours >= 120) return { status: 'Compliant', className: styles.statusCompliant };
-        if (total_cpe_hours >= 80) return { status: 'On Track', className: styles.statusOnTrack };
-        if (total_cpe_hours >= 40) return { status: 'Needs Attention', className: styles.statusAttention };
+        const dataSource = displayData?.compliance_summary;
+        if (!dataSource) return { status: 'Loading...', className: styles.statusRequired };
+
+        const { total_cpe_hours } = dataSource;
+        const requiredHours = selectedPeriod?.total_hours_required || 120;
+
+        if (total_cpe_hours >= requiredHours) return { status: 'Compliant', className: styles.statusCompliant };
+        if (total_cpe_hours >= requiredHours * 0.67) return { status: 'On Track', className: styles.statusOnTrack };
+        if (total_cpe_hours >= requiredHours * 0.33) return { status: 'Needs Attention', className: styles.statusAttention };
         return { status: 'Action Required', className: styles.statusRequired };
     };
 
-    const complianceStatus = getComplianceStatus();
+    // Get the data source for display (period analysis or dashboard data)
+    // Get the data source for display (period analysis or dashboard data)
+    const getDisplayData = () => {
+        // If we have a selected period and it's NOT the current period, use period analysis
+        if (selectedPeriod && !selectedPeriod.is_current && periodAnalysis) {
+            return {
+                compliance_summary: {
+                    total_cpe_hours: periodAnalysis.total_cpe_hours || 0,
+                    total_ethics_hours: periodAnalysis.total_ethics_hours || 0,
+                    total_certificates: periodAnalysis.total_certificates || 0
+                },
+                certificates: periodAnalysis.certificates || []
+            };
+        }
+
+        // For current period or when no period analysis, always use dashboard data
+        return dashboardData;
+    };
+
+    const displayData = dashboardData ? getDisplayData() : null;
+    const complianceStatus = displayData ? getComplianceStatus() : null;
 
     const handleFileUpload = async (files) => {
         setUploading(true);
@@ -112,15 +164,47 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
 
     const handleExportAudit = async () => {
         try {
-            const { apiService } = await import('../../services/api');
-            const result = await apiService.generateAuditPresentation(licenseNumber, {
-                format: 'pdf',
-                style: 'professional'
-            });
-            console.log('Audit export:', result);
-            // Handle download/export logic here
+            console.log('Generating audit export...');
+
+            // For now, create a simple CSV export as a fallback
+            const csvData = [
+                ['Course Title', 'Provider', 'CPE Credits', 'Completion Date', 'Confidence', 'ID'],
+                ...displayData.certificates.map(cert => [
+                    cert.course_title,
+                    cert.provider,
+                    cert.cpe_credits,
+                    cert.completion_date,
+                    `${Math.round((cert.confidence || 0) * 100)}%`,
+                    cert.id
+                ])
+            ];
+
+            const csvContent = csvData.map(row =>
+                row.map(field => `"${field}"`).join(',')
+            ).join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `CPE_Audit_Report_${dashboardData.cpa.license_number}_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            console.log('Audit export completed');
+
+            // TODO: Replace with actual API call when backend endpoint is ready
+            // const { apiService } = await import('../../services/api');
+            // const result = await apiService.generateAuditPresentation(licenseNumber, {
+            //     format: 'pdf',
+            //     style: 'professional'
+            // });
+
         } catch (error) {
             console.error('Export failed:', error);
+            alert('Export failed. Please try again.');
         }
     };
 
@@ -141,16 +225,75 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
         );
     };
 
+    // Calculate hours by year for annual requirements
+    const calculateYearlyHours = () => {
+        const certificates = displayData?.certificates || [];
+        const period = selectedPeriod;
+
+        if (!period || certificates.length === 0) {
+            return { year1: 0, year2: 0, year3: 0 };
+        }
+
+        const startDate = new Date(period.start_date);
+        const endDate = new Date(period.end_date);
+
+        // Define year boundaries
+        const year1Start = new Date(startDate);
+        const year1End = new Date(startDate.getFullYear() + 1, startDate.getMonth(), startDate.getDate() - 1);
+        const year2Start = new Date(year1End.getTime() + 24 * 60 * 60 * 1000); // Next day
+        const year2End = new Date(startDate.getFullYear() + 2, startDate.getMonth(), startDate.getDate() - 1);
+        const year3Start = new Date(year2End.getTime() + 24 * 60 * 60 * 1000); // Next day
+        const year3End = new Date(endDate);
+
+        let year1Hours = 0, year2Hours = 0, year3Hours = 0;
+
+        certificates.forEach(cert => {
+            const certDate = new Date(cert.completion_date);
+            const hours = parseFloat(cert.cpe_credits) || 0;
+
+            if (certDate >= year1Start && certDate <= year1End) {
+                year1Hours += hours;
+            } else if (certDate >= year2Start && certDate <= year2End) {
+                year2Hours += hours;
+            } else if (period.duration_years >= 3 && certDate >= year3Start && certDate <= year3End) {
+                year3Hours += hours;
+            }
+        });
+
+        return {
+            year1: year1Hours,
+            year2: year2Hours,
+            year3: year3Hours
+        };
+    };
+
     // Calculate average confidence for processing quality
     const calculateAverageConfidence = () => {
-        if (!dashboardData.certificates || dashboardData.certificates.length === 0) return 0;
-        const total = dashboardData.certificates.reduce((sum, cert) => sum + (cert.confidence || 0), 0);
-        return (total / dashboardData.certificates.length) * 100;
+        const certificates = displayData?.certificates || [];
+        if (certificates.length === 0) return 0;
+        const total = certificates.reduce((sum, cert) => sum + (cert.confidence || 0), 0);
+        return (total / certificates.length) * 100;
+    };
+
+    const yearlyHours = displayData ? calculateYearlyHours() : { year1: 0, year2: 0, year3: 0 };
+
+    // Helper function to get year status
+    const getYearStatus = (hours) => {
+        if (hours >= 20) return { text: 'Complete', className: styles.yearStatusComplete };
+        if (hours > 0) return { text: 'In Progress', className: styles.yearStatusProgress };
+        return { text: 'Incomplete', className: styles.yearStatusIncomplete };
     };
 
     return (
         <div className={styles.dashboard}>
             <div className={styles.container}>
+
+                {/* Period Selector */}
+                <PeriodSelector
+                    licenseNumber={licenseNumber}
+                    selectedPeriod={selectedPeriod}
+                    onPeriodChange={handlePeriodChange}
+                />
 
                 {/* Header */}
                 <div className={styles.header}>
@@ -159,7 +302,10 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
                             <h1 className={styles.title}>CPE Compliance Dashboard</h1>
                             <div className={styles.cpeName}>{dashboardData.cpa.name}</div>
                             <div className={styles.licenseInfo}>
-                                License: {dashboardData.cpa.license_number} • Expires: June 29, 2027
+                                License: {dashboardData.cpa.license_number}
+                                {selectedPeriod && (
+                                    <span> • Tracking: {new Date(selectedPeriod.start_date).toLocaleDateString()} - {new Date(selectedPeriod.end_date).toLocaleDateString()}</span>
+                                )}
                             </div>
                         </div>
                         <div className={styles.headerStatus}>
@@ -167,8 +313,12 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
                                 {complianceStatus.status}
                             </div>
                             <div className={styles.hoursDisplay}>
-                                <div className={styles.hoursNumber}>{dashboardData.compliance_summary.total_cpe_hours}</div>
-                                <div className={styles.hoursLabel}>of 120 hours required</div>
+                                <div className={styles.hoursNumber}>
+                                    {displayData?.compliance_summary?.total_cpe_hours || 0}
+                                </div>
+                                <div className={styles.hoursLabel}>
+                                    of {selectedPeriod?.total_hours_required || 120} hours required
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -186,18 +336,18 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
 
                         <div className={styles.progressList}>
                             <ProgressBar
-                                percentage={(dashboardData.compliance_summary.total_cpe_hours / 120) * 100}
+                                percentage={((displayData?.compliance_summary?.total_cpe_hours || 0) / (selectedPeriod?.total_hours_required || 120)) * 100}
                                 label="Total CPE Hours"
-                                current={dashboardData.compliance_summary.total_cpe_hours}
-                                total={120}
+                                current={displayData?.compliance_summary?.total_cpe_hours || 0}
+                                total={selectedPeriod?.total_hours_required || 120}
                                 colorClass={styles.progressBlue}
                             />
 
                             <ProgressBar
-                                percentage={(dashboardData.compliance_summary.total_ethics_hours / 4) * 100}
+                                percentage={((displayData?.compliance_summary?.total_ethics_hours || 0) / (selectedPeriod?.ethics_hours_required || 4)) * 100}
                                 label="Ethics Hours"
-                                current={dashboardData.compliance_summary.total_ethics_hours}
-                                total={4}
+                                current={displayData?.compliance_summary?.total_ethics_hours || 0}
+                                total={selectedPeriod?.ethics_hours_required || 4}
                                 colorClass={styles.progressGreen}
                             />
 
@@ -205,20 +355,28 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
                                 <h4 className={styles.annualTitle}>Annual Requirements (20 hours minimum per year)</h4>
                                 <div className={styles.yearGrid}>
                                     <div className={styles.yearCard}>
-                                        <div className={styles.yearHours}>0</div>
+                                        <div className={styles.yearHours}>{yearlyHours.year1}</div>
                                         <div className={styles.yearLabel}>Year 1</div>
-                                        <div className={styles.yearStatus}>Incomplete</div>
+                                        <div className={`${styles.yearStatus} ${getYearStatus(yearlyHours.year1).className}`}>
+                                            {getYearStatus(yearlyHours.year1).text}
+                                        </div>
                                     </div>
                                     <div className={styles.yearCard}>
-                                        <div className={styles.yearHours}>0</div>
+                                        <div className={styles.yearHours}>{yearlyHours.year2}</div>
                                         <div className={styles.yearLabel}>Year 2</div>
-                                        <div className={styles.yearStatus}>Incomplete</div>
+                                        <div className={`${styles.yearStatus} ${getYearStatus(yearlyHours.year2).className}`}>
+                                            {getYearStatus(yearlyHours.year2).text}
+                                        </div>
                                     </div>
-                                    <div className={styles.yearCard}>
-                                        <div className={styles.yearHours}>0</div>
-                                        <div className={styles.yearLabel}>Year 3</div>
-                                        <div className={styles.yearStatus}>Incomplete</div>
-                                    </div>
+                                    {selectedPeriod?.duration_years >= 3 && (
+                                        <div className={styles.yearCard}>
+                                            <div className={styles.yearHours}>{yearlyHours.year3}</div>
+                                            <div className={styles.yearLabel}>Year 3</div>
+                                            <div className={`${styles.yearStatus} ${getYearStatus(yearlyHours.year3).className}`}>
+                                                {getYearStatus(yearlyHours.year3).text}
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -265,7 +423,9 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
                                 </div>
                                 <div className={styles.statusRow}>
                                     <span className={styles.statusLabel}>Documents Processed</span>
-                                    <span className={styles.statusValue}>{dashboardData.compliance_summary.total_certificates}</span>
+                                    <span className={styles.statusValue}>
+                                        {displayData?.compliance_summary?.total_certificates || 0}
+                                    </span>
                                 </div>
                                 <div className={styles.statusNote}>
                                     Google Cloud Vision analysis with manual review capability
@@ -335,32 +495,23 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
                 </div>
 
                 {/* Certificates Table */}
-                {dashboardData.certificates && dashboardData.certificates.length > 0 && (
+                {displayData.certificates && displayData.certificates.length > 0 && (
                     <div className={styles.certificatesSection}>
                         <div className={styles.tableHeader}>
-                            <div className={styles.sectionHeader}>
-                                <h3 className={styles.sectionTitle}>CPE Certificate Records ({dashboardData.certificates.length})</h3>
+                            <div className={styles.sectionHeaderExport}>
+                                <h3 className={styles.sectionTitle}>CPE Certificate Records ({displayData.certificates.length})</h3>
                                 <button className={styles.exportButton} onClick={handleExportAudit}>
                                     <Download className={styles.buttonIcon} />
-                                    Export for Audit
+                                    Export
                                 </button>
                             </div>
                         </div>
 
                         <div className={styles.tableContainer}>
                             <table className={styles.certificatesTable}>
-                                <thead className={styles.tableHead}>
-                                    <tr>
-                                        <th className={styles.tableHeader}>Course Information</th>
-                                        <th className={styles.tableHeader}>Provider</th>
-                                        <th className={styles.tableHeader}>CPE Credits</th>
-                                        <th className={styles.tableHeader}>Completion Date</th>
-                                        <th className={styles.tableHeader}>Status</th>
-                                        <th className={styles.tableHeader}>Actions</th>
-                                    </tr>
-                                </thead>
+
                                 <tbody className={styles.tableBody}>
-                                    {dashboardData.certificates.map((cert) => (
+                                    {displayData.certificates.map((cert) => (
                                         <tr key={cert.id} className={styles.tableRow}>
                                             <td className={styles.tableCell}>
                                                 <div>
@@ -374,10 +525,10 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
                                             <td className={styles.tableCell}>
                                                 <div className={styles.creditValue}>{cert.cpe_credits}</div>
                                             </td>
-                                            <td className={styles.tableCell}>
+                                            <td className={`${styles.tableCell} ${styles.hideOnMobile}`}>
                                                 <div className={styles.dateValue}>{cert.completion_date}</div>
                                             </td>
-                                            <td className={styles.tableCell}>
+                                            <td className={`${styles.tableCell} ${styles.hideOnMobile}`}>
                                                 <div className={styles.statusContainer}>
                                                     <span className={styles.verifiedBadge}>Verified</span>
                                                     <span className={styles.confidenceText}>
@@ -385,7 +536,7 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
                                                     </span>
                                                 </div>
                                             </td>
-                                            <td className={styles.tableCell}>
+                                            <td className={`${styles.tableCell} ${styles.hideOnMobile}`}>
                                                 <button className={styles.actionButton}>
                                                     <Eye className={styles.actionIcon} />
                                                 </button>
@@ -399,11 +550,21 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
                 )}
 
                 {/* No Certificates State */}
-                {dashboardData.certificates && dashboardData.certificates.length === 0 && (
+                {displayData?.certificates && displayData.certificates.length === 0 && (
                     <div className={styles.emptyCertificates}>
                         <FileText className={styles.emptyIcon} />
-                        <h3>No certificates uploaded yet</h3>
-                        <p>Upload your first CPE certificate to start tracking your compliance progress.</p>
+                        <h3>
+                            {selectedPeriod?.is_current
+                                ? "No certificates uploaded yet"
+                                : "No certificates found for this period"
+                            }
+                        </h3>
+                        <p>
+                            {selectedPeriod?.is_current
+                                ? "Upload your first CPE certificate to start tracking your compliance progress."
+                                : "Upload certificates or select a different compliance period to view records."
+                            }
+                        </p>
                     </div>
                 )}
 

@@ -14,6 +14,70 @@
     gap: 1.5rem;
 }
 
+/* Loading and Error States */
+.loadingState,
+.errorState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    text-align: center;
+}
+
+.loadingState h2,
+.errorState h2 {
+    margin: 1rem 0 0.5rem 0;
+    color: #111827;
+}
+
+.loadingState p,
+.errorState p {
+    color: #6b7280;
+    margin: 0;
+}
+
+.errorIcon {
+    width: 3rem;
+    height: 3rem;
+    color: #ef4444;
+    margin-bottom: 1rem;
+}
+
+.retryButton {
+    margin-top: 1rem;
+    padding: 0.75rem 1.5rem;
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.retryButton:hover {
+    background-color: #1d4ed8;
+}
+
+.spinner {
+    width: 2rem;
+    height: 2rem;
+    border: 3px solid #e5e7eb;
+    border-top: 3px solid #2563eb;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
 /* Header */
 .header {
     background-color: white;
@@ -27,6 +91,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
 }
 
 .title {
@@ -216,6 +282,7 @@
 .annualRequirements {
     padding-top: 1rem;
     border-top: 1px solid #f3f4f6;
+    margin-top: 1rem;
 }
 
 .annualTitle {
@@ -236,6 +303,7 @@
     padding: 0.75rem;
     background-color: #f9fafb;
     border-radius: 0.375rem;
+    border: 1px solid #e5e7eb;
 }
 
 .yearHours {
@@ -251,8 +319,20 @@
 
 .yearStatus {
     font-size: 0.75rem;
-    color: #dc2626;
     margin-top: 0.25rem;
+    font-weight: 500;
+}
+
+.yearStatusComplete {
+    color: #059669;
+}
+
+.yearStatusProgress {
+    color: #d97706;
+}
+
+.yearStatusIncomplete {
+    color: #dc2626;
 }
 
 /* Status Content */
@@ -265,6 +345,7 @@
 .statusRow {
     display: flex;
     justify-content: space-between;
+    align-items: center;
 }
 
 .statusLabel {
@@ -302,14 +383,14 @@
     border-radius: 0.5rem;
     padding: 2rem;
     text-align: center;
-    background-color: #f9fafb;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.2s;
+    margin-top: 1rem;
 }
 
 .uploadZone:hover {
-    background-color: #f3f4f6;
-    border-color: #9ca3af;
+    border-color: #2563eb;
+    background-color: #fafbff;
 }
 
 .fileInput {
@@ -324,9 +405,9 @@
 }
 
 .uploadIcon {
-    width: 2rem;
-    height: 2rem;
-    color: #9ca3af;
+    width: 3rem;
+    height: 3rem;
+    color: #6b7280;
 }
 
 .uploadText {
@@ -346,115 +427,94 @@
 }
 
 .uploadButton {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.5rem 1rem;
-    background-color: #374151;
+    padding: 0.75rem 1.5rem;
+    background-color: #2563eb;
     color: white;
-    font-size: 0.875rem;
-    font-weight: 500;
-    border-radius: 0.375rem;
     border: none;
+    border-radius: 0.375rem;
+    font-weight: 500;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: background-color 0.2s;
 }
 
 .uploadButton:hover {
-    background-color: #1f2937;
+    background-color: #1d4ed8;
 }
 
 /* Upload Processing */
 .uploadProcessing {
-    border: 2px dashed #d1d5db;
-    border-radius: 0.5rem;
-    padding: 2rem;
     text-align: center;
-    background-color: #f9fafb;
-}
-
-.spinner {
-    width: 2rem;
-    height: 2rem;
-    border: 2px solid #e5e7eb;
-    border-top: 2px solid #374151;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 1rem;
-}
-
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
-    }
+    padding: 2rem;
 }
 
 .processingTitle {
     font-size: 1.125rem;
     font-weight: 600;
     color: #111827;
-    margin: 0 0 0.5rem 0;
+    margin: 1rem 0 0.5rem 0;
 }
 
 .processingText {
     color: #6b7280;
-    margin: 0 0 1rem 0;
+    margin: 0 0 1.5rem 0;
 }
 
 .processingSteps {
     display: flex;
-    align-items: center;
     justify-content: center;
     gap: 2rem;
-    font-size: 0.875rem;
-    color: #6b7280;
+    flex-wrap: wrap;
 }
 
 .processingStep {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    font-size: 0.875rem;
+    color: #6b7280;
 }
 
 .stepIndicator {
-    width: 0.5rem;
-    height: 0.5rem;
+    width: 1rem;
+    height: 1rem;
     border-radius: 50%;
     background-color: #e5e7eb;
 }
 
 .stepActive {
-    background-color: #059669;
+    background-color: #2563eb;
 }
 
-/* Certificates Table */
+/* Certificates Section - Responsive */
 .certificatesSection {
     background-color: white;
     border-radius: 0.5rem;
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
     border: 1px solid #e5e7eb;
+    padding: 1.5rem;
 }
 
 .tableHeader {
-    padding: 1.5rem 1.5rem 1rem;
-    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
 }
 
 .exportButton {
     display: inline-flex;
-    align-items: center;
+    align-items: right;
+    gap: 0.5rem;
     padding: 0.5rem 1rem;
     background-color: #374151;
     color: white;
+    border: none;
+    border-radius: 0.375rem;
     font-size: 0.875rem;
     font-weight: 500;
-    border-radius: 0.375rem;
-    border: none;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: background-color 0.2s;
+    margin-left: auto;
 }
 
 .exportButton:hover {
@@ -464,7 +524,11 @@
 .buttonIcon {
     width: 1rem;
     height: 1rem;
-    margin-right: 0.5rem;
+}
+
+/* Desktop Table View */
+.desktopTable {
+    display: block;
 }
 
 .tableContainer {
@@ -481,13 +545,11 @@
 }
 
 .tableHeader {
-    padding: 0.75rem 1.5rem;
+    padding: 0.75rem;
     text-align: left;
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: #6b7280;
-    text-transform: uppercase;
-    letter-spacing: 0.025em;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
     border-bottom: 1px solid #e5e7eb;
 }
 
@@ -496,7 +558,7 @@
 }
 
 .tableRow {
-    transition: background-color 0.2s ease;
+    border-bottom: 1px solid #f3f4f6;
 }
 
 .tableRow:hover {
@@ -504,18 +566,100 @@
 }
 
 .tableCell {
-    padding: 1rem 1.5rem;
-    border-bottom: 1px solid #e5e7eb;
+    padding: 0.75rem;
+    vertical-align: top;
 }
 
+/* Mobile Card View */
+.mobileCards {
+    display: none;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.certificateCard {
+    background-color: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    gap: 1rem;
+}
+
+.cardTitle {
+    flex: 1;
+}
+
+.cardCredits {
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.cardBody {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.cardRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.cardLabel {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #6b7280;
+    flex-shrink: 0;
+    min-width: 120px;
+}
+
+.cardValue {
+    font-size: 0.875rem;
+    color: #111827;
+    flex: 1;
+    text-align: right;
+}
+
+.cardStatus {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.25rem;
+}
+
+.cardActions {
+    padding-top: 1rem;
+    border-top: 1px solid #f3f4f6;
+}
+
+.creditLabel {
+    font-size: 0.75rem;
+    color: #6b7280;
+    display: block;
+}
+
+/* Certificate Details */
 .certTitle {
     font-size: 0.875rem;
     font-weight: 500;
     color: #111827;
+    margin-bottom: 0.25rem;
+    line-height: 1.4;
 }
 
 .certId {
-    font-size: 0.875rem;
+    font-size: 0.75rem;
     color: #6b7280;
 }
 
@@ -537,19 +681,21 @@
 
 .statusContainer {
     display: flex;
-    align-items: center;
-    gap: 0.5rem;
+    flex-direction: column;
+    gap: 0.25rem;
 }
 
 .verifiedBadge {
     display: inline-flex;
     align-items: center;
-    padding: 0.125rem 0.625rem;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 500;
+    padding: 0.25rem 0.5rem;
     background-color: #f0fdf4;
     color: #166534;
+    border: 1px solid #bbf7d0;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    width: fit-content;
 }
 
 .confidenceText {
@@ -558,33 +704,66 @@
 }
 
 .actionButton {
-    color: #9ca3af;
-    background: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background-color: #f3f4f6;
     border: none;
+    border-radius: 0.25rem;
     cursor: pointer;
-    padding: 0.25rem;
-    transition: color 0.2s ease;
+    transition: background-color 0.2s;
+    font-size: 0.875rem;
+    color: #6b7280;
 }
 
 .actionButton:hover {
-    color: #6b7280;
+    background-color: #e5e7eb;
 }
 
 .actionIcon {
     width: 1rem;
     height: 1rem;
+    color: #6b7280;
 }
 
-/* Professional Upgrade Notice */
-.upgradeNotice {
+/* Empty State */
+.emptyCertificates {
+    text-align: center;
+    padding: 3rem;
     background-color: white;
     border-radius: 0.5rem;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
     border: 1px solid #e5e7eb;
+}
+
+.emptyIcon {
+    width: 3rem;
+    height: 3rem;
+    color: #9ca3af;
+    margin: 0 auto 1rem;
+}
+
+.emptyCertificates h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 0 0 0.5rem 0;
+}
+
+.emptyCertificates p {
+    color: #6b7280;
+    margin: 0;
+}
+
+/* Upgrade Notice */
+.upgradeNotice {
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    border: 1px solid #bfdbfe;
+    border-radius: 0.5rem;
     padding: 1.5rem;
     display: flex;
-    align-items: flex-start;
     gap: 1rem;
+    align-items: flex-start;
 }
 
 .upgradeIcon {
@@ -594,7 +773,7 @@
 .checkIcon {
     width: 1.5rem;
     height: 1.5rem;
-    color: #059669;
+    color: #2563eb;
 }
 
 .upgradeContent {
@@ -605,22 +784,25 @@
     font-size: 1.125rem;
     font-weight: 600;
     color: #111827;
-    margin: 0 0 0.25rem 0;
+    margin: 0 0 0.5rem 0;
 }
 
 .upgradeDescription {
-    color: #6b7280;
+    color: #374151;
     margin: 0 0 1rem 0;
 }
 
 .upgradeFeatures {
     display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    font-size: 0.875rem;
-    color: #6b7280;
-    margin-bottom: 1rem;
     flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.upgradeFeatures span {
+    font-size: 0.875rem;
+    color: #059669;
+    font-weight: 500;
 }
 
 .upgradeAction {
@@ -628,27 +810,36 @@
 }
 
 .upgradeButton {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.5rem 1rem;
+    padding: 0.75rem 1.5rem;
     background-color: #2563eb;
     color: white;
-    font-size: 0.875rem;
-    font-weight: 500;
-    border-radius: 0.375rem;
     border: none;
+    border-radius: 0.375rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: background-color 0.2s;
 }
 
 .upgradeButton:hover {
     background-color: #1d4ed8;
 }
 
+.sectionHeaderExport {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    width: 100%;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .dashboard {
         padding: 1rem;
+    }
+
+    .hideOnMobile {
+        display: none;
     }
 
     .container {
@@ -658,11 +849,12 @@
     .headerContent {
         flex-direction: column;
         align-items: flex-start;
-        gap: 1rem;
+        text-align: left;
     }
 
     .headerStatus {
         text-align: left;
+        width: 100%;
     }
 
     .yearGrid {
@@ -675,41 +867,60 @@
         gap: 1rem;
     }
 
+    .upgradeNotice {
+        flex-direction: column;
+    }
+
     .upgradeFeatures {
         flex-direction: column;
-        align-items: flex-start;
         gap: 0.5rem;
     }
 
-    .tableContainer {
-        font-size: 0.875rem;
+    /* Hide desktop table, show mobile cards */
+    .desktopTable {
+        display: none;
     }
 
-    .tableHeader,
-    .tableCell {
-        padding: 0.5rem;
-    }
-}
-
-@media (max-width: 640px) {
-    .title {
-        font-size: 1.25rem;
+    .mobileCards {
+        display: flex;
     }
 
-    .cpeName {
-        font-size: 1rem;
-    }
-
-    .uploadContent {
+    .cardHeader {
+        flex-direction: column;
+        align-items: flex-start;
         gap: 0.75rem;
     }
 
-    .uploadIcon {
-        width: 1.5rem;
-        height: 1.5rem;
+    .cardCredits {
+        text-align: left;
     }
 
-    .uploadTitle {
-        font-size: 1rem;
+    .cardRow {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .cardLabel {
+        min-width: auto;
+    }
+
+    .cardValue {
+        text-align: left;
+    }
+
+    .cardStatus {
+        align-items: flex-start;
+    }
+}
+
+@media (min-width: 769px) {
+
+    /* Show desktop table, hide mobile cards */
+    .desktopTable {
+        display: block;
+    }
+
+    .mobileCards {
+        display: none;
     }
 }

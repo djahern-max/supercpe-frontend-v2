@@ -9,13 +9,13 @@ import { apiService } from '../services/api';
 import { formatDate, calculateDaysRemaining } from '../utils/dateUtils';
 import styles from '../styles/pages/Dashboard.module.css';
 
-// Import ComplianceDashboard component if it exists, otherwise use fallback
-let ComplianceDashboard;
+// Import ProfessionalCPEDashboard instead of ComplianceDashboard
+let ProfessionalCPEDashboard;
 try {
-    ComplianceDashboard = require('../components/dashboard/ComplianceDashboard').default;
+    ProfessionalCPEDashboard = require('../components/compliance/ProfessionalCPEDashboard').default;
 } catch (error) {
-    console.log('ComplianceDashboard component not found, using basic dashboard only');
-    ComplianceDashboard = null;
+    console.log('ProfessionalCPEDashboard component not found, using basic dashboard only');
+    ProfessionalCPEDashboard = null;
 }
 
 const Dashboard = () => {
@@ -23,7 +23,7 @@ const Dashboard = () => {
     const [cpa, setCpa] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [useEnhanced, setUseEnhanced] = useState(!!ComplianceDashboard);
+    const [useEnhanced, setUseEnhanced] = useState(false); // Start with basic view
 
     useEffect(() => {
         if (licenseNumber) {
@@ -127,38 +127,44 @@ const Dashboard = () => {
                 </div>
 
                 {/* Dashboard Mode Toggle */}
-                {ComplianceDashboard && (
+                {ProfessionalCPEDashboard && (
                     <div className={styles.dashboardControls}>
                         <div className={styles.controlGroup}>
                             <Button
-                                variant={useEnhanced ? "primary" : "outline"}
-                                onClick={() => setUseEnhanced(true)}
-                            >
-                                Enhanced Dashboard
-                            </Button>
-                            <Button
                                 variant={!useEnhanced ? "primary" : "outline"}
                                 onClick={() => setUseEnhanced(false)}
+                                className={styles.controlButton}
                             >
-                                Basic View
+                                Reporting Requirements
+                            </Button>
+                            <Button
+                                variant={useEnhanced ? "primary" : "outline"}
+                                onClick={() => setUseEnhanced(true)}
+                                className={styles.controlButton}
+                            >
+                                CPE Compliance
                             </Button>
                         </div>
                     </div>
                 )}
 
                 {/* Render Enhanced or Basic Dashboard */}
-                {useEnhanced && ComplianceDashboard ? (
-                    <ComplianceDashboard licenseNumber={licenseNumber} />
+                {useEnhanced && ProfessionalCPEDashboard ? (
+                    <ProfessionalCPEDashboard licenseNumber={licenseNumber} />
                 ) : (
-                    <BasicDashboardView cpa={cpa} licenseNumber={licenseNumber} />
+                    <BasicDashboardView
+                        cpa={cpa}
+                        licenseNumber={licenseNumber}
+                        onEnhanceToggle={() => setUseEnhanced(true)}
+                    />
                 )}
             </div>
         </div>
     );
 };
 
-
-const BasicDashboardView = ({ cpa, licenseNumber }) => {
+// Fixed BasicDashboardView component
+const BasicDashboardView = ({ cpa, licenseNumber, onEnhanceToggle }) => {
     if (!cpa) {
         return (
             <Card className={styles.errorCard}>
@@ -199,17 +205,7 @@ const BasicDashboardView = ({ cpa, licenseNumber }) => {
                 </p>
             </div>
 
-            {/* Upload Action - This should work now */}
-            <div className={styles.uploadSection}>
-                <Button
-                    as={Link}
-                    to={`/compliance/${licenseNumber}`}
-                    variant="primary"
-                    size="lg"
-                >
-                    Upload CPE Certificate
-                </Button>
-            </div>
+
 
             <Card className={styles.statusCard}>
                 <div className={styles.statusHeader}>
@@ -300,42 +296,6 @@ const BasicDashboardView = ({ cpa, licenseNumber }) => {
                 </div>
             </Card>
 
-            {/* Requirements Card */}
-            <Card className={styles.requirementsCard}>
-                <h3>Your CPE Requirements (2-Year Period)</h3>
-
-                <div className={styles.requirementsList}>
-                    <div className={styles.requirement}>
-                        <div className={styles.requirementHeader}>
-                            <span className={styles.label}>Total CPE Hours</span>
-                            <span className={styles.value}>0 / 80</span>
-                        </div>
-                        <div className={styles.progressBar}>
-                            <div className={styles.progressFill} style={{ width: '0%' }}></div>
-                        </div>
-                        <p className={styles.note}>80 hours required over 2 years</p>
-                    </div>
-
-                    <div className={styles.requirement}>
-                        <div className={styles.requirementHeader}>
-                            <span className={styles.label}>Ethics Hours</span>
-                            <span className={styles.value}>0 / 4</span>
-                        </div>
-                        <div className={styles.progressBar}>
-                            <div className={styles.progressFill} style={{ width: '0%' }}></div>
-                        </div>
-                        <p className={styles.note}>4 hours required anytime during the 2-year period</p>
-                    </div>
-
-                    <div className={styles.requirement}>
-                        <div className={styles.requirementHeader}>
-                            <span className={styles.label}>Annual Minimum</span>
-                            <span className={styles.value}>20 hours/year</span>
-                        </div>
-                        <p className={styles.note}>Must complete at least 20 hours each year</p>
-                    </div>
-                </div>
-            </Card>
 
             {/* Key Facts */}
             <Card className={styles.factsCard}>
@@ -351,6 +311,7 @@ const BasicDashboardView = ({ cpa, licenseNumber }) => {
                         <strong>Your Renewal Date:</strong> {wasLicensedBeforeRuleChange
                             ? 'June 30th every 2 years'
                             : `${issueDate.toLocaleDateString('en-US', { month: 'long' })} every 2 years`}
+
                     </div>
                     <div className={styles.fact}>
                         <strong>Annual Minimum:</strong> 20 hours per year must still be completed
@@ -360,9 +321,19 @@ const BasicDashboardView = ({ cpa, licenseNumber }) => {
                     </div>
                 </div>
             </Card>
+            {/* Upload Action - Now uses the toggle function */}
+            <div className={styles.uploadSection}>
+                <Button
+                    onClick={onEnhanceToggle}
+                    variant="primary"
+                    size="lg"
+                >
+                    Upload CPE Certificate
+                </Button>
+            </div>
+
         </div>
     );
 };
-
 
 export default Dashboard;
