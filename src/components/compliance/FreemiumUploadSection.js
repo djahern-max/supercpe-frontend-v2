@@ -96,7 +96,7 @@ const FreemiumUploadSection = ({ licenseNumber, uploadCount, onUploadSuccess }) 
             <Card className={styles.uploadSection}>
                 {/* Enhanced Progress Header */}
                 <div className={styles.uploadHeader}>
-                    <h3>🚀 Enhanced Free CPE Management</h3>
+                    <h3> Enhanced Free CPE Management</h3>
                     <Badge variant={remaining > 0 ? "success" : "warning"}>
                         {remaining > 0
                             ? `${remaining} Full-Feature Uploads Remaining`
@@ -161,26 +161,7 @@ const FreemiumUploadSection = ({ licenseNumber, uploadCount, onUploadSuccess }) 
                     </div>
                 )}
 
-                {/* Enhanced Benefits Section */}
-                {uploadCount < MAX_FREE_UPLOADS && (
-                    <div className={styles.uploadBenefits}>
-                        <h4>🎯 Your Enhanced Free Tier Includes FULL Functionality:</h4>
-                        <ul>
-                            <li>🤖 <strong>Google Cloud Vision AI</strong> - Professional certificate analysis</li>
-                            <li>☁️ <strong>Digital Ocean Spaces Storage</strong> - Secure, permanent cloud storage</li>
-                            <li>💾 <strong>Database Records</strong> - Full compliance tracking and history</li>
-                            <li>📊 <strong>Real-time Dashboard</strong> - Live compliance progress updates</li>
-                            <li>📋 <strong>Audit Presentation Tools</strong> - Professional reporting ready</li>
-                            <li>🎯 <strong>Smart Period Assignment</strong> - Automatic compliance period detection</li>
-                            <li>⚡ <strong>Instant Hours Calculation</strong> - CPE and ethics hours tracking</li>
-                            <li>🔒 <strong>Enterprise Security</strong> - Same security as premium tier</li>
-                        </ul>
-                        <div className={styles.enhancedNote}>
-                            <strong>🎉 This is the SAME functionality as our $10/month Professional tier!</strong>
-                            <br />Experience the complete system with your first 10 certificates.
-                        </div>
-                    </div>
-                )}
+
 
             </Card>
 

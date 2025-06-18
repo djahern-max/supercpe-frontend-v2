@@ -1,4 +1,4 @@
-// src/services/api.js
+// src/services/api.js - CLEANED AND ORGANIZED VERSION
 import axios from 'axios';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
@@ -43,13 +43,12 @@ apiClient.interceptors.response.use(
 );
 
 export const apiService = {
-    // Health Check
+    // ===== HEALTH & CONNECTION =====
     async healthCheck() {
         const response = await apiClient.get('/health');
         return response.data;
     },
 
-    // Test Connection
     async testConnection() {
         try {
             const response = await apiClient.get('/health');
@@ -66,7 +65,7 @@ export const apiService = {
         }
     },
 
-    // CPA Management
+    // ===== CPA MANAGEMENT =====
     async getAllCPAs(skip = 0, limit = 100) {
         const response = await apiClient.get(`/api/cpas/?skip=${skip}&limit=${limit}`);
         return response.data;
@@ -87,40 +86,47 @@ export const apiService = {
         return response.data;
     },
 
-    // Basic Compliance Management (existing)
+    // ===== COMPLIANCE MANAGEMENT =====
     async getCompliance(licenseNumber) {
         const response = await apiClient.get(`/api/compliance/${licenseNumber}`);
         return response.data;
     },
 
-    // ===== NEW ENHANCED COMPLIANCE METHODS =====
-
-    /**
-     * Get the comprehensive enhanced compliance dashboard
-     * This is the main endpoint for the personalized dashboard
-     */
     async getEnhancedCompliance(licenseNumber) {
         const response = await apiClient.get(`/api/compliance/${licenseNumber}/dashboard`);
         return response.data;
     },
 
-    /**
-     * Get quick compliance status (for overview cards)
-     */
     async getQuickComplianceStatus(licenseNumber) {
         const response = await apiClient.get(`/api/compliance/${licenseNumber}/quick-status`);
         return response.data;
     },
 
-    /**
-     * Get detailed NH compliance rules explanation
-     */
     async getComplianceRulesExplanation(licenseNumber) {
         const response = await apiClient.get(`/api/compliance/${licenseNumber}/rules/explanation`);
         return response.data;
     },
 
-    // Time Windows (existing)
+    /**
+     * Get compliance dashboard data (main dashboard endpoint)
+     * This is the primary endpoint your ProfessionalCPEDashboard uses
+     */
+    async getComplianceDashboard(licenseNumber) {
+        const response = await apiClient.get(`/api/upload/compliance-dashboard/${licenseNumber}`);
+        return response.data;
+    },
+
+    async generateAuditPresentation(licenseNumber, options = {}) {
+        const response = await apiClient.post(`/api/compliance/generate-audit-presentation/${licenseNumber}`, {
+            include_free_tier: true,
+            include_premium: true,
+            format: options.format || 'pdf',
+            style: options.style || 'professional'
+        });
+        return response.data;
+    },
+
+    // ===== TIME WINDOWS & PERIODS =====
     async getTimeWindows(licenseNumber) {
         const response = await apiClient.get(`/api/time-windows/${licenseNumber}`);
         return response.data;
@@ -131,14 +137,34 @@ export const apiService = {
         return response.data;
     },
 
+    async getAvailablePeriods(licenseNumber) {
+        const response = await apiClient.get(`/api/time-windows/${licenseNumber}/available`);
+        return response.data.available_windows || response.data;
+    },
+
     async analyzeTimeWindow(licenseNumber, timeWindow) {
         const response = await apiClient.post(`/api/time-windows/${licenseNumber}/analyze`, {
-            time_window: timeWindow
+            start_date: timeWindow.start_date,
+            end_date: timeWindow.end_date
         });
         return response.data;
     },
 
-    // Admin and Upload functionality
+    async getCurrentPeriod(licenseNumber) {
+        const response = await apiClient.get(`/api/time-windows/${licenseNumber}/current-period`);
+        return response.data;
+    },
+
+    async getCurrentPeriodAnalysis(licenseNumber) {
+        const response = await apiClient.get(`/api/time-windows/${licenseNumber}/current-period`);
+        return response.data;
+    },
+
+    // ===== UPLOAD & CERTIFICATE MANAGEMENT =====
+
+    /**
+     * ADMIN: Upload monthly CPA list
+     */
     async uploadCPAList(file) {
         const formData = new FormData();
         formData.append('file', file);
@@ -151,136 +177,18 @@ export const apiService = {
         return response.data;
     },
 
-    // Certificate Analysis (AI functionality)
-    async analyzeCertificate(licenseNumber, file) {
-        const formData = new FormData();
-        formData.append('file', file);
-
-        const response = await apiClient.post(
-            `/api/admin/analyze-certificate/${licenseNumber}`,
-            formData,
-            {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            }
-        );
-        return response.data;
-    },
-
-    async saveReviewedCertificate(licenseNumber, certificateData) {
-        const response = await apiClient.post(
-            `/api/admin/save-reviewed-certificate/${licenseNumber}`,
-            certificateData
-        );
-        return response.data;
-    },
-
-    // Payment and Subscription
-    async getSubscriptionStatus(licenseNumber) {
-        const response = await apiClient.get(`/api/payments/subscription-status/${licenseNumber}`);
-        return response.data;
-    },
-
-    async createPaymentIntent(licenseNumber) {
-        const response = await apiClient.post(`/api/payments/create-payment-intent/${licenseNumber}`);
-        return response.data;
-    },
-
-    async confirmPayment(licenseNumber, paymentIntentId) {
-        const response = await apiClient.post(`/api/payments/confirm-payment/${licenseNumber}`, {
-            payment_intent_id: paymentIntentId
-        });
-        return response.data;
-    },
-
-
-
     /**
-     * Analyze a certificate with AI (FREE tier)
+     * FREE TIER: Get upload status and remaining uploads
      */
-    async analyzeCertificate(licenseNumber, file) {
-        const formData = new FormData();
-        formData.append('file', file);
-
-        const response = await apiClient.post(
-            `/api/upload/analyze-certificate/${licenseNumber}`,
-            formData,
-            {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-                timeout: 60000, // 60 seconds for AI processing
-            }
-        );
+    async getFreeTierStatus(licenseNumber) {
+        const response = await apiClient.get(`/api/upload/free-tier-status/${licenseNumber}`);
         return response.data;
     },
 
     /**
-     * Get quick compliance status
+     * FREE TIER: Upload certificate with FULL functionality (AI + Storage + Tracking)
+     * LIMITED to 10 uploads, then subscription required
      */
-    async getQuickCompliance(licenseNumber) {
-        const response = await apiClient.get(`/api/compliance/${licenseNumber}/quick-status`);
-        return response.data;
-    },
-
-    /**
-     * Get enhanced compliance dashboard
-     */
-    async getEnhancedCompliance(licenseNumber) {
-        const response = await apiClient.get(`/api/compliance/${licenseNumber}/dashboard`);
-        return response.data;
-    },
-
-
-
-    /**
-     * Get current compliance period
-     */
-    async getCurrentPeriod(licenseNumber) {
-        const response = await apiClient.get(`/api/time-windows/${licenseNumber}/current-period`);
-        return response.data;
-    },
-
-    /**
-     * Check subscription status
-     */
-    async getSubscriptionStatus(licenseNumber) {
-        const response = await apiClient.get(`/api/payments/subscription-status/${licenseNumber}`);
-        return response.data;
-    },
-
-    /**
-/**
- * Get available compliance periods for a CPA
- */
-    async getAvailablePeriods(licenseNumber) {
-        const response = await apiClient.get(`/api/time-windows/${licenseNumber}/available`);
-        return response.data.available_windows || response.data;
-    },
-
-    /**
-     * Analyze a specific time window/period
-     */
-    async analyzeTimeWindow(licenseNumber, timeWindow) {
-        const response = await apiClient.post(`/api/time-windows/${licenseNumber}/analyze`, {
-            start_date: timeWindow.start_date,
-            end_date: timeWindow.end_date
-        });
-        return response.data;
-    },
-
-    /**
-     * Get current period analysis
-     */
-    async getCurrentPeriodAnalysis(licenseNumber) {
-        const response = await apiClient.get(`/api/time-windows/${licenseNumber}/current-period`);
-        return response.data;
-    },
-    /**
- * Upload certificate with ENHANCED FREE functionality
- * Includes: AI Analysis + Digital Ocean Storage + Database Records + Compliance Tracking
- */
     async uploadCertificateEnhancedFree(licenseNumber, file) {
         const formData = new FormData();
         formData.append('file', file);
@@ -299,44 +207,62 @@ export const apiService = {
     },
 
     /**
-     * Get free tier upload status and remaining uploads
+     * PREMIUM: Upload certificate for subscribers (unlimited)
      */
-    async getFreeTierStatus(licenseNumber) {
-        const response = await apiClient.get(`/api/upload/free-tier-status/${licenseNumber}`);
+    async uploadCertificatePremium(licenseNumber, file) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await apiClient.post(
+            `/api/upload/upload-cpe-certificate/${licenseNumber}`,
+            formData,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+                timeout: 60000,
+            }
+        );
         return response.data;
     },
 
     /**
-     * Generate audit presentation (works for both free and premium)
+     * ADMIN: Analyze certificate with AI (preview mode)
      */
-    async generateAuditPresentation(licenseNumber, options = {}) {
-        const response = await apiClient.post(`/api/compliance/generate-audit-presentation/${licenseNumber}`, {
-            include_free_tier: true,
-            include_premium: true,
-            format: options.format || 'pdf',
-            style: options.style || 'professional'
-        });
+    async analyzeCertificate(licenseNumber, file) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await apiClient.post(
+            `/api/admin/analyze-certificate/${licenseNumber}`,
+            formData,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+                timeout: 60000, // 60 seconds for AI processing
+            }
+        );
         return response.data;
     },
 
     /**
- * Get compliance dashboard data (no auth required)
- * This calls the endpoint you successfully tested with CURL
- */
-    async getComplianceDashboard(licenseNumber) {
-        const response = await apiClient.get(`/api/upload/compliance-dashboard/${licenseNumber}`);
+     * ADMIN: Save reviewed certificate (after user edits AI results)
+     */
+    async saveReviewedCertificate(licenseNumber, certificateData) {
+        const response = await apiClient.post(
+            `/api/admin/save-reviewed-certificate/${licenseNumber}`,
+            certificateData
+        );
         return response.data;
     },
 
     /**
- * Delete a certificate record
- * @param {string|number} certificateId - The ID of the certificate to delete
- * @param {string} licenseNumber - The CPA license number
- * @returns {Promise<Object>} - Response from the server
- */
-    deleteCertificate: async (certificateId, licenseNumber) => {
+     * Delete a certificate record
+     */
+    async deleteCertificate(certificateId, licenseNumber) {
         try {
-            const response = await axios.delete(
+            const response = await apiClient.delete(
                 `/api/upload/certificate/${certificateId}?license_number=${licenseNumber}`
             );
             return response.data;
@@ -346,9 +272,22 @@ export const apiService = {
         }
     },
 
-    createAccountForPayment: async (accountData) => {
+    // ===== PAYMENTS & SUBSCRIPTIONS =====
+
+    /**
+     * Get subscription status for a CPA
+     */
+    async getSubscriptionStatus(licenseNumber) {
+        const response = await apiClient.get(`/api/payments/subscription-status/${licenseNumber}`);
+        return response.data;
+    },
+
+    /**
+     * Create account and initiate payment process
+     */
+    async createAccountForPayment(accountData) {
         try {
-            const response = await axios.post(
+            const response = await apiClient.post(
                 `/api/payments/create-account-for-payment`,
                 accountData
             );
@@ -359,5 +298,23 @@ export const apiService = {
         }
     },
 
+    /**
+     * Create payment intent for one-time payments
+     */
+    async createPaymentIntent(licenseNumber) {
+        const response = await apiClient.post(`/api/payments/create-payment-intent/${licenseNumber}`);
+        return response.data;
+    },
 
+    /**
+     * Confirm payment completion
+     */
+    async confirmPayment(licenseNumber, paymentIntentId) {
+        const response = await apiClient.post(`/api/payments/confirm-payment/${licenseNumber}`, {
+            payment_intent_id: paymentIntentId
+        });
+        return response.data;
+    },
 };
+
+export default apiService;

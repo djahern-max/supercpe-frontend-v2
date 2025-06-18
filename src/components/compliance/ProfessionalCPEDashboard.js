@@ -4,6 +4,7 @@ import { Upload, FileText, BarChart3, Clock, AlertTriangle, CheckCircle, Eye, Do
 import PeriodSelector from './PeriodSelector';
 import styles from '../../styles/components/ProfessionalCPEDashboard.module.css';
 import DeleteCertificateButton from './DeleteCertificateButton';
+import EnhancedFreemiumUploadSection from './EnhancedFreemiumUploadSection';
 
 const ProfessionalCPEDashboard = ({ licenseNumber }) => {
     // REAL STATE - NO MOCK DATA
@@ -492,29 +493,15 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
                             </div>
                         </div>
                     ) : (
-                        <div
-                            className={styles.uploadZone}
-                            onClick={() => document.getElementById('fileInput').click()}
-                        >
-                            <input
-                                id="fileInput"
-                                type="file"
-                                multiple
-                                accept=".pdf,.png,.jpg,.jpeg"
-                                className={styles.fileInput}
-                                onChange={(e) => handleFileUpload(Array.from(e.target.files))}
-                            />
-                            <div className={styles.uploadContent}>
-                                <Upload className={styles.uploadIcon} />
-                                <div className={styles.uploadText}>
-                                    <h4 className={styles.uploadTitle}>Upload Certificate Documents</h4>
-                                    <p className={styles.uploadDescription}>
-                                        Drag and drop files here, or click to select files
-                                    </p>
-                                </div>
-                                <button className={styles.uploadButton}>Select Files</button>
-                            </div>
-                        </div>
+                        <EnhancedFreemiumUploadSection
+                            licenseNumber={licenseNumber}
+                            onUploadSuccess={(uploadResult) => {
+                                // Your existing refresh logic
+                                loadDashboardData(licenseNumber);
+                            }}
+                        />
+
+
                     )}
                 </div>
 
