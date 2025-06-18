@@ -328,5 +328,23 @@ export const apiService = {
         return response.data;
     },
 
+    /**
+ * Delete a certificate record
+ * @param {string|number} certificateId - The ID of the certificate to delete
+ * @param {string} licenseNumber - The CPA license number
+ * @returns {Promise<Object>} - Response from the server
+ */
+    deleteCertificate: async (certificateId, licenseNumber) => {
+        try {
+            const response = await axios.delete(
+                `/api/upload/certificate/${certificateId}?license_number=${licenseNumber}`
+            );
+            return response.data;
+        } catch (error) {
+            console.error('Error deleting certificate:', error);
+            throw error;
+        }
+    },
+
 
 };

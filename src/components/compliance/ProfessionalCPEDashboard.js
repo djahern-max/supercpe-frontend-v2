@@ -1,8 +1,9 @@
 // src/components/compliance/ProfessionalCPEDashboard.js
 import React, { useState, useEffect } from 'react';
-import { Upload, FileText, BarChart3, Clock, AlertTriangle, CheckCircle, Eye, Download, Shield, Database } from 'lucide-react';
+import { Upload, FileText, BarChart3, Clock, AlertTriangle, CheckCircle, Eye, Download, Shield, Database, Trash2 } from 'lucide-react';
 import PeriodSelector from './PeriodSelector';
 import styles from '../../styles/components/ProfessionalCPEDashboard.module.css';
+import DeleteCertificateButton from './DeleteCertificateButton';
 
 const ProfessionalCPEDashboard = ({ licenseNumber }) => {
     // REAL STATE - NO MOCK DATA
@@ -36,6 +37,29 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
         } finally {
             setLoading(false);
         }
+    };
+
+    // Handle certificate deletion
+    const handleCertificateDeleted = (deletedCertId) => {
+        if (!dashboardData || !dashboardData.certificates) return;
+
+        // Update the certificates in the dashboard data
+        const updatedCertificates = dashboardData.certificates.filter(
+            cert => cert.id !== deletedCertId
+        );
+
+        // Update dashboard data with the filtered certificates
+        setDashboardData({
+            ...dashboardData,
+            certificates: updatedCertificates,
+            compliance_summary: {
+                ...dashboardData.compliance_summary,
+                total_certificates: updatedCertificates.length
+            }
+        });
+
+        // Recalculate totals if needed (could be more complex in real application)
+        console.log(`Certificate ${deletedCertId} removed from UI`);
     };
 
     // Show loading state
@@ -536,10 +560,18 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
                                                     </span>
                                                 </div>
                                             </td>
-                                            <td className={`${styles.tableCell} ${styles.hideOnMobile}`}>
-                                                <button className={styles.actionButton}>
-                                                    <Eye className={styles.actionIcon} />
-                                                </button>
+                                            <td className={styles.tableCell}>
+                                                <div className={styles.certificateActions}>
+                                                    <button className={styles.actionButton}>
+                                                        <Eye className={styles.actionIcon} />
+                                                    </button>
+                                                    <DeleteCertificateButton
+                                                        certificateId={cert.id}
+                                                        licenseNumber={licenseNumber}
+                                                        certificateTitle={cert.course_title}
+                                                        onDeleteSuccess={handleCertificateDeleted}
+                                                    />
+                                                </div>
                                             </td>
                                         </tr>
                                     ))}
@@ -578,7 +610,7 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
                             <h3 className={styles.upgradeTitle}>Professional CPE Management</h3>
                             <p className={styles.upgradeDescription}>
                                 You have {dashboardData.upload_status.free_uploads_remaining} remaining uploads with full functionality.
-                                Continue with unlimited professional management for $58/year.
+                                Continue with unlimited professional management for $10/month.
                             </p>
                             <div className={styles.upgradeFeatures}>
                                 <span>✓ Unlimited certificate uploads</span>

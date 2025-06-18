@@ -132,7 +132,7 @@ npm run build
 - Basic compliance lookup
 - Professional dashboard view
 
-### Professional Tier ($58/year)
+### Professional Tier ($10/month)
 - Permanent record storage
 - Advanced compliance reports
 - Secure document management

@@ -176,7 +176,7 @@ const FreemiumUploadSection = ({ licenseNumber, uploadCount, onUploadSuccess }) 
                             <li>🔒 <strong>Enterprise Security</strong> - Same security as premium tier</li>
                         </ul>
                         <div className={styles.enhancedNote}>
-                            <strong>🎉 This is the SAME functionality as our $58/year Professional tier!</strong>
+                            <strong>🎉 This is the SAME functionality as our $10/month Professional tier!</strong>
                             <br />Experience the complete system with your first 10 certificates.
                         </div>
                     </div>

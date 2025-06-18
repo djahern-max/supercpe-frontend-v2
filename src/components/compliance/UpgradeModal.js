@@ -112,11 +112,11 @@ const UpgradeModal = ({ onClose, uploadCount, licenseNumber }) => {
                             <Badge variant="success">Best Value</Badge>
                         </div>
                         <div className={styles.price}>
-                            <span className={styles.priceAmount}>$58</span>
-                            <span className={styles.pricePeriod}>/year</span>
+                            <span className={styles.priceAmount}>$10</span>
+                            <span className={styles.pricePeriod}>/month</span>
                         </div>
                         <div className={styles.priceNote}>
-                            Less than $5/month • Cancel anytime
+                            $8/month • Cancel anytime
                         </div>
                     </div>
                 </div>
