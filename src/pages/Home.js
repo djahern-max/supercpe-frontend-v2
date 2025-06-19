@@ -27,7 +27,7 @@ const Home = () => {
                         <CPASearch />
 
                         <div className={styles.searchInstructions}>
-                            <p>Search by name or license number to access your dashboard</p>
+                            <p>Enter Your Name or License Number</p>
                         </div>
                     </div>
                 </section>

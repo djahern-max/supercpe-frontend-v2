@@ -1,4 +1,4 @@
-// src/components/CPASearch.js - Enhanced to preserve license through OAuth
+// src/components/CPASearch.js - Simplified (AuthCallback handles license linking)
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
@@ -27,59 +27,6 @@ const CPASearch = () => {
             }
         };
     }, []);
-
-    // Check for pending license link after authentication
-    useEffect(() => {
-        const checkPendingLicense = async () => {
-            if (isAuthenticated && user) {
-                const pendingLicense = sessionStorage.getItem('pending_license_link');
-                const pendingCpaName = sessionStorage.getItem('pending_cpa_name');
-
-                if (pendingLicense && !user.license_number) {
-                    console.log(`Found pending license link: ${pendingLicense}`);
-
-                    try {
-                        setIsLinkingLicense(true);
-
-                        toast.loading(`Linking license ${pendingLicense} to your account...`, {
-                            id: 'auto-linking'
-                        });
-
-                        await connectLicense(pendingLicense);
-
-                        // Clear pending license
-                        sessionStorage.removeItem('pending_license_link');
-                        sessionStorage.removeItem('pending_cpa_name');
-
-                        toast.success(`Welcome! License ${pendingLicense} has been linked to your account.`, {
-                            id: 'auto-linking',
-                            duration: 4000
-                        });
-
-                        // Redirect to the dashboard for this license
-                        setTimeout(() => {
-                            navigate(`/dashboard/${pendingLicense}`, { replace: true });
-                        }, 1500);
-
-                    } catch (error) {
-                        console.error('Failed to auto-link pending license:', error);
-
-                        // Clear the pending license even if it failed
-                        sessionStorage.removeItem('pending_license_link');
-                        sessionStorage.removeItem('pending_cpa_name');
-
-                        toast.error(`Failed to link license ${pendingLicense}. Please try selecting it again.`, {
-                            id: 'auto-linking'
-                        });
-                    } finally {
-                        setIsLinkingLicense(false);
-                    }
-                }
-            }
-        };
-
-        checkPendingLicense();
-    }, [isAuthenticated, user, connectLicense, navigate]);
 
     // Debounced search as user types
     useEffect(() => {
@@ -187,10 +134,10 @@ const CPASearch = () => {
             navigate(`/dashboard/${cpa.license_number}`);
 
         } else {
-            // User is NOT authenticated - store license for later linking and trigger OAuth
-            console.log(`Storing license ${cpa.license_number} for post-auth linking`);
+            // User is NOT authenticated - store license for OAuth callback to handle
+            console.log(`Storing license ${cpa.license_number} for post-OAuth linking`);
 
-            // Store the license info for after authentication
+            // Store the license info for AuthCallback to handle after OAuth
             sessionStorage.setItem('pending_license_link', cpa.license_number);
             sessionStorage.setItem('pending_cpa_name', cpa.full_name);
 
@@ -254,7 +201,7 @@ const CPASearch = () => {
                     onChange={(e) => setQuery(e.target.value)}
                     onKeyDown={handleKeyDown}
                     onFocus={handleInputFocus}
-                    placeholder="Search by CPA name or license number..."
+                    placeholder="Enter Your Name or License Number"
                     className={styles.searchInput}
                     autoComplete="off"
                     disabled={isLinkingLicense}
@@ -296,14 +243,7 @@ const CPASearch = () => {
                                 </div>
                             )}
 
-                            {!isAuthenticated && (
-                                <div className={styles.authNotice}>
-                                    <span className={styles.authIcon}>🔑</span>
-                                    <span className={styles.authText}>
-                                        Select a CPA to view dashboard - sign in to link to your account
-                                    </span>
-                                </div>
-                            )}
+
 
                             <ul className={styles.resultsList}>
                                 {results.map((cpa, index) => (

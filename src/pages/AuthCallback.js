@@ -1,4 +1,4 @@
-// src/pages/AuthCallback.js - Fixed to prevent multiple executions
+// src/pages/AuthCallback.js - Enhanced to handle license linking directly
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -8,7 +8,7 @@ import styles from '../styles/pages/AuthCallback.module.css';
 const AuthCallback = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    const { login } = useAuth();
+    const { login, connectLicense } = useAuth();
     const [isProcessing, setIsProcessing] = useState(true);
     const [status, setStatus] = useState('Completing Sign In...');
 
@@ -90,9 +90,50 @@ const AuthCallback = () => {
                 // Clean up URL params before deciding what to do next
                 window.history.replaceState({}, document.title, '/auth/callback');
 
-                // Determine redirect destination
+                // Check for pending license link FIRST (highest priority)
+                const pendingLicense = sessionStorage.getItem('pending_license_link');
+                const pendingCpaName = sessionStorage.getItem('pending_cpa_name');
+
+                if (pendingLicense && !userProfile.license_number) {
+                    setStatus('Linking your selected license...');
+                    console.log(`Found pending license link: ${pendingLicense}`);
+
+                    try {
+                        await connectLicense(pendingLicense);
+
+                        // Clear pending license
+                        sessionStorage.removeItem('pending_license_link');
+                        sessionStorage.removeItem('pending_cpa_name');
+
+                        setStatus('Redirecting to your dashboard...');
+
+                        toast.success(`Welcome, ${userProfile.name}! License ${pendingLicense} has been linked to your account.`, {
+                            duration: 4000
+                        });
+
+                        // Direct redirect to dashboard with default (Reporting Requirements) view
+                        setTimeout(() => {
+                            navigate(`/dashboard/${pendingLicense}`, { replace: true });
+                        }, 1000);
+
+                        return; // Exit early - we're done!
+
+                    } catch (error) {
+                        console.error('Failed to link pending license:', error);
+
+                        // Clear the pending license even if it failed
+                        sessionStorage.removeItem('pending_license_link');
+                        sessionStorage.removeItem('pending_cpa_name');
+
+                        toast.error(`Failed to link license ${pendingLicense}. You can try selecting it again from the home page.`);
+
+                        // Fall through to normal redirect logic
+                    }
+                }
+
+                // Normal redirect logic (no pending license)
                 if (userProfile.license_number) {
-                    // User has a license - go directly to dashboard
+                    // User has a license - go to default dashboard view (Reporting Requirements)
                     setStatus('Redirecting to your dashboard...');
                     const redirectPath = `/dashboard/${userProfile.license_number}`;
                     console.log('Redirecting to:', redirectPath);
@@ -103,10 +144,10 @@ const AuthCallback = () => {
 
                     setTimeout(() => {
                         navigate(redirectPath, { replace: true });
-                    }, 1000);
+                    }, 800);
 
                 } else if (userLicense) {
-                    // Backend provided a license number - use it
+                    // Backend provided a license number - go to default dashboard view
                     setStatus('Redirecting to your dashboard...');
                     const redirectPath = `/dashboard/${userLicense}`;
                     console.log('Redirecting to:', redirectPath);
@@ -117,7 +158,7 @@ const AuthCallback = () => {
 
                     setTimeout(() => {
                         navigate(redirectPath, { replace: true });
-                    }, 1000);
+                    }, 800);
 
                 } else {
                     // No license number - go to home with clear instructions
@@ -141,7 +182,7 @@ const AuthCallback = () => {
                                 needsLicense: true
                             }
                         });
-                    }, 1500);
+                    }, 1000);
                 }
 
             } catch (error) {
@@ -156,9 +197,11 @@ const AuthCallback = () => {
                     toast.error('An unexpected error occurred during authentication.');
                 }
 
-                // Clear any stored tokens
+                // Clear any stored tokens and pending licenses
                 localStorage.removeItem('access_token');
                 localStorage.removeItem('refresh_token');
+                sessionStorage.removeItem('pending_license_link');
+                sessionStorage.removeItem('pending_cpa_name');
 
                 navigate('/', { replace: true });
             } finally {
