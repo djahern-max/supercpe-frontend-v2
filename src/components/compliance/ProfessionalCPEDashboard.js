@@ -5,6 +5,8 @@ import PeriodSelector from './PeriodSelector';
 import styles from '../../styles/components/ProfessionalCPEDashboard.module.css';
 import DeleteCertificateButton from './DeleteCertificateButton';
 import EnhancedFreemiumUploadSection from './EnhancedFreemiumUploadSection';
+import { apiService } from '../../services/api';
+import { toast } from 'react-hot-toast';
 
 const ProfessionalCPEDashboard = ({ licenseNumber }) => {
     // REAL STATE - NO MOCK DATA
@@ -27,8 +29,11 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
         try {
             setLoading(true);
             setError(null);
-            // Import your API service
-            const { apiService } = await import('../../services/api');
+
+            // REMOVE THIS LINE - you already imported apiService at the top:
+            // const { apiService } = await import('../../services/api');
+
+            // Use the static import instead:
             const response = await apiService.getComplianceDashboard(license);
             setDashboardData(response);
             console.log('Dashboard data loaded:', response);
@@ -61,6 +66,26 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
 
         // Recalculate totals if needed (could be more complex in real application)
         console.log(`Certificate ${deletedCertId} removed from UI`);
+    };
+
+    const handleViewDocument = async (certificateId) => {
+        try {
+            // Option 1: Get URL and open in new tab
+            const result = await apiService.getDocumentUrl(certificateId, licenseNumber);
+            if (result.success) {
+                window.open(result.document_url, '_blank');
+            }
+        } catch (error) {
+            console.error('Error viewing document:', error);
+
+            if (error.response?.status === 404) {
+                toast.error('Document not found or not available');
+            } else if (error.response?.status === 403) {
+                toast.error('Access denied to this document');
+            } else {
+                toast.error('Failed to load document. Please try again.');
+            }
+        }
     };
 
     // Show loading state
@@ -164,8 +189,8 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
         setSelectedFiles(files);
 
         try {
-            // Import your API service
-            const { apiService } = await import('../../services/api');
+            // REMOVE THIS LINE - you already imported apiService at the top:
+            // const { apiService } = await import('../../services/api');
 
             for (const file of files) {
                 console.log('Uploading file:', file.name);
@@ -186,7 +211,6 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
             setSelectedFiles([]);
         }
     };
-
     const handleExportAudit = async () => {
         try {
             console.log('Generating audit export...');
@@ -546,7 +570,14 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
                                             </td>
                                             <td className={styles.tableCell}>
                                                 <div className={styles.certificateActions}>
-                                                    <button className={styles.actionButton}>
+                                                    <button
+                                                        className={styles.actionButton}
+                                                        onClick={() => {
+                                                            console.log('👆 Button clicked, cert data:', cert);
+                                                            handleViewDocument(cert.id);
+                                                        }}
+                                                        title="View Certificate Document"
+                                                    >
                                                         <Eye className={styles.actionIcon} />
                                                     </button>
                                                     <DeleteCertificateButton

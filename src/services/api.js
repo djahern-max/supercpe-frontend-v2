@@ -315,6 +315,28 @@ export const apiService = {
         });
         return response.data;
     },
-};
+
+    async getDocumentUrl(certificateId, licenseNumber) {
+        try {
+            const response = await apiClient.get(`/api/upload/document/${certificateId}`, {
+                params: { license_number: licenseNumber }
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Error getting document URL:', error);
+            throw error;
+        }
+    },
+    async viewDocument(certificateId, licenseNumber) {
+        try {
+            // This endpoint redirects directly to the document
+            const url = `${this.baseURL}/api/upload/view-document/${certificateId}?license_number=${licenseNumber}`;
+            window.open(url, '_blank');
+        } catch (error) {
+            console.error('Error viewing document:', error);
+            throw error;
+        }
+    }
+}
 
 export default apiService;
