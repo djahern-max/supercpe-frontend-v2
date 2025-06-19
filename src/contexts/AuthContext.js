@@ -1,6 +1,7 @@
-// src/contexts/AuthContext.js
+// src/contexts/AuthContext.js - Fixed to prevent 401 errors
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { apiService } from '../services/api';
+import { toast } from 'react-hot-toast';
 
 const AuthContext = createContext();
 
@@ -13,150 +14,134 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [user, setUser] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
 
+    // Make auth context globally available for API interceptors
     useEffect(() => {
-        initializeAuth();
+        window.authContext = {
+            setIsAuthenticated,
+            setUser
+        };
+
+        // Cleanup on unmount
+        return () => {
+            delete window.authContext;
+        };
     }, []);
 
-    const initializeAuth = async () => {
+    // Make toast globally available for API interceptors
+    useEffect(() => {
+        window.toast = toast;
+
+        return () => {
+            delete window.toast;
+        };
+    }, []);
+
+    // Check authentication status on app load
+    useEffect(() => {
+        checkAuthStatus();
+    }, []);
+
+    const checkAuthStatus = async () => {
+        setIsLoading(true);
+
+        const accessToken = localStorage.getItem('access_token');
+
+        // If no token, user is not authenticated
+        if (!accessToken) {
+            setIsAuthenticated(false);
+            setUser(null);
+            setIsLoading(false);
+            return;
+        }
+
         try {
-            setLoading(true);
+            // Only try to get current user if we have a token
+            const authStatus = await apiService.checkAuthStatus();
 
-            // Check if we have tokens in localStorage
-            const accessToken = localStorage.getItem('access_token');
-            const refreshToken = localStorage.getItem('refresh_token');
-
-            if (accessToken) {
-                // Verify token is valid by making a test API call
-                try {
-                    const userProfile = await apiService.getCurrentUser();
-                    setUser(userProfile);
-                    setIsAuthenticated(true);
-                } catch (error) {
-                    // Token is invalid, try to refresh
-                    if (refreshToken) {
-                        try {
-                            await refreshAccessToken(refreshToken);
-                        } catch (refreshError) {
-                            // Refresh failed, clear tokens
-                            clearAuthData();
-                        }
-                    } else {
-                        clearAuthData();
-                    }
-                }
+            if (authStatus.isAuthenticated && authStatus.user) {
+                setIsAuthenticated(true);
+                setUser(authStatus.user);
             } else {
-                // Check URL params for tokens (from OAuth callback)
-                const urlParams = new URLSearchParams(window.location.search);
-                const urlAccessToken = urlParams.get('access_token');
-                const urlRefreshToken = urlParams.get('refresh_token');
-                const licenseNumber = urlParams.get('license_number');
-
-                if (urlAccessToken) {
-                    // Store tokens and get user info
-                    localStorage.setItem('access_token', urlAccessToken);
-                    if (urlRefreshToken) {
-                        localStorage.setItem('refresh_token', urlRefreshToken);
-                    }
-
-                    try {
-                        const userProfile = await apiService.getCurrentUser();
-                        setUser(userProfile);
-                        setIsAuthenticated(true);
-
-                        // Clean up URL params
-                        window.history.replaceState({}, document.title, window.location.pathname);
-
-                        // If we have a license number, redirect to dashboard
-                        if (licenseNumber) {
-                            window.location.href = `/dashboard/${licenseNumber}`;
-                        }
-                    } catch (error) {
-                        clearAuthData();
-                    }
-                }
+                // Clear any stale data
+                clearAuthState();
             }
         } catch (error) {
-            console.error('Auth initialization error:', error);
+            console.error('Auth check failed:', error);
+
+            // If we get a 401, it means the token is invalid
+            if (error.response?.status === 401) {
+                console.log('Token invalid, clearing auth state');
+                clearAuthState();
+            } else {
+                // For other errors, just log them but don't clear auth
+                console.log('Auth check error (non-401):', error.message);
+                setIsAuthenticated(false);
+                setUser(null);
+            }
         } finally {
-            setLoading(false);
+            setIsLoading(false);
         }
     };
 
-    const refreshAccessToken = async (refreshToken) => {
-        try {
-            const response = await apiService.refreshToken(refreshToken);
-
-            localStorage.setItem('access_token', response.access_token);
-            if (response.refresh_token) {
-                localStorage.setItem('refresh_token', response.refresh_token);
-            }
-
-            const userProfile = await apiService.getCurrentUser();
-            setUser(userProfile);
-            setIsAuthenticated(true);
-
-            return response.access_token;
-        } catch (error) {
-            throw error;
-        }
-    };
-
-    const clearAuthData = () => {
+    const clearAuthState = () => {
+        setIsAuthenticated(false);
+        setUser(null);
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
-        setUser(null);
-        setIsAuthenticated(false);
     };
 
-    const loginWithGoogle = async () => {
+    const login = async (accessToken, refreshToken, userProfile) => {
         try {
-            const response = await apiService.getGoogleAuthUrl();
-            window.location.href = response.auth_url;
-        } catch (error) {
-            console.error('Google login error:', error);
-            throw error;
-        }
-    };
-
-    const loginWithEmail = async (email, password) => {
-        try {
-            const response = await apiService.loginWithEmail(email, password);
-
-            localStorage.setItem('access_token', response.access_token);
-            localStorage.setItem('refresh_token', response.refresh_token);
-
-            setUser(response.user);
-            setIsAuthenticated(true);
-
-            return response;
-        } catch (error) {
-            console.error('Email login error:', error);
-            throw error;
-        }
-    };
-
-    const createAccountWithEmail = async (accountData) => {
-        try {
-            // Call the correct signup endpoint instead of payment endpoint
-            const response = await apiService.createAccountWithEmail(accountData);
-
-            if (response.success && response.access_token) {
-                localStorage.setItem('access_token', response.access_token);
-                if (response.refresh_token) {
-                    localStorage.setItem('refresh_token', response.refresh_token);
-                }
-
-                setUser(response.user);
-                setIsAuthenticated(true);
+            // Store tokens
+            localStorage.setItem('access_token', accessToken);
+            if (refreshToken) {
+                localStorage.setItem('refresh_token', refreshToken);
             }
 
-            return response;
+            // Update state
+            setIsAuthenticated(true);
+            setUser(userProfile);
+
+            return true;
         } catch (error) {
-            console.error('Account creation error:', error);
+            console.error('Login failed:', error);
+            clearAuthState();
+            return false;
+        }
+    };
+
+    const logout = async () => {
+        try {
+            // Try to call logout endpoint, but don't fail if it doesn't work
+            await apiService.logout();
+        } catch (error) {
+            console.error('Logout error:', error);
+            // Continue with cleanup even if server logout fails
+        } finally {
+            clearAuthState();
+        }
+    };
+
+    const refreshUser = async () => {
+        try {
+            const userProfile = await apiService.getCurrentUser();
+            setUser(userProfile);
+            return userProfile;
+        } catch (error) {
+            console.error('Failed to refresh user:', error);
+
+            // If user no longer exists, clear auth state
+            if (error.response?.status === 401) {
+                clearAuthState();
+                if (window.toast) {
+                    window.toast.error('Your session has expired. Please sign in again.');
+                }
+            }
+
             throw error;
         }
     };
@@ -165,35 +150,64 @@ export const AuthProvider = ({ children }) => {
         try {
             const response = await apiService.connectLicense(licenseNumber);
 
-            // Update user with license info
-            setUser(prev => ({
-                ...prev,
-                license_number: licenseNumber,
-                ...response.user
-            }));
+            // Update user state with new license
+            if (response.user) {
+                setUser(prevUser => ({
+                    ...prevUser,
+                    license_number: response.user.license_number
+                }));
+            }
 
             return response;
         } catch (error) {
-            console.error('License connection error:', error);
+            console.error('License connection failed:', error);
+
+            const errorMessage = error.response?.data?.detail || 'Failed to connect license';
+            if (window.toast) {
+                window.toast.error(errorMessage);
+            }
+
             throw error;
         }
     };
 
-    const logout = () => {
-        clearAuthData();
-        window.location.href = '/';
+    // Handle authentication errors globally
+    const handleAuthError = (error) => {
+        if (error.response?.status === 401) {
+            const errorMessage = error.response?.data?.detail;
+
+            if (errorMessage === 'User account no longer exists') {
+                if (window.toast) {
+                    window.toast.error('Your account is no longer available. Please sign in again.');
+                }
+            } else {
+                if (window.toast) {
+                    window.toast.error('Your session has expired. Please sign in again.');
+                }
+            }
+
+            clearAuthState();
+
+            // Redirect to home if not already there
+            if (window.location.pathname !== '/') {
+                window.location.href = '/';
+            }
+        }
     };
 
     const value = {
-        user,
-        loading,
         isAuthenticated,
-        loginWithGoogle,
-        loginWithEmail,
-        createAccountWithEmail,
-        connectLicense,
+        user,
+        isLoading,
+        login,
         logout,
-        refreshAccessToken
+        refreshUser,
+        connectLicense,
+        checkAuthStatus,
+        clearAuthState,
+        handleAuthError,
+        setIsAuthenticated,
+        setUser
     };
 
     return (

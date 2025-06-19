@@ -1,21 +1,35 @@
-// src/services/api.js - Clean and Organized API Service
+// src/services/api.js - Complete API service with enhanced authentication handling
 import axios from 'axios';
 
-const API_BASE_URL = process.env.NODE_ENV === 'production'
-    ? 'https://nh.supercpe.com'
-    : 'http://localhost:8000';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
-// Create axios instance with interceptors
+// Create axios instance
 const apiClient = axios.create({
     baseURL: API_BASE_URL,
     timeout: 30000,
 });
 
+// Track if we're currently refreshing token to prevent multiple simultaneous refresh attempts
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+    failedQueue.forEach(prom => {
+        if (error) {
+            prom.reject(error);
+        } else {
+            prom.resolve(token);
+        }
+    });
+
+    failedQueue = [];
+};
+
 // Request interceptor to add auth token
 apiClient.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('access_token');
-        if (token) {
+        if (token && !config.headers.Authorization) {
             config.headers.Authorization = `Bearer ${token}`;
         }
         return config;
@@ -25,16 +39,61 @@ apiClient.interceptors.request.use(
     }
 );
 
-// Response interceptor to handle token refresh
+// Response interceptor to handle token refresh and user deletion
 apiClient.interceptors.response.use(
-    (response) => response,
+    (response) => {
+        return response;
+    },
     async (error) => {
         const originalRequest = error.config;
 
         if (error.response?.status === 401 && !originalRequest._retry) {
+            const errorMessage = error.response?.data?.detail || '';
+
+            // Check if the error is specifically about user not existing
+            if (errorMessage === 'User account no longer exists') {
+                console.log('User account deleted - clearing tokens and redirecting');
+
+                // Clear all authentication data
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('refresh_token');
+
+                // Trigger auth context update if available
+                if (window.authContext) {
+                    window.authContext.setIsAuthenticated(false);
+                    window.authContext.setUser(null);
+                }
+
+                // Show user-friendly message
+                if (window.toast) {
+                    window.toast.error('Your account is no longer available. Please sign in again.');
+                }
+
+                // Redirect to home page
+                if (window.location.pathname !== '/') {
+                    window.location.href = '/';
+                }
+
+                return Promise.reject(error);
+            }
+
+            // Handle token refresh for other 401 errors
+            if (isRefreshing) {
+                return new Promise((resolve, reject) => {
+                    failedQueue.push({ resolve, reject });
+                }).then(token => {
+                    originalRequest.headers.Authorization = `Bearer ${token}`;
+                    return apiClient(originalRequest);
+                }).catch(err => {
+                    return Promise.reject(err);
+                });
+            }
+
             originalRequest._retry = true;
+            isRefreshing = true;
 
             const refreshToken = localStorage.getItem('refresh_token');
+
             if (refreshToken) {
                 try {
                     const response = await axios.post(`${API_BASE_URL}/api/auth/refresh`, {
@@ -44,20 +103,48 @@ apiClient.interceptors.response.use(
                     const { access_token } = response.data;
                     localStorage.setItem('access_token', access_token);
 
-                    // Retry original request with new token
+                    processQueue(null, access_token);
+
                     originalRequest.headers.Authorization = `Bearer ${access_token}`;
                     return apiClient(originalRequest);
+
                 } catch (refreshError) {
-                    // Refresh failed, redirect to login
+                    processQueue(refreshError, null);
+
+                    // Clear tokens and redirect
                     localStorage.removeItem('access_token');
                     localStorage.removeItem('refresh_token');
-                    window.location.href = '/';
+
+                    if (window.authContext) {
+                        window.authContext.setIsAuthenticated(false);
+                        window.authContext.setUser(null);
+                    }
+
+                    if (window.toast) {
+                        window.toast.error('Your session has expired. Please sign in again.');
+                    }
+
+                    if (window.location.pathname !== '/') {
+                        window.location.href = '/';
+                    }
+
                     return Promise.reject(refreshError);
+                } finally {
+                    isRefreshing = false;
                 }
             } else {
-                // No refresh token, redirect to login
+                // No refresh token available
                 localStorage.removeItem('access_token');
-                window.location.href = '/';
+                localStorage.removeItem('refresh_token');
+
+                if (window.authContext) {
+                    window.authContext.setIsAuthenticated(false);
+                    window.authContext.setUser(null);
+                }
+
+                if (window.location.pathname !== '/') {
+                    window.location.href = '/';
+                }
             }
         }
 
@@ -135,11 +222,17 @@ export const apiService = {
             // Clear tokens from localStorage
             localStorage.removeItem('access_token');
             localStorage.removeItem('refresh_token');
+
+            // Clear auth context if available
+            if (window.authContext) {
+                window.authContext.setIsAuthenticated(false);
+                window.authContext.setUser(null);
+            }
         }
     },
 
     /**
-     * Check authentication status
+     * Check authentication status and handle stale tokens
      */
     async checkAuthStatus() {
         try {
@@ -149,10 +242,29 @@ export const apiService = {
                 user
             };
         } catch (error) {
+            // If we get a 401, tokens are likely stale
+            if (error.response?.status === 401) {
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('refresh_token');
+            }
+
             return {
                 isAuthenticated: false,
                 user: null
             };
+        }
+    },
+
+    /**
+     * Clear all authentication data (useful for manual cleanup)
+     */
+    clearAuthData() {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+
+        if (window.authContext) {
+            window.authContext.setIsAuthenticated(false);
+            window.authContext.setUser(null);
         }
     },
 
@@ -215,6 +327,25 @@ export const apiService = {
             {
                 headers: {
                     'Content-Type': 'multipart/form-data',
+                }
+            }
+        );
+        return response.data;
+    },
+
+    /**
+     * Upload certificate (Free tier - REQUIRES AUTHENTICATION)
+     */
+    async uploadCertificateFreeTier(licenseNumber, file) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await apiClient.post(
+            `/api/upload/upload-certificate-free/${licenseNumber}`,
+            formData,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
                 },
             }
         );
@@ -222,7 +353,7 @@ export const apiService = {
     },
 
     /**
-     * Upload and save certificate (REQUIRES AUTHENTICATION)
+     * Upload and save certificate with authentication
      */
     async uploadCertificateAuthenticated(licenseNumber, file) {
         const formData = new FormData();
@@ -230,6 +361,25 @@ export const apiService = {
 
         const response = await apiClient.post(
             `/api/upload/upload-certificate-authenticated/${licenseNumber}`,
+            formData,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            }
+        );
+        return response.data;
+    },
+
+    /**
+     * Upload CPE certificate (Premium - REQUIRES AUTHENTICATION)
+     */
+    async uploadCPECertificatePremium(licenseNumber, file) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await apiClient.post(
+            `/api/upload/upload-cpe-certificate/${licenseNumber}`,
             formData,
             {
                 headers: {
@@ -277,6 +427,25 @@ export const apiService = {
     async viewDocument(certificateId, licenseNumber) {
         const url = `${this.baseURL}/api/upload/view-document/${certificateId}?license_number=${licenseNumber}`;
         window.open(url, '_blank');
+    },
+
+    /**
+     * Upload monthly CPA list (Admin function)
+     */
+    async uploadCPAList(file) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await apiClient.post(
+            '/api/upload/upload-cpa-list',
+            formData,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            }
+        );
+        return response.data;
     },
 
     // ===== TIME WINDOWS / COMPLIANCE METHODS =====
@@ -331,6 +500,24 @@ export const apiService = {
      */
     async getPricingPlans() {
         const response = await apiClient.get('/api/payments/pricing');
+        return response.data;
+    },
+
+    // ===== UTILITY METHODS =====
+
+    /**
+     * Get simple routes list
+     */
+    async getRoutes() {
+        const response = await apiClient.get('/routes-simple');
+        return response.data;
+    },
+
+    /**
+     * Health check
+     */
+    async healthCheck() {
+        const response = await apiClient.get('/health');
         return response.data;
     },
 

@@ -1,0 +1,46 @@
+/* src/styles/pages/AuthCallback.module.css */
+.loadingContainer {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--gray-50);
+}
+
+.loadingContent {
+    text-align: center;
+    padding: var(--space-8);
+}
+
+.spinner {
+    width: 48px;
+    height: 48px;
+    border: 2px solid var(--gray-200);
+    border-top: 2px solid var(--primary-600);
+    border-radius: 50%;
+    margin: 0 auto var(--space-4) auto;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.loadingTitle {
+    font-size: var(--text-lg);
+    font-weight: 500;
+    color: var(--gray-900);
+    margin: 0 0 var(--space-2) 0;
+}
+
+.loadingText {
+    color: var(--gray-600);
+    margin: 0;
+    line-height: var(--leading-relaxed);
+}

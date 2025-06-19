@@ -1,6 +1,6 @@
 // src/pages/Dashboard.js
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useSearchParams, useNavigate } from 'react-router-dom'; // ADD: useSearchParams, useNavigate
 import { toast } from 'react-hot-toast';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
@@ -20,20 +20,40 @@ try {
 
 const Dashboard = () => {
     const { licenseNumber } = useParams();
+    const [searchParams] = useSearchParams(); // ADD THIS
+    const navigate = useNavigate(); // ADD THIS
     const [cpa, setCpa] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // FIX: Get initial state from localStorage or default to enhanced view
+    // REPLACE: The old localStorage logic with URL-based logic
     const [useEnhanced, setUseEnhanced] = useState(() => {
-        const saved = localStorage.getItem('dashboard_view_preference');
-        return saved ? JSON.parse(saved) : true; // Default to enhanced (CPE Compliance)
+        // Get initial state from URL params, default to 'reporting' (false)
+        const tabParam = searchParams.get('tab');
+        return tabParam === 'cpe'; // true if 'cpe', false if 'reporting' or null
     });
 
-    // FIX: Save the toggle state to localStorage whenever it changes
+    // ADD: Set initial tab based on URL when component mounts or URL changes
     useEffect(() => {
-        localStorage.setItem('dashboard_view_preference', JSON.stringify(useEnhanced));
-    }, [useEnhanced]);
+        const tabParam = searchParams.get('tab');
+        if (tabParam === 'cpe') {
+            setUseEnhanced(true);
+        } else {
+            setUseEnhanced(false); // This shows "Reporting Requirements"
+        }
+    }, [searchParams]);
+
+    // ADD: Function to handle tab changes and update URL
+    const handleTabChange = (enhanced) => {
+        setUseEnhanced(enhanced);
+        const newTab = enhanced ? 'cpe' : 'reporting';
+        navigate(`/dashboard/${licenseNumber}?tab=${newTab}`, { replace: true });
+    };
+
+    // REMOVE: The old localStorage effect (delete these lines)
+    // useEffect(() => {
+    //     localStorage.setItem('dashboard_view_preference', JSON.stringify(useEnhanced));
+    // }, [useEnhanced]);
 
     useEffect(() => {
         if (licenseNumber) {
@@ -140,14 +160,14 @@ const Dashboard = () => {
                         <div className={styles.controlGroup}>
                             <Button
                                 variant={!useEnhanced ? "primary" : "outline"}
-                                onClick={() => setUseEnhanced(false)}
+                                onClick={() => handleTabChange(false)} // CHANGE: Use new function
                                 className={styles.controlButton}
                             >
                                 Reporting Requirements
                             </Button>
                             <Button
                                 variant={useEnhanced ? "primary" : "outline"}
-                                onClick={() => setUseEnhanced(true)}
+                                onClick={() => handleTabChange(true)} // CHANGE: Use new function
                                 className={styles.controlButton}
                             >
                                 CPE Compliance
@@ -163,7 +183,7 @@ const Dashboard = () => {
                     <BasicDashboardView
                         cpa={cpa}
                         licenseNumber={licenseNumber}
-                        onEnhanceToggle={() => setUseEnhanced(true)}
+                        onEnhanceToggle={() => handleTabChange(true)} // CHANGE: Use new function
                     />
                 )}
             </div>
@@ -171,8 +191,9 @@ const Dashboard = () => {
     );
 };
 
-// Fixed BasicDashboardView component
+// Fixed BasicDashboardView component - NO CHANGES NEEDED TO THIS PART
 const BasicDashboardView = ({ cpa, licenseNumber, onEnhanceToggle }) => {
+    // ... rest of your existing BasicDashboardView code stays exactly the same
     if (!cpa) {
         return (
             <Card className={styles.errorCard}>
@@ -205,6 +226,7 @@ const BasicDashboardView = ({ cpa, licenseNumber, onEnhanceToggle }) => {
 
     return (
         <div className={styles.basicDashboard}>
+            {/* All your existing BasicDashboardView content stays the same */}
             {/* CPA Name and Credentials at Top */}
             <div className={styles.cpaHeader}>
                 <h1 className={styles.cpaName}>{cpa.full_name}</h1>
@@ -213,12 +235,9 @@ const BasicDashboardView = ({ cpa, licenseNumber, onEnhanceToggle }) => {
                 </p>
             </div>
 
-
-
             <Card className={styles.statusCard}>
                 <div className={styles.statusHeader}>
                     <h3>Your License Status</h3>
-                    {/* Badge removed - this is just license renewal info */}
                 </div>
 
                 <div className={styles.periodInfo}>
@@ -304,7 +323,6 @@ const BasicDashboardView = ({ cpa, licenseNumber, onEnhanceToggle }) => {
                 </div>
             </Card>
 
-
             {/* Key Facts */}
             <Card className={styles.factsCard}>
                 <h3>Key Facts About New NH Rules</h3>
@@ -319,7 +337,6 @@ const BasicDashboardView = ({ cpa, licenseNumber, onEnhanceToggle }) => {
                         <strong>Your Renewal Date:</strong> {wasLicensedBeforeRuleChange
                             ? 'June 30th every 2 years'
                             : `${issueDate.toLocaleDateString('en-US', { month: 'long' })} every 2 years`}
-
                     </div>
                     <div className={styles.fact}>
                         <strong>Annual Minimum:</strong> 20 hours per year must still be completed
@@ -329,6 +346,7 @@ const BasicDashboardView = ({ cpa, licenseNumber, onEnhanceToggle }) => {
                     </div>
                 </div>
             </Card>
+
             {/* Upload Action - Now uses the toggle function */}
             <div className={styles.uploadSection}>
                 <Button
@@ -339,7 +357,6 @@ const BasicDashboardView = ({ cpa, licenseNumber, onEnhanceToggle }) => {
                     Upload CPE Certificate
                 </Button>
             </div>
-
         </div>
     );
 };

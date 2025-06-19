@@ -1,18 +1,18 @@
-// src/App.js - Fixed with correct imports
+// src/App.js - Fixed with AuthCallback import
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './contexts/AuthContext';
 
-// Import your actual page components (using correct names)
+// Import your actual page components
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import ComplianceDashboard from './pages/ComplianceDashboard';
-import Pricing from './pages/Pricing';
 import Upload from './pages/Upload';
 import SecurityPage from './pages/SecurityPage';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
+import AuthCallback from './pages/AuthCallback';
 
 // Import your layout components
 import Header from './components/layout/Header';
@@ -52,10 +52,10 @@ function App() {
                             <Route path="/dashboard/:licenseNumber" element={<Dashboard />} />
                             <Route path="/compliance/:licenseNumber" element={<ComplianceDashboard />} />
                             <Route path="/upload/:licenseNumber" element={<Upload />} />
-                            <Route path="/pricing" element={<Pricing />} />
                             <Route path="/security" element={<SecurityPage />} />
                             <Route path="/privacy" element={<Privacy />} />
                             <Route path="/terms" element={<Terms />} />
+                            <Route path="/auth/callback" element={<AuthCallback />} />
                             <Route path="/auth/error" element={<AuthErrorPage />} />
 
                             {/* Catch all route */}
@@ -72,23 +72,9 @@ function App() {
                         toastOptions={{
                             duration: 4000,
                             style: {
-                                background: '#363636',
-                                color: '#fff',
-                                fontSize: '14px',
-                                borderRadius: '8px',
-                                padding: '12px 16px',
-                            },
-                            success: {
-                                iconTheme: {
-                                    primary: '#10b981',
-                                    secondary: '#fff',
-                                },
-                            },
-                            error: {
-                                iconTheme: {
-                                    primary: '#ef4444',
-                                    secondary: '#fff',
-                                },
+                                background: '#fff',
+                                color: '#374151',
+                                boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
                             },
                         }}
                     />
