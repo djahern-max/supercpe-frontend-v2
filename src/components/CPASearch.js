@@ -1,4 +1,4 @@
-// src/components/CPASearch.js - Enhanced to auto-link license to authenticated users
+// src/components/CPASearch.js - Enhanced to preserve license through OAuth
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
@@ -27,6 +27,59 @@ const CPASearch = () => {
             }
         };
     }, []);
+
+    // Check for pending license link after authentication
+    useEffect(() => {
+        const checkPendingLicense = async () => {
+            if (isAuthenticated && user) {
+                const pendingLicense = sessionStorage.getItem('pending_license_link');
+                const pendingCpaName = sessionStorage.getItem('pending_cpa_name');
+
+                if (pendingLicense && !user.license_number) {
+                    console.log(`Found pending license link: ${pendingLicense}`);
+
+                    try {
+                        setIsLinkingLicense(true);
+
+                        toast.loading(`Linking license ${pendingLicense} to your account...`, {
+                            id: 'auto-linking'
+                        });
+
+                        await connectLicense(pendingLicense);
+
+                        // Clear pending license
+                        sessionStorage.removeItem('pending_license_link');
+                        sessionStorage.removeItem('pending_cpa_name');
+
+                        toast.success(`Welcome! License ${pendingLicense} has been linked to your account.`, {
+                            id: 'auto-linking',
+                            duration: 4000
+                        });
+
+                        // Redirect to the dashboard for this license
+                        setTimeout(() => {
+                            navigate(`/dashboard/${pendingLicense}`, { replace: true });
+                        }, 1500);
+
+                    } catch (error) {
+                        console.error('Failed to auto-link pending license:', error);
+
+                        // Clear the pending license even if it failed
+                        sessionStorage.removeItem('pending_license_link');
+                        sessionStorage.removeItem('pending_cpa_name');
+
+                        toast.error(`Failed to link license ${pendingLicense}. Please try selecting it again.`, {
+                            id: 'auto-linking'
+                        });
+                    } finally {
+                        setIsLinkingLicense(false);
+                    }
+                }
+            }
+        };
+
+        checkPendingLicense();
+    }, [isAuthenticated, user, connectLicense, navigate]);
 
     // Debounced search as user types
     useEffect(() => {
@@ -86,58 +139,68 @@ const CPASearch = () => {
         setShowResults(false);
         setSelectedIndex(-1);
 
-        // Check if user is authenticated but doesn't have this license linked
-        const shouldLinkLicense = isAuthenticated &&
-            user &&
-            (!user.license_number || user.license_number !== cpa.license_number);
+        // If user is authenticated, try to link the license immediately
+        if (isAuthenticated && user) {
+            const shouldLinkLicense = !user.license_number || user.license_number !== cpa.license_number;
 
-        if (shouldLinkLicense) {
-            try {
-                setIsLinkingLicense(true);
+            if (shouldLinkLicense) {
+                try {
+                    setIsLinkingLicense(true);
 
-                // Show initial toast
-                toast.loading(`Linking license ${cpa.license_number} to your account...`, {
-                    id: 'linking-license'
-                });
-
-                // Connect the license to the user account
-                await connectLicense(cpa.license_number);
-
-                // Success message
-                toast.success(`License ${cpa.license_number} linked to your account!`, {
-                    id: 'linking-license',
-                    duration: 3000
-                });
-
-                console.log(`Successfully linked license ${cpa.license_number} to user ${user.email}`);
-
-            } catch (error) {
-                console.error('Failed to link license:', error);
-
-                // Handle specific error cases
-                if (error.response?.status === 409) {
-                    toast.error('This license is already connected to another account.', {
+                    toast.loading(`Linking license ${cpa.license_number} to your account...`, {
                         id: 'linking-license'
                     });
-                } else if (error.response?.status === 404) {
-                    toast.error('License number not found in our database.', {
-                        id: 'linking-license'
+
+                    await connectLicense(cpa.license_number);
+
+                    toast.success(`License ${cpa.license_number} linked to your account!`, {
+                        id: 'linking-license',
+                        duration: 3000
                     });
-                } else {
-                    toast.error('Failed to link license to your account.', {
-                        id: 'linking-license'
-                    });
+
+                    console.log(`Successfully linked license ${cpa.license_number} to user ${user.email}`);
+
+                } catch (error) {
+                    console.error('Failed to link license:', error);
+
+                    if (error.response?.status === 409) {
+                        toast.error('This license is already connected to another account.', {
+                            id: 'linking-license'
+                        });
+                    } else if (error.response?.status === 404) {
+                        toast.error('License number not found in our database.', {
+                            id: 'linking-license'
+                        });
+                    } else {
+                        toast.error('Failed to link license to your account.', {
+                            id: 'linking-license'
+                        });
+                    }
+                } finally {
+                    setIsLinkingLicense(false);
                 }
-            } finally {
-                setIsLinkingLicense(false);
+            } else {
+                toast.success(`Accessing dashboard for ${cpa.full_name}`);
             }
-        } else {
-            // Regular flow for non-authenticated users or users with license already linked
-            toast.success(`Accessing dashboard for ${cpa.full_name}`);
-        }
 
-        // Navigate to dashboard regardless of linking outcome
-        navigate(`/dashboard/${cpa.license_number}`);
+            // Navigate to dashboard
+            navigate(`/dashboard/${cpa.license_number}`);
+
+        } else {
+            // User is NOT authenticated - store license for later linking and trigger OAuth
+            console.log(`Storing license ${cpa.license_number} for post-auth linking`);
+
+            // Store the license info for after authentication
+            sessionStorage.setItem('pending_license_link', cpa.license_number);
+            sessionStorage.setItem('pending_cpa_name', cpa.full_name);
+
+            toast.success(`Selected ${cpa.full_name}. Please sign in to link this license to your account.`, {
+                duration: 4000
+            });
+
+            // Navigate to dashboard which will show sign-in prompt
+            navigate(`/dashboard/${cpa.license_number}`);
+        }
     };
 
     const handleKeyDown = (e) => {
@@ -222,7 +285,8 @@ const CPASearch = () => {
                                     Use ↑↓ keys to navigate, Enter to select
                                 </span>
                             </div>
-                            {/* Show helpful message for authenticated users */}
+
+                            {/* Show different messages based on auth status */}
                             {isAuthenticated && user && !user.license_number && (
                                 <div className={styles.authNotice}>
                                     <span className={styles.authIcon}>🔗</span>
@@ -231,6 +295,16 @@ const CPASearch = () => {
                                     </span>
                                 </div>
                             )}
+
+                            {!isAuthenticated && (
+                                <div className={styles.authNotice}>
+                                    <span className={styles.authIcon}>🔑</span>
+                                    <span className={styles.authText}>
+                                        Select a CPA to view dashboard - sign in to link to your account
+                                    </span>
+                                </div>
+                            )}
+
                             <ul className={styles.resultsList}>
                                 {results.map((cpa, index) => (
                                     <li
