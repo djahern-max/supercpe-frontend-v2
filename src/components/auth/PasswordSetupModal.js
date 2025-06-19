@@ -146,38 +146,52 @@ const PasswordSetupModal = ({ onClose, onSuccess, temporaryPassword = null }) =>
                         </div>
                     </div>
 
-                    {/* Password Requirements */}
-                    <div className={styles.requirements}>
-                        <h4>Password Requirements:</h4>
-                        <div className={styles.requirementsList}>
-                            <div className={`${styles.requirement} ${hasMinLength ? styles.requirementMet : ''}`}>
-                                <Check size={16} className={styles.checkIcon} />
-                                <span>At least 8 characters</span>
-                            </div>
-                            <div className={`${styles.requirement} ${hasUpperCase ? styles.requirementMet : ''}`}>
-                                <Check size={16} className={styles.checkIcon} />
-                                <span>One uppercase letter</span>
-                            </div>
-                            <div className={`${styles.requirement} ${hasLowerCase ? styles.requirementMet : ''}`}>
-                                <Check size={16} className={styles.checkIcon} />
-                                <span>One lowercase letter</span>
-                            </div>
-                            <div className={`${styles.requirement} ${hasNumber ? styles.requirementMet : ''}`}>
-                                <Check size={16} className={styles.checkIcon} />
-                                <span>One number</span>
-                            </div>
-                            <div className={`${styles.requirement} ${hasSpecialChar ? styles.requirementMet : ''}`}>
-                                <Check size={16} className={styles.checkIcon} />
-                                <span>One special character</span>
-                            </div>
-                            <div className={`${styles.requirement} ${passwordsMatch ? styles.requirementMet : ''}`}>
-                                <Check size={16} className={styles.checkIcon} />
-                                <span>Passwords match</span>
+                    {/* 🔥 CONDITIONAL REQUIREMENTS/SUCCESS MESSAGE */}
+                    {!isPasswordValid ? (
+                        /* Show requirements when password doesn't meet criteria */
+                        <div className={styles.requirements}>
+                            <h4>Password Requirements:</h4>
+                            <div className={styles.requirementsList}>
+                                <div className={`${styles.requirement} ${hasMinLength ? styles.requirementMet : ''}`}>
+                                    <Check size={16} className={styles.checkIcon} />
+                                    <span>At least 8 characters</span>
+                                </div>
+                                <div className={`${styles.requirement} ${hasUpperCase ? styles.requirementMet : ''}`}>
+                                    <Check size={16} className={styles.checkIcon} />
+                                    <span>One uppercase letter</span>
+                                </div>
+                                <div className={`${styles.requirement} ${hasLowerCase ? styles.requirementMet : ''}`}>
+                                    <Check size={16} className={styles.checkIcon} />
+                                    <span>One lowercase letter</span>
+                                </div>
+                                <div className={`${styles.requirement} ${hasNumber ? styles.requirementMet : ''}`}>
+                                    <Check size={16} className={styles.checkIcon} />
+                                    <span>One number</span>
+                                </div>
+                                <div className={`${styles.requirement} ${hasSpecialChar ? styles.requirementMet : ''}`}>
+                                    <Check size={16} className={styles.checkIcon} />
+                                    <span>One special character</span>
+                                </div>
+                                <div className={`${styles.requirement} ${passwordsMatch ? styles.requirementMet : ''}`}>
+                                    <Check size={16} className={styles.checkIcon} />
+                                    <span>Passwords match</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    ) : (
+                        /* Show success message when all requirements are met */
+                        <div className={styles.successMessage}>
+                            <div className={styles.successIcon}>
+                                <CheckCircle size={24} />
+                            </div>
+                            <div className={styles.successText}>
+                                <h4>Perfect! Your password meets all requirements.</h4>
+                                <p>You can now set your password securely.</p>
+                            </div>
+                        </div>
+                    )}
 
-                    {/* Submit Button */}
+                    {/* Submit Button - Now always visible */}
                     <Button
                         type="submit"
                         variant="primary"

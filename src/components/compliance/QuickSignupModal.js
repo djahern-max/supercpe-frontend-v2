@@ -1,7 +1,7 @@
 // src/components/compliance/QuickSignupModal.js - Enhanced with password setup flow
 import React, { useState } from 'react';
 import { toast } from 'react-hot-toast';
-import { X, Mail, User, Shield, Check, ArrowRight } from 'lucide-react';
+import { X, Shield, CheckCircle, BarChart3, Clock, Lock } from 'lucide-react';
 import Button from '../ui/Button';
 import { useAuth } from '../../contexts/AuthContext';
 import PasswordSetupModal from '../auth/PasswordSetupModal';
@@ -22,36 +22,9 @@ const QuickSignupModal = ({
     const [showPasswordSetup, setShowPasswordSetup] = useState(false);
     const [temporaryPassword, setTemporaryPassword] = useState(null);
 
-    const { loginWithGoogle, createAccountWithEmail, setAuthToken } = useAuth();
+    const { createAccountWithEmail, setAuthToken } = useAuth();
 
-    const handleGoogleSignup = async () => {
-        try {
-            setIsSubmitting(true);
 
-            // Store license data for OAuth callback to use
-            if (isPasscodeVerified && cpaData) {
-                console.log('Storing license data for OAuth flow:', {
-                    license: cpaData.license_number,
-                    name: cpaData.full_name
-                });
-
-                sessionStorage.setItem('pending_license_link', cpaData.license_number);
-                sessionStorage.setItem('pending_cpa_name', cpaData.full_name);
-                sessionStorage.setItem('oauth_from_passcode', 'true');
-            }
-
-            await loginWithGoogle();
-        } catch (error) {
-            console.error('Google signup error:', error);
-            toast.error('Google signup failed. Please try again.');
-            setIsSubmitting(false);
-
-            // Clear the stored license data if OAuth fails
-            sessionStorage.removeItem('pending_license_link');
-            sessionStorage.removeItem('pending_cpa_name');
-            sessionStorage.removeItem('oauth_from_passcode');
-        }
-    };
 
     const handleEmailSignup = async (e) => {
         e.preventDefault();
@@ -206,7 +179,7 @@ const QuickSignupModal = ({
     const handlePasswordSetupSuccess = () => {
         setShowPasswordSetup(false);
         setStep('success');
-        toast.success('Password set successfully!');
+
         setTimeout(() => {
             onSuccess();
         }, 2000);
@@ -244,197 +217,139 @@ const QuickSignupModal = ({
     return (
         <div className={styles.modalOverlay}>
             <div className={styles.modalContent}>
-                {/* Header */}
+                {/* Enhanced Header */}
                 <div className={styles.modalHeader}>
-                    {step === 'email' && (
-                        <button
-                            onClick={() => setStep('method')}
-                            className={styles.backButton}
-                            disabled={isSubmitting}
-                        >
-                            ← Back
-                        </button>
-                    )}
-                    <h2 className={styles.modalTitle}>
-                        {step === 'method' ? 'Create Your Free Account' :
-                            step === 'email' ? 'Create Account' : 'Welcome!'}
-                    </h2>
-                    <button
-                        onClick={closeModal}
-                        className={styles.closeButton}
-                        disabled={isSubmitting}
-                    >
-                        <X size={24} />
-                    </button>
+                    <h2 className={styles.modalTitle}>Create Your Professional Account</h2>
+                    <p className={styles.subtitle}>
+                        Join New Hampshire CPAs using AI-powered compliance tracking
+                    </p>
                 </div>
 
-                {/* Content */}
-                <div className={styles.modalBody}>
-                    {step === 'method' && (
-                        <>
-                            <p className={styles.subtitle}>
-                                Sign up to securely upload and track your CPE certificates
-                            </p>
-
-                            {/* Benefits */}
-                            <div className={styles.benefits}>
-                                <div className={styles.benefit}>
-                                    <Check className={styles.checkIcon} />
-                                    <span>10 free uploads with full functionality</span>
-                                </div>
-                                <div className={styles.benefit}>
-                                    <Check className={styles.checkIcon} />
-                                    <span>Secure cloud storage & AI analysis</span>
-                                </div>
-                                <div className={styles.benefit}>
-                                    <Check className={styles.checkIcon} />
-                                    <span>Professional compliance reports</span>
-                                </div>
-                            </div>
-
-                            {/* Sign up options */}
-                            <div className={styles.signupOptions}>
-                                {/* Google Signup */}
-                                <Button
-                                    onClick={handleGoogleSignup}
-                                    variant="outline"
-                                    disabled={isSubmitting}
-                                    loading={isSubmitting}
-                                    className={styles.googleButton}
-                                >
-                                    <Mail size={16} />
-                                    Continue with Google
-                                </Button>
-
-                                <div className={styles.divider}>
-                                    <span>or</span>
-                                </div>
-
-                                {/* Email Signup */}
-                                <Button
-                                    onClick={() => setStep('email')}
-                                    variant="primary"
-                                    disabled={isSubmitting}
-                                    className={styles.emailButton}
-                                >
-                                    <User size={16} />
-                                    Continue with Email
-                                </Button>
-                            </div>
-
-                            {/* License info */}
-                            {licenseNumber && (
-                                <div className={styles.licenseInfo}>
-                                    <div className={styles.licenseCard}>
-                                        <div className={styles.licenseDetails}>
-                                            <strong>{cpaName}</strong>
-                                            <br />
-                                            <span>License: {licenseNumber}</span>
-                                        </div>
-                                        <Shield className={styles.licenseIcon} />
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Footer */}
-                            <div className={styles.modalFooter}>
-                                <div className={styles.securityInfo}>
-                                    <Shield size={16} />
-                                    <span>Secure & Encrypted</span>
-                                </div>
-                                <div className={styles.securityInfo}>
-                                    <Check size={16} />
-                                    <span>No Credit Card Required</span>
-                                </div>
-                            </div>
-                        </>
-                    )}
-
-                    {step === 'email' && (
-                        <>
-                            <p className={styles.subtitle}>
-                                Enter your details to get started
-                            </p>
-
-                            <form onSubmit={handleEmailSignup} className={styles.form}>
-                                <div className={styles.inputGroup}>
-                                    <label htmlFor="email" className={styles.label}>
-                                        Email Address
-                                    </label>
-                                    <input
-                                        id="email"
-                                        type="email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        className={styles.input}
-                                        placeholder="your.email@example.com"
-                                        disabled={isSubmitting}
-                                        required
-                                    />
-                                </div>
-
-                                <div className={styles.inputGroup}>
-                                    <label htmlFor="name" className={styles.label}>
-                                        Full Name
-                                    </label>
-                                    <input
-                                        id="name"
-                                        type="text"
-                                        value={name}
-                                        onChange={(e) => setName(e.target.value)}
-                                        className={styles.input}
-                                        placeholder="Your full name"
-                                        disabled={isSubmitting}
-                                        required
-                                    />
-                                </div>
-
-                                <Button
-                                    type="submit"
-                                    variant="primary"
-                                    disabled={isSubmitting || !email || !name}
-                                    loading={isSubmitting}
-                                    className={styles.submitButton}
-                                >
-                                    Create Account <ArrowRight size={16} />
-                                </Button>
-                            </form>
-
-                            {/* License verification display */}
-                            {licenseNumber && (
-                                <div className={styles.verificationInfo}>
-                                    <Shield size={16} />
-                                    <span>Verified access for license {licenseNumber}</span>
-                                </div>
-                            )}
-
-                            {/* Footer */}
-                            <div className={styles.modalFooter}>
-                                <div className={styles.securityInfo}>
-                                    <Shield size={16} />
-                                    <span>Secure & Encrypted</span>
-                                </div>
-                                <div className={styles.securityInfo}>
-                                    <Check size={16} />
-                                    <span>No Credit Card Required</span>
-                                </div>
-                            </div>
-                        </>
-                    )}
-
-                    {step === 'success' && (
-                        <div className={styles.successContent}>
-                            <div className={styles.successIcon}>
-                                <Check size={48} />
-                            </div>
-                            <h3>Account Created Successfully!</h3>
-                            <p>Welcome to SuperCPE. Redirecting you to your dashboard...</p>
+                {/* Enhanced Value Proposition */}
+                <div className={styles.valueProposition}>
+                    <div className={styles.feature}>
+                        <CheckCircle className={styles.featureIcon} size={20} />
+                        <div>
+                            <strong>AI Certificate Analysis</strong>
+                            <p>Automatically extract CPE hours, subjects, and compliance data</p>
                         </div>
-                    )}
+                    </div>
+
+                    <div className={styles.feature}>
+                        <Shield className={styles.featureIcon} size={20} />
+                        <div>
+                            <strong>Secure Cloud Storage</strong>
+                            <p>Bank-level encryption for all your professional documents</p>
+                        </div>
+                    </div>
+
+                    <div className={styles.feature}>
+                        <BarChart3 className={styles.featureIcon} size={20} />
+                        <div>
+                            <strong>Compliance Reporting</strong>
+                            <p>Generate professional reports for license renewal</p>
+                        </div>
+                    </div>
+
+                    <div className={styles.feature}>
+                        <Clock className={styles.featureIcon} size={20} />
+                        <div>
+                            <strong>Time Tracking</strong>
+                            <p>Monitor progress toward your 80-hour requirement</p>
+                        </div>
+                    </div>
                 </div>
+
+                {/* Simplified Signup Form */}
+                <form onSubmit={handleEmailSignup} className={styles.form}>
+                    <div className={styles.inputGroup}>
+                        <label htmlFor="email" className={styles.label}>
+                            Professional Email Address
+                        </label>
+                        <input
+                            id="email"
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className={styles.input}
+                            placeholder="your.email@firmname.com"
+                            disabled={isSubmitting}
+                            required
+                        />
+                        <p className={styles.inputHint}>
+                            Use your firm email for easier compliance tracking
+                        </p>
+                    </div>
+
+                    <div className={styles.inputGroup}>
+                        <label htmlFor="name" className={styles.label}>
+                            Full Name
+                        </label>
+                        <input
+                            id="name"
+                            type="text"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            className={styles.input}
+                            placeholder="Your full name"
+                            disabled={isSubmitting}
+                            required
+                        />
+                    </div>
+
+                    <Button
+                        type="submit"
+                        variant="primary"
+                        disabled={!email || !name || isSubmitting}
+                        loading={isSubmitting}
+                        className={styles.submitButton}
+                    >
+                        Create Professional Account
+                    </Button>
+                </form>
+
+                {/* Enhanced CPA Verification Display */}
+                {isPasscodeVerified && cpaData && (
+                    <div className={styles.cpaVerification}>
+                        <div className={styles.verificationBadge}>
+                            <Shield className={styles.verificationIcon} size={16} />
+                            <span>NH CPA License Verified</span>
+                        </div>
+                        <div className={styles.cpaInfo}>
+                            <strong>{cpaData.full_name}</strong>
+                            <span>License: {cpaData.license_number}</span>
+                        </div>
+                    </div>
+                )}
+
+                {/* Trust Indicators */}
+                <div className={styles.trustIndicators}>
+                    <div className={styles.trustItem}>
+                        <Shield size={16} />
+                        <span>SOC 2 Compliant</span>
+                    </div>
+                    <div className={styles.trustItem}>
+                        <Lock size={16} />
+                        <span>256-bit Encryption</span>
+                    </div>
+                    <div className={styles.trustItem}>
+                        <CheckCircle size={16} />
+                        <span>AICPA Approved</span>
+                    </div>
+                </div>
+
+                {/* Close Button */}
+                <button
+                    onClick={onClose}
+                    className={styles.closeButton}
+                    disabled={isSubmitting}
+                >
+                    <X size={24} />
+                </button>
             </div>
         </div>
     );
 };
+
 
 export default QuickSignupModal;
