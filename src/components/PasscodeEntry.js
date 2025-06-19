@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'react-hot-toast';
 import QuickSignupModal from './compliance/QuickSignupModal';
+import { apiService } from '../services/api';
 import styles from '../styles/components/PasscodeEntry.module.css';
 
 const PasscodeEntry = () => {
@@ -23,23 +24,26 @@ const PasscodeEntry = () => {
 
         setLoading(true);
         try {
-            const response = await fetch(`/api/cpas/verify-passcode?passcode=${passcode}`);
+            const response = await fetch(`/api/cpas/lookup-passcode/${passcode}`);
 
             if (response.ok) {
                 const data = await response.json();
-                setCpaData(data.cpa);
 
-                if (isAuthenticated && user?.license_number === data.cpa.license_number) {
-                    navigate(`/dashboard/${data.cpa.license_number}`);
-                } else if (isAuthenticated) {
-                    toast.error('This passcode is for a different CPA license.');
+                if (data.found) {
+                    setCpaData(data.cpa);
+
+                    if (isAuthenticated && user?.license_number === data.cpa.license_number) {
+                        navigate(`/dashboard/${data.cpa.license_number}`);
+                    } else if (isAuthenticated) {
+                        toast.error('This passcode is for a different CPA license.');
+                    } else {
+                        setShowSignupModal(true);
+                    }
                 } else {
-                    setShowSignupModal(true);
+                    toast.error('Invalid passcode. Please check and try again.');
                 }
-            } else if (response.status === 404) {
-                toast.error('Invalid passcode. Please check and try again.');
-            } else if (response.status === 409) {
-                toast.error('This passcode has already been used.');
+            } else {
+                toast.error('Error verifying passcode. Please try again.');
             }
         } catch (error) {
             toast.error('Error verifying passcode. Please try again.');
@@ -153,6 +157,7 @@ const PasscodeEntry = () => {
                     licenseNumber={cpaData.license_number}
                     cpaName={cpaData.full_name}
                     cpaData={cpaData}
+                    isPasscodeVerified={true}  // Add this line!
                     onClose={() => setShowSignupModal(false)}
                     onSuccess={handleSignupSuccess}
                 />

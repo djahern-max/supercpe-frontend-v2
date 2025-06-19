@@ -535,7 +535,14 @@ export const apiService = {
      */
     async getAvailableWindows(licenseNumber) {
         return this.getAvailablePeriods(licenseNumber);
-    }
+    },
+    /**
+ * Check passcode for CPA access
+ */
+    async checkPasscode(passcode) {
+        const response = await apiClient.get(`/api/cpas/check-code?passcode=${passcode}`);
+        return response.data;
+    },
 };
 
 export default apiService;

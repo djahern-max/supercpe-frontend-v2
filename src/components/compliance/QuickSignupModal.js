@@ -35,6 +35,18 @@ const QuickSignupModal = ({
     const handleEmailSignup = async (e) => {
         e.preventDefault();
 
+        // ADD DEBUG LOGGING HERE - Right at the start
+        console.log('=== DEBUG: QuickSignupModal handleEmailSignup ===');
+        console.log('Debug info:', {
+            isPasscodeVerified,
+            cpaData,
+            hasPasscode: !!cpaData?.passcode,
+            willUsePasscodeFlow: isPasscodeVerified && cpaData?.passcode,
+            licenseNumber,
+            email: email.trim(),
+            name: name.trim()
+        });
+
         if (!email || !email.includes('@')) {
             toast.error('Please enter a valid email address');
             return;
@@ -51,6 +63,14 @@ const QuickSignupModal = ({
             let result;
 
             if (isPasscodeVerified && cpaData?.passcode) {
+                // ADD MORE DEBUG LOGGING HERE - Right before the API call
+                console.log('Using passcode flow - making request to:', '/api/auth/signup-with-passcode');
+                console.log('Request body:', {
+                    email: email.trim(),
+                    name: name.trim(),
+                    passcode: cpaData.passcode,
+                });
+
                 // New passcode-based signup
                 const response = await fetch('/api/auth/signup-with-passcode', {
                     method: 'POST',
@@ -64,16 +84,22 @@ const QuickSignupModal = ({
                     }),
                 });
 
+                console.log('Response status:', response.status);
+                console.log('Response ok:', response.ok);
+
                 if (response.ok) {
                     const data = await response.json();
+                    console.log('Success response data:', data);
                     setAuthToken(data.access_token);
                     result = { success: true };
                 } else {
                     const errorData = await response.json();
-                    result = { success: false, error: errorData.detail };
+                    console.error('Passcode signup error:', errorData);
+                    result = { success: false, error: errorData.detail || 'Signup failed' };
                 }
             } else {
-                // Original email signup flow
+                // Fallback to original flow if passcode not verified
+                console.warn('Passcode not verified, using fallback signup');
                 result = await createAccountWithEmail({
                     email: email.trim(),
                     name: name.trim(),
@@ -83,8 +109,6 @@ const QuickSignupModal = ({
 
             if (result.success) {
                 setStep('success');
-
-                // Auto-close after showing success
                 setTimeout(() => {
                     onSuccess();
                 }, 2000);
@@ -93,16 +117,7 @@ const QuickSignupModal = ({
             }
         } catch (error) {
             console.error('Account creation error:', error);
-
-            if (error.response?.status === 400) {
-                toast.error('Invalid request. Please check your information.');
-            } else if (error.response?.status === 404) {
-                toast.error('CPA license number not found. Please verify your license number.');
-            } else if (error.response?.status === 409) {
-                toast.error('An account with this email already exists. Please sign in instead.');
-            } else {
-                toast.error('Unable to process your request. Please try again or contact support.');
-            }
+            toast.error('Network error. Please check your connection and try again.');
         } finally {
             setIsSubmitting(false);
         }
