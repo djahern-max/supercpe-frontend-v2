@@ -218,6 +218,103 @@
     color: var(--gray-500);
 }
 
+.authNotice {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    background: linear-gradient(90deg, #dbeafe 0%, #e0f2fe 100%);
+    border-bottom: 1px solid var(--blue-200);
+    font-size: var(--text-sm);
+    color: var(--blue-800);
+}
+
+.authIcon {
+    font-size: 16px;
+}
+
+.authText {
+    font-weight: 500;
+}
+
+/* User's current license highlighting */
+.userLicense {
+    background-color: var(--green-50);
+    border-left: 4px solid var(--green-500);
+}
+
+.userLicense:hover,
+.userLicense.selected {
+    background-color: var(--green-100);
+}
+
+.yourLicenseLabel {
+    font-size: var(--text-xs);
+    color: var(--green-700);
+    background: var(--green-100);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+    margin-left: var(--space-2);
+    font-weight: 600;
+}
+
+/* Loading states */
+.searchInput:disabled {
+    background-color: var(--gray-100);
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Enhanced loading spinner */
+.loadingSpinner {
+    position: absolute;
+    right: var(--space-3);
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--gray-200);
+    border-top: 2px solid var(--primary-600);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 640px) {
+    .authNotice {
+        padding: var(--space-2) var(--space-3);
+        font-size: var(--text-xs);
+    }
+
+    .yourLicenseLabel {
+        display: block;
+        margin-left: 0;
+        margin-top: var(--space-1);
+        width: fit-content;
+    }
+
+    .resultMain {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-1);
+    }
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .searchInput {

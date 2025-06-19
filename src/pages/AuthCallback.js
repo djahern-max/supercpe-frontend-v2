@@ -1,4 +1,4 @@
-// src/pages/AuthCallback.js - Improved with better dashboard redirect logic
+// src/pages/AuthCallback.js - Fixed to prevent multiple executions
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -13,8 +13,24 @@ const AuthCallback = () => {
     const [status, setStatus] = useState('Completing Sign In...');
 
     useEffect(() => {
+        // Create a flag to track if we've processed this callback
+        const callbackId = searchParams.get('access_token');
+        const processedKey = `callback_processed_${callbackId?.slice(-10) || 'unknown'}`;
+
+        // Check if we've already processed this exact callback
+        if (sessionStorage.getItem(processedKey)) {
+            console.log('Callback already processed, skipping...');
+            setIsProcessing(false);
+            return;
+        }
+
         const handleCallback = async () => {
             try {
+                // Mark as processed immediately to prevent re-runs
+                if (callbackId) {
+                    sessionStorage.setItem(processedKey, 'true');
+                }
+
                 setStatus('Processing authentication...');
 
                 const accessToken = searchParams.get('access_token');
@@ -71,40 +87,62 @@ const AuthCallback = () => {
                     return;
                 }
 
-                setStatus('Redirecting to your dashboard...');
+                // Clean up URL params before deciding what to do next
+                window.history.replaceState({}, document.title, '/auth/callback');
 
-                // Determine redirect destination with priority logic
-                let redirectPath = '/';
-                let welcomeMessage = `Welcome, ${userProfile.name}!`;
-
-                // Priority 1: User's own license number from profile
+                // Determine redirect destination
                 if (userProfile.license_number) {
-                    redirectPath = `/dashboard/${userProfile.license_number}`;
-                    welcomeMessage = `Welcome back, ${userProfile.name}! Redirecting to your dashboard...`;
+                    // User has a license - go directly to dashboard
+                    setStatus('Redirecting to your dashboard...');
+                    const redirectPath = `/dashboard/${userProfile.license_number}`;
+                    console.log('Redirecting to:', redirectPath);
+
+                    toast.success(`Welcome back, ${userProfile.name}!`, {
+                        duration: 2000
+                    });
+
+                    setTimeout(() => {
+                        navigate(redirectPath, { replace: true });
+                    }, 1000);
+
+                } else if (userLicense) {
+                    // Backend provided a license number - use it
+                    setStatus('Redirecting to your dashboard...');
+                    const redirectPath = `/dashboard/${userLicense}`;
+                    console.log('Redirecting to:', redirectPath);
+
+                    toast.success(`Welcome, ${userProfile.name}!`, {
+                        duration: 2000
+                    });
+
+                    setTimeout(() => {
+                        navigate(redirectPath, { replace: true });
+                    }, 1000);
+
+                } else {
+                    // No license number - go to home with clear instructions
+                    setStatus('Redirecting to home...');
+                    console.log('Redirecting to: / (no license)');
+
+                    // Clear any existing toasts first
+                    toast.dismiss();
+
+                    // Show success message with clear next steps
+                    toast.success(`Welcome, ${userProfile.name}! Please search for and select your CPA license below to link it to your account.`, {
+                        duration: 6000
+                    });
+
+                    setTimeout(() => {
+                        navigate('/', {
+                            replace: true,
+                            state: {
+                                justLoggedIn: true,
+                                userName: userProfile.name,
+                                needsLicense: true
+                            }
+                        });
+                    }, 1500);
                 }
-                // Priority 2: License number from backend callback URL
-                else if (userLicense) {
-                    redirectPath = `/dashboard/${userLicense}`;
-                    welcomeMessage = `Welcome, ${userProfile.name}! Redirecting to your dashboard...`;
-                }
-                // Priority 3: No license - go to home with helpful message
-                else {
-                    redirectPath = '/';
-                    welcomeMessage = `Welcome, ${userProfile.name}! Enter your CPA license number to get started.`;
-                }
-
-                console.log('Redirecting to:', redirectPath);
-
-                // Show success message
-                toast.success(welcomeMessage, { duration: 3000 });
-
-                // Clean up URL params before navigating
-                window.history.replaceState({}, document.title, window.location.pathname);
-
-                // Navigate to destination with small delay for better UX
-                setTimeout(() => {
-                    navigate(redirectPath, { replace: true });
-                }, 1500);
 
             } catch (error) {
                 console.error('Auth callback error:', error);
@@ -128,8 +166,19 @@ const AuthCallback = () => {
             }
         };
 
-        handleCallback();
-    }, [searchParams, navigate, login]);
+        // Only run if we haven't processed this callback
+        if (!sessionStorage.getItem(processedKey)) {
+            handleCallback();
+        }
+
+        // Cleanup function to remove the processed flag after some time
+        return () => {
+            setTimeout(() => {
+                sessionStorage.removeItem(processedKey);
+            }, 30000); // Remove after 30 seconds
+        };
+
+    }, []); // Empty dependency array - only run once
 
     if (isProcessing) {
         return (

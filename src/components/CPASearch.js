@@ -1,7 +1,8 @@
-// src/components/CPASearch.js
+// src/components/CPASearch.js - Enhanced to auto-link license to authenticated users
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
+import { useAuth } from '../contexts/AuthContext';
 import { apiService } from '../services/api';
 import styles from '../styles/components/CPASearch.module.css';
 
@@ -11,7 +12,10 @@ const CPASearch = () => {
     const [loading, setLoading] = useState(false);
     const [showResults, setShowResults] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(-1);
+    const [isLinkingLicense, setIsLinkingLicense] = useState(false);
+
     const navigate = useNavigate();
+    const { isAuthenticated, user, connectLicense } = useAuth();
     const searchRef = useRef(null);
     const debounceRef = useRef(null);
 
@@ -77,11 +81,62 @@ const CPASearch = () => {
         }
     };
 
-    const handleResultClick = (cpa) => {
+    const handleResultClick = async (cpa) => {
         setQuery('');
         setShowResults(false);
         setSelectedIndex(-1);
-        toast.success(`Accessing dashboard for ${cpa.full_name}`);
+
+        // Check if user is authenticated but doesn't have this license linked
+        const shouldLinkLicense = isAuthenticated &&
+            user &&
+            (!user.license_number || user.license_number !== cpa.license_number);
+
+        if (shouldLinkLicense) {
+            try {
+                setIsLinkingLicense(true);
+
+                // Show initial toast
+                toast.loading(`Linking license ${cpa.license_number} to your account...`, {
+                    id: 'linking-license'
+                });
+
+                // Connect the license to the user account
+                await connectLicense(cpa.license_number);
+
+                // Success message
+                toast.success(`License ${cpa.license_number} linked to your account!`, {
+                    id: 'linking-license',
+                    duration: 3000
+                });
+
+                console.log(`Successfully linked license ${cpa.license_number} to user ${user.email}`);
+
+            } catch (error) {
+                console.error('Failed to link license:', error);
+
+                // Handle specific error cases
+                if (error.response?.status === 409) {
+                    toast.error('This license is already connected to another account.', {
+                        id: 'linking-license'
+                    });
+                } else if (error.response?.status === 404) {
+                    toast.error('License number not found in our database.', {
+                        id: 'linking-license'
+                    });
+                } else {
+                    toast.error('Failed to link license to your account.', {
+                        id: 'linking-license'
+                    });
+                }
+            } finally {
+                setIsLinkingLicense(false);
+            }
+        } else {
+            // Regular flow for non-authenticated users or users with license already linked
+            toast.success(`Accessing dashboard for ${cpa.full_name}`);
+        }
+
+        // Navigate to dashboard regardless of linking outcome
         navigate(`/dashboard/${cpa.license_number}`);
     };
 
@@ -139,9 +194,10 @@ const CPASearch = () => {
                     placeholder="Search by CPA name or license number..."
                     className={styles.searchInput}
                     autoComplete="off"
+                    disabled={isLinkingLicense}
                 />
 
-                {loading && (
+                {(loading || isLinkingLicense) && (
                     <div className={styles.loadingSpinner}>
                         <div className={styles.spinner}></div>
                     </div>
@@ -166,11 +222,22 @@ const CPASearch = () => {
                                     Use ↑↓ keys to navigate, Enter to select
                                 </span>
                             </div>
+                            {/* Show helpful message for authenticated users */}
+                            {isAuthenticated && user && !user.license_number && (
+                                <div className={styles.authNotice}>
+                                    <span className={styles.authIcon}>🔗</span>
+                                    <span className={styles.authText}>
+                                        Selecting a CPA will link this license to your account
+                                    </span>
+                                </div>
+                            )}
                             <ul className={styles.resultsList}>
                                 {results.map((cpa, index) => (
                                     <li
                                         key={cpa.license_number}
                                         className={`${styles.resultItem} ${index === selectedIndex ? styles.selected : ''
+                                            } ${isAuthenticated && user?.license_number === cpa.license_number
+                                                ? styles.userLicense : ''
                                             }`}
                                         onClick={() => handleResultClick(cpa)}
                                         onMouseEnter={() => setSelectedIndex(index)}
@@ -179,6 +246,11 @@ const CPASearch = () => {
                                             <div className={styles.resultMain}>
                                                 <span className={styles.resultName}>
                                                     {cpa.full_name}
+                                                    {isAuthenticated && user?.license_number === cpa.license_number && (
+                                                        <span className={styles.yourLicenseLabel}>
+                                                            (Your License)
+                                                        </span>
+                                                    )}
                                                 </span>
                                                 <span className={styles.resultLicense}>
                                                     #{cpa.license_number}
