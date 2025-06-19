@@ -106,18 +106,40 @@ const QuickSignupModal = ({
                 console.log('Response status:', response.status);
                 console.log('Response ok:', response.ok);
 
+
+
+                // Add this debugging to your QuickSignupModal.js handleEmailSignup function
+                // Replace the section after "if (response.ok)" with this:
+
                 if (response.ok) {
                     const data = await response.json();
-                    console.log('Success response data:', data);
+
+                    // 🔍 DETAILED DEBUGGING
+                    console.log('🔍 FULL BACKEND RESPONSE:', JSON.stringify(data, null, 2));
+                    console.log('🔍 TEMPORARY PASSWORD CHECK:', {
+                        hasTemporaryPassword: !!data.temporary_password,
+                        temporaryPasswordValue: data.temporary_password,
+                        temporaryPasswordType: typeof data.temporary_password,
+                        hasRequiresPasswordReset: !!data.requires_password_reset,
+                        requiresPasswordResetValue: data.requires_password_reset
+                    });
 
                     setAuthToken(data.access_token, data.refresh_token);
 
                     // 🔥 CHECK FOR TEMPORARY PASSWORD
                     if (data.temporary_password) {
+                        console.log('✅ TEMPORARY PASSWORD DETECTED - SHOWING PASSWORD SETUP');
                         setTemporaryPassword(data.temporary_password);
                         setStep('password-setup');
                         toast.success('Account created! Please set your password.');
+                        return;
+                    } else if (data.requires_password_reset) {
+                        console.log('✅ REQUIRES PASSWORD RESET - SHOWING PASSWORD SETUP');
+                        setStep('password-setup');
+                        toast.success('Account created! Please set your password.');
+                        return;
                     } else {
+                        console.log('❌ NO PASSWORD SETUP REQUIRED - GOING TO SUCCESS');
                         setStep('success');
                         setTimeout(() => {
                             onSuccess();
@@ -125,9 +147,22 @@ const QuickSignupModal = ({
                     }
 
                     result = { success: true };
-                } else {
+                }
+
+
+
+
+
+
+
+
+
+
+
+
+                else {
                     const errorData = await response.json();
-                    console.error('Passcode signup error:', errorData);
+                    console.error('❌ PASSCODE SIGNUP ERROR:', errorData);
                     result = { success: false, error: errorData.detail || 'Signup failed' };
                 }
             } else {
@@ -164,6 +199,9 @@ const QuickSignupModal = ({
             setIsSubmitting(false);
         }
     };
+
+
+
 
     const handlePasswordSetupSuccess = () => {
         setShowPasswordSetup(false);

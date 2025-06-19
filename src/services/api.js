@@ -161,7 +161,8 @@ export const apiService = {
      * Get Google OAuth URL
      */
     async getGoogleAuthUrl() {
-        const response = await apiClient.get('/api/auth/google/login');
+        // ✅ CORRECT endpoint that matches your backend
+        const response = await apiClient.get('/api/auth/google');
         return response.data;
     },
 

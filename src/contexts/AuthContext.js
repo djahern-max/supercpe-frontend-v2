@@ -134,22 +134,24 @@ export const AuthProvider = ({ children }) => {
         }
     }, [clearAuthState]);
 
-    const loginWithGoogle = async (googleToken) => {
+    const loginWithGoogle = async () => {
         try {
             console.log('🔐 AuthContext: Google login initiated');
-            const response = await apiService.googleLogin(googleToken);
 
-            if (response.success) {
-                return await login(
-                    response.access_token,
-                    response.refresh_token,
-                    response.user
-                );
+            // Get the OAuth URL from backend
+            const response = await apiService.getGoogleAuthUrl();
+
+            if (response.oauth_url) {
+                // Redirect to Google OAuth
+                console.log('🔐 Redirecting to Google OAuth:', response.oauth_url);
+                window.location.href = response.oauth_url;
+                return true;
             }
 
-            return false;
+            throw new Error('No OAuth URL received from backend');
         } catch (error) {
             console.error('🔐 Google login failed:', error);
+            toast.error('Failed to initiate Google login. Please try again.');
             return false;
         }
     };
