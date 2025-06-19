@@ -1,0 +1,456 @@
+/* src/styles/components/QuickSignupModal.module.css */
+
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(8px);
+}
+
+.modalContent {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    padding: 32px;
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.closeButton {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: none;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 8px;
+    color: #6b7280;
+    transition: all 0.2s ease;
+}
+
+.closeButton:hover {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.modalHeader {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.iconWrapper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    border-radius: 16px;
+    margin-bottom: 16px;
+}
+
+.headerIcon {
+    color: white;
+}
+
+.modalHeader h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 8px 0;
+}
+
+.modalHeader p {
+    color: #6b7280;
+    font-size: 16px;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.backButton {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    background: none;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 8px;
+    color: #6b7280;
+    font-size: 18px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.backButton:hover {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+/* Benefits Section */
+.benefits {
+    margin-bottom: 24px;
+}
+
+.benefit {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    font-size: 14px;
+    color: #374151;
+}
+
+.checkIcon {
+    color: #10b981;
+    flex-shrink: 0;
+}
+
+/* Auth Options */
+.authOptions {
+    margin-bottom: 24px;
+}
+
+.googleButton,
+.emailButton {
+    width: 100%;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 14px 20px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+}
+
+.googleButton {
+    background: white;
+    color: #374151;
+    border-color: #d1d5db;
+}
+
+.googleButton:hover {
+    border-color: #9ca3af;
+    background: #f9fafb;
+}
+
+.googleIcon {
+    width: 20px;
+    height: 20px;
+}
+
+.emailButton {
+    background: #f3f4f6;
+    color: #374151;
+    border-color: #e5e7eb;
+}
+
+.emailButton:hover {
+    background: #e5e7eb;
+    border-color: #d1d5db;
+}
+
+.divider {
+    text-align: center;
+    margin: 20px 0;
+    position: relative;
+    color: #9ca3af;
+    font-size: 14px;
+}
+
+.divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #e5e7eb;
+    z-index: 1;
+}
+
+.divider span {
+    background: white;
+    padding: 0 16px;
+    position: relative;
+    z-index: 2;
+}
+
+/* License Info */
+.licenseInfo {
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.licenseCard {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.licenseDetails strong {
+    color: #0c4a6e;
+    font-size: 16px;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.licenseDetails p {
+    color: #0369a1;
+    margin: 0;
+    font-size: 14px;
+}
+
+.verifiedIcon {
+    color: #10b981;
+    flex-shrink: 0;
+}
+
+/* Email Form */
+.emailForm {
+    margin-bottom: 24px;
+}
+
+.formGroup {
+    margin-bottom: 16px;
+}
+
+.formGroup label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 6px;
+}
+
+.formGroup input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.2s ease;
+    box-sizing: border-box;
+}
+
+.formGroup input:focus {
+    outline: none;
+    border-color: #3b82f6;
+}
+
+.formGroup input:disabled {
+    background: #f9fafb;
+    color: #9ca3af;
+    cursor: not-allowed;
+}
+
+.submitButton {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 20px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.verificationNote {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #6b7280;
+    background: #f9fafb;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+/* Success State */
+.successState {
+    text-align: center;
+    padding: 20px 0;
+}
+
+.successIcon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    border-radius: 50%;
+    margin-bottom: 20px;
+    color: white;
+}
+
+.successState h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 12px 0;
+}
+
+.successState p {
+    color: #6b7280;
+    font-size: 16px;
+    margin: 0 0 24px 0;
+}
+
+.successBenefits {
+    text-align: left;
+}
+
+.successBenefits .benefit {
+    font-size: 16px;
+    font-weight: 500;
+    color: #059669;
+}
+
+/* Trust Indicators */
+.trustIndicators {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e7eb;
+    margin-top: 24px;
+}
+
+.trustItem {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.trustItem svg {
+    color: #10b981;
+}
+
+/* Auth Required Upload Styles */
+.authRequired {
+    background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+    border: 2px dashed #0ea5e9;
+    border-radius: 16px;
+    padding: 40px 24px;
+    text-align: center;
+}
+
+.authPrompt {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.authIcon {
+    color: #0ea5e9;
+    margin-bottom: 16px;
+}
+
+.authPrompt h3 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #0c4a6e;
+    margin: 0 0 12px 0;
+}
+
+.authPrompt p {
+    color: #0369a1;
+    font-size: 16px;
+    margin: 0 0 24px 0;
+    line-height: 1.5;
+}
+
+.authButtons {
+    margin-bottom: 24px;
+}
+
+.authButtons button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 0 auto;
+    padding: 14px 28px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.benefits {
+    text-align: left;
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+.benefit {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #0369a1;
+}
+
+.checkmark {
+    color: #10b981;
+    font-weight: 700;
+    font-size: 16px;
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+    .modalContent {
+        margin: 16px;
+        padding: 24px;
+        max-height: calc(100vh - 32px);
+    }
+
+    .modalHeader h2 {
+        font-size: 20px;
+    }
+
+    .trustIndicators {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .authRequired {
+        padding: 24px 16px;
+    }
+
+    .authPrompt h3 {
+        font-size: 20px;
+    }
+}

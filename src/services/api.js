@@ -1,20 +1,23 @@
-// src/services/api.js - CLEANED AND ORGANIZED VERSION
+// src/services/api.js - Enhanced with Authentication
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+const API_BASE_URL = process.env.NODE_ENV === 'production'
+    ? 'https://nh.supercpe.com'
+    : 'http://localhost:8000';
 
+// Create axios instance with interceptors
 const apiClient = axios.create({
     baseURL: API_BASE_URL,
     timeout: 30000,
-    headers: {
-        'Content-Type': 'application/json',
-    },
 });
 
-// Request interceptor for logging
+// Request interceptor to add auth token
 apiClient.interceptors.request.use(
     (config) => {
-        console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`);
+        const token = localStorage.getItem('access_token');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
         return config;
     },
     (error) => {
@@ -22,163 +25,143 @@ apiClient.interceptors.request.use(
     }
 );
 
-// Response interceptor for error handling
+// Response interceptor to handle token refresh
 apiClient.interceptors.response.use(
-    (response) => {
-        return response;
-    },
-    (error) => {
-        console.error('API Error:', error.response?.data || error.message);
+    (response) => response,
+    async (error) => {
+        const originalRequest = error.config;
 
-        if (error.response?.status === 404) {
-            throw new Error('Resource not found (404)');
-        } else if (error.response?.status === 500) {
-            throw new Error('Server error. Please try again later.');
-        } else if (error.code === 'ECONNABORTED') {
-            throw new Error('Request timeout. Please check your connection.');
+        if (error.response?.status === 401 && !originalRequest._retry) {
+            originalRequest._retry = true;
+
+            const refreshToken = localStorage.getItem('refresh_token');
+            if (refreshToken) {
+                try {
+                    const response = await axios.post(`${API_BASE_URL}/api/auth/refresh`, {
+                        refresh_token: refreshToken
+                    });
+
+                    const { access_token } = response.data;
+                    localStorage.setItem('access_token', access_token);
+
+                    // Retry original request with new token
+                    originalRequest.headers.Authorization = `Bearer ${access_token}`;
+                    return apiClient(originalRequest);
+                } catch (refreshError) {
+                    // Refresh failed, redirect to login
+                    localStorage.removeItem('access_token');
+                    localStorage.removeItem('refresh_token');
+                    window.location.href = '/';
+                    return Promise.reject(refreshError);
+                }
+            } else {
+                // No refresh token, redirect to login
+                localStorage.removeItem('access_token');
+                window.location.href = '/';
+            }
         }
 
-        throw error;
+        return Promise.reject(error);
     }
 );
 
 export const apiService = {
-    // ===== HEALTH & CONNECTION =====
-    async healthCheck() {
-        const response = await apiClient.get('/health');
-        return response.data;
-    },
+    baseURL: API_BASE_URL,
 
-    async testConnection() {
-        try {
-            const response = await apiClient.get('/health');
-            return {
-                success: true,
-                status: response.data.status,
-                version: '2.0.0'
-            };
-        } catch (error) {
-            return {
-                success: false,
-                error: error.message
-            };
-        }
-    },
+    // ===== AUTHENTICATION METHODS =====
 
-    // ===== CPA MANAGEMENT =====
-    async getAllCPAs(skip = 0, limit = 100) {
-        const response = await apiClient.get(`/api/cpas/?skip=${skip}&limit=${limit}`);
-        return response.data;
-    },
-
-    async getCPA(licenseNumber) {
-        const response = await apiClient.get(`/api/cpas/${licenseNumber}`);
-        return response.data;
-    },
-
-    async getCPAStats() {
-        const response = await apiClient.get('/api/cpas/stats/summary');
-        return response.data;
-    },
-
-    async searchCPAs(query, limit = 10) {
-        const response = await apiClient.get(`/api/cpas/search?q=${encodeURIComponent(query)}&limit=${limit}`);
-        return response.data;
-    },
-
-    // ===== COMPLIANCE MANAGEMENT =====
-    async getCompliance(licenseNumber) {
-        const response = await apiClient.get(`/api/compliance/${licenseNumber}`);
-        return response.data;
-    },
-
-    async getEnhancedCompliance(licenseNumber) {
-        const response = await apiClient.get(`/api/compliance/${licenseNumber}/dashboard`);
-        return response.data;
-    },
-
-    async getQuickComplianceStatus(licenseNumber) {
-        const response = await apiClient.get(`/api/compliance/${licenseNumber}/quick-status`);
-        return response.data;
-    },
-
-    async getComplianceRulesExplanation(licenseNumber) {
-        const response = await apiClient.get(`/api/compliance/${licenseNumber}/rules/explanation`);
+    /**
+     * Get Google OAuth URL
+     */
+    async getGoogleAuthUrl() {
+        const response = await apiClient.get('/api/auth/google/login');
         return response.data;
     },
 
     /**
-     * Get compliance dashboard data (main dashboard endpoint)
-     * This is the primary endpoint your ProfessionalCPEDashboard uses
+     * Login with email and password (if you implement this)
+     */
+    async loginWithEmail(email, password) {
+        const response = await apiClient.post('/api/auth/login', { email, password });
+        return response.data;
+    },
+
+    /**
+     * Get current user profile
+     */
+    async getCurrentUser() {
+        const response = await apiClient.get('/api/auth/me');
+        return response.data;
+    },
+
+    /**
+     * Refresh access token
+     */
+    async refreshToken(refreshToken) {
+        const response = await apiClient.post('/api/auth/refresh', {
+            refresh_token: refreshToken
+        });
+        return response.data;
+    },
+
+    /**
+     * Connect license to user account
+     */
+    async connectLicense(licenseNumber) {
+        const response = await apiClient.post('/api/auth/connect-license', {
+            license_number: licenseNumber
+        });
+        return response.data;
+    },
+
+    /**
+     * Check authentication status
+     */
+    async checkAuthStatus() {
+        try {
+            const user = await this.getCurrentUser();
+            return {
+                isAuthenticated: true,
+                user
+            };
+        } catch (error) {
+            return {
+                isAuthenticated: false,
+                user: null
+            };
+        }
+    },
+
+    // ===== EXISTING METHODS (Updated to require auth where needed) =====
+
+    /**
+     * Search CPAs by name or license number (Public - No auth required)
+     */
+    async searchCPAs(query, limit = 10) {
+        const response = await apiClient.get(`/api/cpas/search`, {
+            params: { q: query, limit }
+        });
+        return response.data;
+    },
+
+    /**
+     * Get CPA by license number (Public - No auth required)
+     */
+    async getCPAByLicense(licenseNumber) {
+        const response = await apiClient.get(`/api/cpas/${licenseNumber}`);
+        return response.data;
+    },
+
+    /**
+     * Get compliance dashboard (Public - No auth required)
      */
     async getComplianceDashboard(licenseNumber) {
         const response = await apiClient.get(`/api/upload/compliance-dashboard/${licenseNumber}`);
         return response.data;
     },
 
-    async generateAuditPresentation(licenseNumber, options = {}) {
-        const response = await apiClient.post(`/api/compliance/generate-audit-presentation/${licenseNumber}`, {
-            include_free_tier: true,
-            include_premium: true,
-            format: options.format || 'pdf',
-            style: options.style || 'professional'
-        });
-        return response.data;
-    },
-
-    // ===== TIME WINDOWS & PERIODS =====
-    async getTimeWindows(licenseNumber) {
-        const response = await apiClient.get(`/api/time-windows/${licenseNumber}`);
-        return response.data;
-    },
-
-    async getReportingPeriods(licenseNumber) {
-        const response = await apiClient.get(`/api/time-windows/${licenseNumber}/available`);
-        return response.data;
-    },
-
-    async getAvailablePeriods(licenseNumber) {
-        const response = await apiClient.get(`/api/time-windows/${licenseNumber}/available`);
-        return response.data.available_windows || response.data;
-    },
-
-    async analyzeTimeWindow(licenseNumber, timeWindow) {
-        const response = await apiClient.post(`/api/time-windows/${licenseNumber}/analyze`, {
-            start_date: timeWindow.start_date,
-            end_date: timeWindow.end_date
-        });
-        return response.data;
-    },
-
-    async getCurrentPeriod(licenseNumber) {
-        const response = await apiClient.get(`/api/time-windows/${licenseNumber}/current-period`);
-        return response.data;
-    },
-
-    async getCurrentPeriodAnalysis(licenseNumber) {
-        const response = await apiClient.get(`/api/time-windows/${licenseNumber}/current-period`);
-        return response.data;
-    },
-
-    // ===== UPLOAD & CERTIFICATE MANAGEMENT =====
-
     /**
-     * ADMIN: Upload monthly CPA list
-     */
-    async uploadCPAList(file) {
-        const formData = new FormData();
-        formData.append('file', file);
-
-        const response = await apiClient.post('/api/admin/upload-cpa-list', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-        });
-        return response.data;
-    },
-
-    /**
-     * FREE TIER: Get upload status and remaining uploads
+     * Get free tier status (Public - No auth required)
      */
     async getFreeTierStatus(licenseNumber) {
         const response = await apiClient.get(`/api/upload/free-tier-status/${licenseNumber}`);
@@ -186,28 +169,26 @@ export const apiService = {
     },
 
     /**
-     * FREE TIER: Upload certificate with FULL functionality (AI + Storage + Tracking)
-     * LIMITED to 10 uploads, then subscription required
+     * Upload certificate (REQUIRES AUTHENTICATION)
      */
-    async uploadCertificateEnhancedFree(licenseNumber, file) {
+    async uploadCertificateAuthenticated(licenseNumber, file) {
         const formData = new FormData();
         formData.append('file', file);
 
         const response = await apiClient.post(
-            `/api/upload/upload-certificate-free/${licenseNumber}`,
+            `/api/upload/upload-certificate-authenticated/${licenseNumber}`,
             formData,
             {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
-                timeout: 90000, // 90 seconds for full processing (AI + upload + DB)
             }
         );
         return response.data;
     },
 
     /**
-     * PREMIUM: Upload certificate for subscribers (unlimited)
+     * Upload certificate premium (REQUIRES AUTHENTICATION)
      */
     async uploadCertificatePremium(licenseNumber, file) {
         const formData = new FormData();
@@ -220,70 +201,45 @@ export const apiService = {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
-                timeout: 60000,
             }
         );
         return response.data;
     },
 
     /**
-     * ADMIN: Analyze certificate with AI (preview mode)
+     * Analyze certificate preview (Public - No auth required)
      */
-    async analyzeCertificate(licenseNumber, file) {
+    async analyzeCertificatePreview(licenseNumber, file) {
         const formData = new FormData();
         formData.append('file', file);
 
         const response = await apiClient.post(
-            `/api/admin/analyze-certificate/${licenseNumber}`,
+            `/api/upload/analyze-certificate/${licenseNumber}`,
             formData,
             {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
-                timeout: 60000, // 60 seconds for AI processing
             }
         );
         return response.data;
     },
 
     /**
-     * ADMIN: Save reviewed certificate (after user edits AI results)
+     * Save reviewed certificate (REQUIRES AUTHENTICATION)
      */
-    async saveReviewedCertificate(licenseNumber, certificateData) {
+    async saveReviewedCertificate(licenseNumber, reviewData) {
         const response = await apiClient.post(
-            `/api/admin/save-reviewed-certificate/${licenseNumber}`,
-            certificateData
+            `/api/upload/save-reviewed-certificate/${licenseNumber}`,
+            reviewData
         );
         return response.data;
     },
 
-    /**
-     * Delete a certificate record
-     */
-    async deleteCertificate(certificateId, licenseNumber) {
-        try {
-            const response = await apiClient.delete(
-                `/api/upload/certificate/${certificateId}?license_number=${licenseNumber}`
-            );
-            return response.data;
-        } catch (error) {
-            console.error('Error deleting certificate:', error);
-            throw error;
-        }
-    },
-
-    // ===== PAYMENTS & SUBSCRIPTIONS =====
+    // ===== PAYMENT & SUBSCRIPTION METHODS =====
 
     /**
-     * Get subscription status for a CPA
-     */
-    async getSubscriptionStatus(licenseNumber) {
-        const response = await apiClient.get(`/api/payments/subscription-status/${licenseNumber}`);
-        return response.data;
-    },
-
-    /**
-     * Create account and initiate payment process
+     * Create account and initiate payment process (REQUIRES AUTHENTICATION)
      */
     async createAccountForPayment(accountData) {
         try {
@@ -299,23 +255,26 @@ export const apiService = {
     },
 
     /**
-     * Create payment intent for one-time payments
+     * Get subscription status (REQUIRES AUTHENTICATION)
      */
-    async createPaymentIntent(licenseNumber) {
-        const response = await apiClient.post(`/api/payments/create-payment-intent/${licenseNumber}`);
+    async getSubscriptionStatus(licenseNumber) {
+        const response = await apiClient.get(`/api/payments/subscription-status/${licenseNumber}`);
         return response.data;
     },
 
     /**
-     * Confirm payment completion
+     * Get pricing plans (Public - No auth required)
      */
-    async confirmPayment(licenseNumber, paymentIntentId) {
-        const response = await apiClient.post(`/api/payments/confirm-payment/${licenseNumber}`, {
-            payment_intent_id: paymentIntentId
-        });
+    async getPricingPlans() {
+        const response = await apiClient.get('/api/payments/pricing');
         return response.data;
     },
 
+    // ===== UTILITY METHODS =====
+
+    /**
+     * Get document URL (REQUIRES AUTHENTICATION)
+     */
     async getDocumentUrl(certificateId, licenseNumber) {
         try {
             const response = await apiClient.get(`/api/upload/document/${certificateId}`, {
@@ -327,16 +286,39 @@ export const apiService = {
             throw error;
         }
     },
+
+    /**
+     * View document (REQUIRES AUTHENTICATION)
+     */
     async viewDocument(certificateId, licenseNumber) {
         try {
-            // This endpoint redirects directly to the document
             const url = `${this.baseURL}/api/upload/view-document/${certificateId}?license_number=${licenseNumber}`;
             window.open(url, '_blank');
         } catch (error) {
             console.error('Error viewing document:', error);
             throw error;
         }
+    },
+
+    /**
+     * Delete certificate (REQUIRES AUTHENTICATION)
+     */
+    async deleteCertificate(recordId, licenseNumber) {
+        const response = await apiClient.delete(`/api/upload/certificate/${recordId}`, {
+            params: { license_number: licenseNumber }
+        });
+        return response.data;
+    },
+
+    // ===== LEGACY METHODS (Keep for compatibility) =====
+
+    /**
+     * @deprecated Use analyzeCertificatePreview instead
+     */
+    async uploadCertificateEnhancedFree(licenseNumber, file) {
+        console.warn('uploadCertificateEnhancedFree is deprecated. This will now redirect to authentication.');
+        throw new Error('Authentication required. Please sign in to upload certificates.');
     }
-}
+};
 
 export default apiService;
