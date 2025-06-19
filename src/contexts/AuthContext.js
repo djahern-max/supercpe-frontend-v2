@@ -151,8 +151,8 @@ export const AuthProvider = ({ children }) => {
     const setAuthToken = (token) => {
         if (token) {
             localStorage.setItem('access_token', token);
-            // You might also want to update the auth state immediately
-            checkAuthStatus();
+            setIsAuthenticated(true);
+            // Remove this line: checkAuthStatus();
         }
     };
 
