@@ -148,6 +148,14 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const setAuthToken = (token) => {
+        if (token) {
+            localStorage.setItem('access_token', token);
+            // You might also want to update the auth state immediately
+            checkAuthStatus();
+        }
+    };
+
     const logout = async () => {
         try {
             // Try to call logout endpoint, but don't fail if it doesn't work
@@ -234,8 +242,8 @@ export const AuthProvider = ({ children }) => {
         user,
         isLoading,
         login,
-        loginWithGoogle,        // ADDED: Missing function
-        createAccountWithEmail, // ADDED: Missing function
+        loginWithGoogle,
+        createAccountWithEmail,
         logout,
         refreshUser,
         connectLicense,
@@ -243,7 +251,8 @@ export const AuthProvider = ({ children }) => {
         clearAuthState,
         handleAuthError,
         setIsAuthenticated,
-        setUser
+        setUser,
+        setAuthToken
     };
 
     return (

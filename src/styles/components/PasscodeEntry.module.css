@@ -1,0 +1,152 @@
+/* PasscodeEntry.module.css */
+.entryContainer {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.inputWrapper {
+    position: relative;
+    margin-bottom: 16px;
+}
+
+.searchInput, .loginInput {
+    width: 100%;
+    padding: 16px 20px;
+    font-size: 18px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    outline: none;
+    transition: border-color 0.2s;
+    background: white;
+}
+
+.searchInput:focus, .loginInput:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.loginForm {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.loginForm button {
+    padding: 14px;
+    font-size: 16px;
+    font-weight: 600;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.loginForm button:hover:not(:disabled) {
+    background: #2563eb;
+}
+
+.loginForm button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.exclusiveHint {
+    text-align: center;
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 16px;
+    padding: 12px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border-left: 4px solid #3b82f6;
+}
+
+.switchMode {
+    text-align: center;
+    font-size: 14px;
+    color: #6b7280;
+    margin-top: 16px;
+}
+
+.switchMode button {
+    background: none;
+    border: none;
+    color: #3b82f6;
+    cursor: pointer;
+    text-decoration: underline;
+    margin-left: 4px;
+    font-size: 14px;
+}
+
+.switchMode button:hover {
+    color: #2563eb;
+}
+
+.loadingSpinner {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #e5e7eb;
+    border-top: 2px solid #3b82f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.minCharsHint {
+    text-align: center;
+    font-size: 12px;
+    color: #9ca3af;
+    margin-top: 8px;
+    padding: 8px;
+    background: #fef3c7;
+    border-radius: 6px;
+    border: 1px solid #fbbf24;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+    .entryContainer {
+        padding: 0 16px;
+    }
+    
+    .searchInput, .loginInput {
+        font-size: 16px;
+        padding: 14px 16px;
+    }
+    
+    .loginForm button {
+        padding: 12px;
+        font-size: 15px;
+    }
+}
+
+/* Focus states for accessibility */
+.searchInput:focus,
+.loginInput:focus,
+.switchMode button:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+}
+
+/* Error states (if needed later) */
+.inputError {
+    border-color: #ef4444;
+}
+
+.inputError:focus {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}

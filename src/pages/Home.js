@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Button from '../components/ui/Button';
 import CPASearch from '../components/CPASearch';
 import styles from '../styles/pages/Home.module.css';
+import PasscodeEntry from '../components/PasscodeEntry';
 
 const Home = () => {
     const navigate = useNavigate();
@@ -24,11 +25,10 @@ const Home = () => {
                             professional compliance reporting, and secure document management.
                         </p>
 
-                        <CPASearch />
+                        {/* <CPASearch /> */}
+                        <PasscodeEntry />
 
-                        <div className={styles.searchInstructions}>
-                            <p>Enter Your Name or License Number</p>
-                        </div>
+
                     </div>
                 </section>
 

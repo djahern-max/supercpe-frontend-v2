@@ -140,6 +140,102 @@
     margin: 0;
 }
 
+.entryContainer {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.inputWrapper {
+    position: relative;
+    margin-bottom: 16px;
+}
+
+.searchInput,
+.loginInput {
+    width: 100%;
+    padding: 16px 20px;
+    font-size: 18px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.searchInput:focus,
+.loginInput:focus {
+    border-color: #3b82f6;
+}
+
+.loginForm {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.loginForm button {
+    padding: 14px;
+    font-size: 16px;
+    font-weight: 600;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.loginForm button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.exclusiveHint {
+    text-align: center;
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 16px;
+}
+
+.switchMode {
+    text-align: center;
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.switchMode button {
+    background: none;
+    border: none;
+    color: #3b82f6;
+    cursor: pointer;
+    text-decoration: underline;
+    margin-left: 4px;
+}
+
+.loadingSpinner {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #e5e7eb;
+    border-top: 2px solid #3b82f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
 @media (max-width: 768px) {
     .inputGroup {
         flex-direction: column;
