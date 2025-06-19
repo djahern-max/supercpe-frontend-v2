@@ -1,4 +1,4 @@
-// src/components/auth/SimpleAuthModal.js
+// src/components/auth/SimpleAuthModal.js - Fixed to properly update auth state
 import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -9,7 +9,7 @@ const SimpleAuthModal = ({ onClose, onSuccess }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const { login } = useAuth();
+    const { login, forceAuthCheck } = useAuth();
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -26,6 +26,7 @@ const SimpleAuthModal = ({ onClose, onSuccess }) => {
         }
 
         setIsLoading(true);
+        console.log('🔐 SimpleAuthModal: Starting login process...');
 
         try {
             const response = await fetch('/api/auth/login', {
@@ -41,6 +42,11 @@ const SimpleAuthModal = ({ onClose, onSuccess }) => {
 
             if (response.ok) {
                 const data = await response.json();
+                console.log('🔐 SimpleAuthModal: Login response received:', {
+                    hasAccessToken: !!data.access_token,
+                    hasUser: !!data.user,
+                    userEmail: data.user?.email
+                });
 
                 // Use the login method from auth context
                 const loginSuccess = await login(
@@ -50,22 +56,42 @@ const SimpleAuthModal = ({ onClose, onSuccess }) => {
                 );
 
                 if (loginSuccess) {
+                    console.log('🔐 SimpleAuthModal: Login successful, calling callbacks');
+
+                    // Force an auth check to ensure state is synchronized
+                    setTimeout(() => {
+                        forceAuthCheck();
+                    }, 100);
+
                     toast.success('Welcome back!');
-                    onSuccess();
+
+                    // Call success callback first
+                    if (onSuccess) {
+                        onSuccess();
+                    }
+
+                    // Close modal
+                    onClose();
 
                     // Navigate to dashboard if user has license
                     if (data.user?.license_number) {
-                        navigate(`/dashboard/${data.user.license_number}`);
+                        console.log('🔐 SimpleAuthModal: Navigating to dashboard');
+                        navigate(`/dashboard/${data.user.license_number}`, { replace: true });
+                    } else {
+                        // If no license, go to home page
+                        navigate('/', { replace: true });
                     }
                 } else {
+                    console.error('🔐 SimpleAuthModal: Login context method failed');
                     toast.error('Login failed. Please try again.');
                 }
             } else {
                 const errorData = await response.json();
+                console.error('🔐 SimpleAuthModal: Login request failed:', errorData);
                 toast.error(errorData.detail || 'Invalid email or password');
             }
         } catch (error) {
-            console.error('Login error:', error);
+            console.error('🔐 SimpleAuthModal: Login error:', error);
             toast.error('Login failed. Please try again.');
         } finally {
             setIsLoading(false);

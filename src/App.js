@@ -1,8 +1,9 @@
-// src/App.js - Fixed with AuthCallback import
+// src/App.js - Updated with AuthSyncProvider and debugging
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './contexts/AuthContext';
+import AuthSyncProvider from './components/AuthSyncProvider';
 
 // Import your actual page components
 import Home from './pages/Home';
@@ -17,6 +18,9 @@ import AuthCallback from './pages/AuthCallback';
 // Import your layout components
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
+
+// Import debugging component (only shows in development)
+import AuthDebug from './components/AuthDebug';
 
 // Import styles
 import './styles/globals.css';
@@ -41,44 +45,57 @@ function App() {
     return (
         <AuthProvider>
             <Router>
-                <div className="App">
-                    {/* Header */}
-                    <Header />
+                <AuthSyncProvider>
+                    <div className="App">
+                        {/* Header */}
+                        <Header />
 
-                    {/* Main Content */}
-                    <main className="main-content">
-                        <Routes>
-                            <Route path="/" element={<Home />} />
-                            <Route path="/dashboard/:licenseNumber" element={<Dashboard />} />
-                            <Route path="/compliance/:licenseNumber" element={<ComplianceDashboard />} />
-                            <Route path="/upload/:licenseNumber" element={<Upload />} />
-                            <Route path="/security" element={<SecurityPage />} />
-                            <Route path="/privacy" element={<Privacy />} />
-                            <Route path="/terms" element={<Terms />} />
-                            <Route path="/auth/callback" element={<AuthCallback />} />
-                            <Route path="/auth/error" element={<AuthErrorPage />} />
+                        {/* Main Content */}
+                        <main className="main-content">
+                            <Routes>
+                                <Route path="/" element={<Home />} />
+                                <Route path="/dashboard/:licenseNumber" element={<Dashboard />} />
+                                <Route path="/compliance/:licenseNumber" element={<ComplianceDashboard />} />
+                                <Route path="/upload/:licenseNumber" element={<Upload />} />
+                                <Route path="/security" element={<SecurityPage />} />
+                                <Route path="/privacy" element={<Privacy />} />
+                                <Route path="/terms" element={<Terms />} />
+                                <Route path="/auth/callback" element={<AuthCallback />} />
+                                <Route path="/auth/error" element={<AuthErrorPage />} />
+                            </Routes>
+                        </main>
 
-                            {/* Catch all route */}
-                            <Route path="*" element={<Home />} />
-                        </Routes>
-                    </main>
+                        {/* Footer */}
+                        <Footer />
 
-                    {/* Footer */}
-                    <Footer />
+                        {/* Toast notifications */}
+                        <Toaster
+                            position="top-right"
+                            toastOptions={{
+                                duration: 4000,
+                                style: {
+                                    background: '#363636',
+                                    color: '#fff',
+                                },
+                                success: {
+                                    duration: 3000,
+                                    theme: {
+                                        primary: '#4aed88',
+                                    },
+                                },
+                                error: {
+                                    duration: 5000,
+                                    theme: {
+                                        primary: '#ff4444',
+                                    },
+                                },
+                            }}
+                        />
 
-                    {/* Toast Notifications */}
-                    <Toaster
-                        position="top-right"
-                        toastOptions={{
-                            duration: 4000,
-                            style: {
-                                background: '#fff',
-                                color: '#374151',
-                                boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
-                            },
-                        }}
-                    />
-                </div>
+                        {/* Auth Debug Component - only shows in development */}
+                        <AuthDebug />
+                    </div>
+                </AuthSyncProvider>
             </Router>
         </AuthProvider>
     );
