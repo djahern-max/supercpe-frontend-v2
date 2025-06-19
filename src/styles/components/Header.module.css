@@ -64,8 +64,8 @@
     background-color: var(--primary-50);
 }
 
-/* Header Actions */
-.headerActions {
+/* Authentication Section */
+.authSection {
     display: flex;
     align-items: center;
     gap: var(--space-4);
@@ -97,25 +97,21 @@
     position: relative;
 }
 
-.userButton {
+.userMenuButton {
     background: none;
     border: 1px solid var(--gray-200);
     border-radius: var(--radius-md);
-    padding: var(--space-1);
+    padding: var(--space-2);
     cursor: pointer;
     transition: all var(--transition-fast);
-}
-
-.userButton:hover {
-    border-color: var(--primary-300);
-    background: var(--primary-50);
-}
-
-.userInfo {
     display: flex;
     align-items: center;
     gap: var(--space-2);
-    padding: var(--space-1) var(--space-2);
+}
+
+.userMenuButton:hover {
+    border-color: var(--primary-300);
+    background: var(--primary-50);
 }
 
 .userAvatar {
@@ -183,29 +179,60 @@
     }
 }
 
-.userProfile {
+/* User Info Section in Dropdown */
+.userInfo {
     padding: var(--space-3);
     border-bottom: 1px solid var(--gray-100);
 }
 
-.userEmail {
+.userInfoName {
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: var(--space-1);
+}
+
+.userInfoEmail {
     font-size: var(--text-sm);
     color: var(--gray-600);
     margin-bottom: var(--space-1);
 }
 
-.userLicense {
+.userInfoLicense {
     font-size: var(--text-xs);
     color: var(--gray-500);
     font-weight: 500;
 }
 
-.dropdownDivider {
-    height: 1px;
-    background: var(--gray-100);
-    margin: var(--space-2) 0;
+/* Dropdown Items - Shared styles for both links and buttons */
+.dropdownLink,
+.dropdownButton {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    width: 100%;
+    padding: var(--space-2) var(--space-3);
+    border: none;
+    background: none;
+    color: var(--gray-700);
+    font-size: var(--text-sm);
+    cursor: pointer;
+    text-decoration: none;
+    transition: all var(--transition-fast);
+    font-weight: 500;
 }
 
+.dropdownLink:hover,
+.dropdownButton:hover {
+    background: var(--gray-50);
+    color: var(--gray-900);
+}
+
+.dropdownLink:last-child,
+.dropdownButton:last-child {
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+
+/* Legacy support for dropdownItem (if still used elsewhere) */
 .dropdownItem {
     display: flex;
     align-items: center;

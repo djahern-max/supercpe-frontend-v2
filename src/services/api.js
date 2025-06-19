@@ -230,6 +230,36 @@ export const apiService = {
             }
         }
     },
+    /**
+         * 🔥 NEW: Login with email and password
+         */
+    async loginWithEmail(email, password) {
+        const response = await apiClient.post('/api/auth/login', {
+            email,
+            password
+        });
+        return response.data;
+    },
+
+    /**
+     * 🔥 NEW: Set password for passcode users
+     */
+    async setPassword(password) {
+        const response = await apiClient.post('/api/auth/set-password', {
+            password
+        });
+        return response.data;
+    },
+
+    /**
+     * 🔥 NEW: Enhanced logout (if not already implemented)
+     */
+    async logout() {
+        const response = await apiClient.post('/api/auth/logout');
+        return response.data;
+    },
+
+
 
     /**
      * Check authentication status and handle stale tokens

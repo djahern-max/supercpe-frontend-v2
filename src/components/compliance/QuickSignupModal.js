@@ -1,9 +1,10 @@
-// src/components/compliance/QuickSignupModal.js - Fixed Google OAuth to preserve license
+// src/components/compliance/QuickSignupModal.js - Enhanced with password setup flow
 import React, { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { X, Mail, User, Shield, Check, ArrowRight } from 'lucide-react';
 import Button from '../ui/Button';
 import { useAuth } from '../../contexts/AuthContext';
+import PasswordSetupModal from '../auth/PasswordSetupModal';
 import styles from '../../styles/components/QuickSignupModal.module.css';
 
 const QuickSignupModal = ({
@@ -18,29 +19,28 @@ const QuickSignupModal = ({
     const [email, setEmail] = useState('');
     const [name, setName] = useState(cpaName || '');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [showPasswordSetup, setShowPasswordSetup] = useState(false);
+    const [temporaryPassword, setTemporaryPassword] = useState(null);
+
     const { loginWithGoogle, createAccountWithEmail, setAuthToken } = useAuth();
 
     const handleGoogleSignup = async () => {
         try {
             setIsSubmitting(true);
 
-            // CRITICAL FIX: Store license data for OAuth callback to use
+            // Store license data for OAuth callback to use
             if (isPasscodeVerified && cpaData) {
                 console.log('Storing license data for OAuth flow:', {
                     license: cpaData.license_number,
                     name: cpaData.full_name
                 });
 
-                // Store the license information in sessionStorage so AuthCallback can find it
                 sessionStorage.setItem('pending_license_link', cpaData.license_number);
                 sessionStorage.setItem('pending_cpa_name', cpaData.full_name);
-
-                // Also store that this came from passcode verification
                 sessionStorage.setItem('oauth_from_passcode', 'true');
             }
 
             await loginWithGoogle();
-            // Google OAuth will redirect, so we don't need to handle success here
         } catch (error) {
             console.error('Google signup error:', error);
             toast.error('Google signup failed. Please try again.');
@@ -56,7 +56,6 @@ const QuickSignupModal = ({
     const handleEmailSignup = async (e) => {
         e.preventDefault();
 
-        // ADD DEBUG LOGGING HERE - Right at the start
         console.log('=== DEBUG: QuickSignupModal handleEmailSignup ===');
         console.log('Debug info:', {
             isPasscodeVerified,
@@ -84,7 +83,6 @@ const QuickSignupModal = ({
             let result;
 
             if (isPasscodeVerified && cpaData?.passcode) {
-                // ADD MORE DEBUG LOGGING HERE - Right before the API call
                 console.log('Using passcode flow - making request to:', '/api/auth/signup-with-passcode');
                 console.log('Request body:', {
                     email: email.trim(),
@@ -111,7 +109,21 @@ const QuickSignupModal = ({
                 if (response.ok) {
                     const data = await response.json();
                     console.log('Success response data:', data);
-                    setAuthToken(data.access_token);
+
+                    setAuthToken(data.access_token, data.refresh_token);
+
+                    // 🔥 CHECK FOR TEMPORARY PASSWORD
+                    if (data.temporary_password) {
+                        setTemporaryPassword(data.temporary_password);
+                        setStep('password-setup');
+                        toast.success('Account created! Please set your password.');
+                    } else {
+                        setStep('success');
+                        setTimeout(() => {
+                            onSuccess();
+                        }, 2000);
+                    }
+
                     result = { success: true };
                 } else {
                     const errorData = await response.json();
@@ -126,14 +138,22 @@ const QuickSignupModal = ({
                     name: name.trim(),
                     license_number: licenseNumber
                 });
+
+                if (result.success) {
+                    if (result.temporaryPassword) {
+                        setTemporaryPassword(result.temporaryPassword);
+                        setStep('password-setup');
+                        toast.success('Account created! Please set your password.');
+                    } else {
+                        setStep('success');
+                        setTimeout(() => {
+                            onSuccess();
+                        }, 2000);
+                    }
+                }
             }
 
-            if (result.success) {
-                setStep('success');
-                setTimeout(() => {
-                    onSuccess();
-                }, 2000);
-            } else {
+            if (!result.success) {
                 toast.error(result.error || 'Failed to create account. Please try again.');
             }
 
@@ -145,6 +165,24 @@ const QuickSignupModal = ({
         }
     };
 
+    const handlePasswordSetupSuccess = () => {
+        setShowPasswordSetup(false);
+        setStep('success');
+        toast.success('Password set successfully!');
+        setTimeout(() => {
+            onSuccess();
+        }, 2000);
+    };
+
+    const handleSkipPasswordSetup = () => {
+        setShowPasswordSetup(false);
+        setStep('success');
+        toast.success('Account setup complete!');
+        setTimeout(() => {
+            onSuccess();
+        }, 2000);
+    };
+
     const closeModal = () => {
         // Clean up any stored OAuth data when modal is closed
         sessionStorage.removeItem('pending_license_link');
@@ -152,6 +190,18 @@ const QuickSignupModal = ({
         sessionStorage.removeItem('oauth_from_passcode');
         onClose();
     };
+
+    // Show password setup modal when needed
+    if (step === 'password-setup' || showPasswordSetup) {
+        return (
+            <PasswordSetupModal
+                onClose={closeModal}
+                onSuccess={handlePasswordSetupSuccess}
+                onSkip={handleSkipPasswordSetup}
+                temporaryPassword={temporaryPassword}
+            />
+        );
+    }
 
     return (
         <div className={styles.modalOverlay}>

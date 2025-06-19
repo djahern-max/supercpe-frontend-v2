@@ -1,5 +1,6 @@
 /* src/styles/components/QuickSignupModal.module.css */
 
+/* Modal Overlay */
 .modalOverlay {
     position: fixed;
     top: 0;
@@ -7,23 +8,24 @@
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1000;
-    backdrop-filter: blur(8px);
+    padding: 20px;
 }
 
+/* Modal Content */
 .modalContent {
     background: white;
     border-radius: 16px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
     max-width: 500px;
-    width: 90%;
+    width: 100%;
     max-height: 90vh;
     overflow-y: auto;
     position: relative;
-    padding: 32px;
     animation: modalSlideIn 0.3s ease-out;
 }
 
@@ -39,10 +41,51 @@
     }
 }
 
+/* Modal Header */
+.modalHeader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 32px 32px 0;
+    margin-bottom: 24px;
+}
+
+.backButton {
+    position: absolute;
+    left: 0;
+    background: none;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 8px;
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.backButton:hover:not(:disabled) {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.backButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.modalTitle {
+    font-size: 24px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+    text-align: center;
+}
+
 .closeButton {
     position: absolute;
-    top: 16px;
-    right: 16px;
+    right: 0;
     background: none;
     border: none;
     padding: 8px;
@@ -50,70 +93,37 @@
     border-radius: 8px;
     color: #6b7280;
     transition: all 0.2s ease;
-}
-
-.closeButton:hover {
-    background: #f3f4f6;
-    color: #374151;
-}
-
-.modalHeader {
-    text-align: center;
-    margin-bottom: 24px;
-}
-
-.iconWrapper {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     justify-content: center;
-    width: 64px;
-    height: 64px;
-    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-    border-radius: 16px;
-    margin-bottom: 16px;
 }
 
-.headerIcon {
-    color: white;
-}
-
-.modalHeader h2 {
-    font-size: 24px;
-    font-weight: 700;
-    color: #111827;
-    margin: 0 0 8px 0;
-}
-
-.modalHeader p {
-    color: #6b7280;
-    font-size: 16px;
-    margin: 0;
-    line-height: 1.5;
-}
-
-.backButton {
-    position: absolute;
-    top: 16px;
-    left: 16px;
-    background: none;
-    border: none;
-    padding: 8px 12px;
-    cursor: pointer;
-    border-radius: 8px;
-    color: #6b7280;
-    font-size: 18px;
-    font-weight: 600;
-    transition: all 0.2s ease;
-}
-
-.backButton:hover {
+.closeButton:hover:not(:disabled) {
     background: #f3f4f6;
     color: #374151;
+}
+
+.closeButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Modal Body */
+.modalBody {
+    padding: 0 32px 32px;
+}
+
+.subtitle {
+    text-align: center;
+    color: #6b7280;
+    font-size: 16px;
+    margin: 0 0 32px 0;
+    line-height: 1.5;
 }
 
 /* Benefits Section */
 .benefits {
-    margin-bottom: 24px;
+    margin-bottom: 32px;
 }
 
 .benefit {
@@ -121,186 +131,271 @@
     align-items: center;
     gap: 12px;
     margin-bottom: 12px;
-    font-size: 14px;
-    color: #374151;
+    padding: 8px 0;
+}
+
+.benefit:last-child {
+    margin-bottom: 0;
 }
 
 .checkIcon {
     color: #10b981;
+    width: 20px;
+    height: 20px;
     flex-shrink: 0;
 }
 
-/* Auth Options */
-.authOptions {
-    margin-bottom: 24px;
+.benefit span {
+    color: #374151;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+/* Signup Options */
+.signupOptions {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 32px;
 }
 
 .googleButton,
 .emailButton {
     width: 100%;
-    margin-bottom: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 12px;
+    gap: 8px;
     padding: 14px 20px;
+    border-radius: 10px;
     font-size: 16px;
     font-weight: 600;
-    border-radius: 12px;
     transition: all 0.2s ease;
-    border: 2px solid transparent;
+    cursor: pointer;
+    border: none;
+    min-height: 50px;
 }
 
 .googleButton {
     background: white;
+    border: 2px solid #e5e7eb;
     color: #374151;
-    border-color: #d1d5db;
 }
 
-.googleButton:hover {
-    border-color: #9ca3af;
+.googleButton:hover:not(:disabled) {
     background: #f9fafb;
-}
-
-.googleIcon {
-    width: 20px;
-    height: 20px;
+    border-color: #d1d5db;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .emailButton {
-    background: #f3f4f6;
-    color: #374151;
-    border-color: #e5e7eb;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
 }
 
-.emailButton:hover {
-    background: #e5e7eb;
-    border-color: #d1d5db;
+.emailButton:hover:not(:disabled) {
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
 }
 
+.googleButton:disabled,
+.emailButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Divider */
 .divider {
+    display: flex;
+    align-items: center;
     text-align: center;
-    margin: 20px 0;
-    position: relative;
-    color: #9ca3af;
-    font-size: 14px;
+    margin: 8px 0;
 }
 
-.divider::before {
+.divider::before,
+.divider::after {
     content: '';
-    position: absolute;
-    top: 50%;
-    left: 0;
-    right: 0;
+    flex: 1;
     height: 1px;
     background: #e5e7eb;
-    z-index: 1;
 }
 
 .divider span {
-    background: white;
     padding: 0 16px;
-    position: relative;
-    z-index: 2;
-}
-
-/* License Info */
-.licenseInfo {
-    background: #f0f9ff;
-    border: 1px solid #bae6fd;
-    border-radius: 12px;
-    padding: 16px;
-}
-
-.licenseCard {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.licenseDetails strong {
-    color: #0c4a6e;
-    font-size: 16px;
-    display: block;
-    margin-bottom: 4px;
-}
-
-.licenseDetails p {
-    color: #0369a1;
-    margin: 0;
+    color: #6b7280;
     font-size: 14px;
+    background: white;
 }
 
-.verifiedIcon {
-    color: #10b981;
-    flex-shrink: 0;
+/* Form Styles */
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
-/* Email Form */
-.emailForm {
-    margin-bottom: 24px;
+.inputGroup {
+    display: flex;
+    flex-direction: column;
 }
 
-.formGroup {
-    margin-bottom: 16px;
-}
-
-.formGroup label {
-    display: block;
+.label {
     font-size: 14px;
     font-weight: 600;
     color: #374151;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
 }
 
-.formGroup input {
+.input {
     width: 100%;
     padding: 12px 16px;
     border: 2px solid #e5e7eb;
-    border-radius: 8px;
+    border-radius: 10px;
     font-size: 16px;
-    transition: border-color 0.2s ease;
+    transition: all 0.2s ease;
     box-sizing: border-box;
 }
 
-.formGroup input:focus {
+.input:focus {
     outline: none;
     border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-.formGroup input:disabled {
-    background: #f9fafb;
-    color: #9ca3af;
+.input:disabled {
+    background-color: #f9fafb;
+    color: #6b7280;
     cursor: not-allowed;
+}
+
+.input::placeholder {
+    color: #9ca3af;
 }
 
 .submitButton {
     width: 100%;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 14px 20px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 14px 20px;
-    font-size: 16px;
-    font-weight: 600;
+    min-height: 50px;
 }
 
-.verificationNote {
+.submitButton:hover:not(:disabled) {
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.submitButton:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* License Info Section */
+.licenseInfo {
+    margin-bottom: 32px;
+}
+
+.licenseCard {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border: 2px solid #bae6fd;
+    border-radius: 12px;
+    padding: 20px;
     display: flex;
     align-items: center;
-    gap: 8px;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.licenseDetails {
+    flex: 1;
+}
+
+.licenseDetails strong {
+    display: block;
+    color: #0c4a6e;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.licenseDetails span {
+    color: #0369a1;
     font-size: 14px;
-    color: #6b7280;
-    background: #f9fafb;
-    padding: 12px;
+    font-weight: 500;
+}
+
+.licenseIcon {
+    color: #0284c7;
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+/* Verification Info */
+.verificationInfo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
     border-radius: 8px;
-    border: 1px solid #e5e7eb;
+    padding: 12px 16px;
+    margin-bottom: 24px;
+}
+
+.verificationInfo span {
+    color: #15803d;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Modal Footer */
+.modalFooter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    padding: 20px 0 0;
+    border-top: 1px solid #f3f4f6;
+    margin-top: 24px;
+}
+
+.securityInfo {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #6b7280;
+    font-size: 13px;
+}
+
+.securityInfo svg {
+    width: 16px;
+    height: 16px;
+    color: #10b981;
 }
 
 /* Success State */
-.successState {
+.successContent {
     text-align: center;
-    padding: 20px 0;
+    padding: 40px 0;
 }
 
 .successIcon {
@@ -311,146 +406,115 @@
     height: 80px;
     background: linear-gradient(135deg, #10b981, #059669);
     border-radius: 50%;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
+}
+
+.successIcon svg {
     color: white;
 }
 
-.successState h2 {
-    font-size: 24px;
+.successContent h3 {
+    font-size: 22px;
     font-weight: 700;
     color: #111827;
     margin: 0 0 12px 0;
 }
 
-.successState p {
+.successContent p {
     color: #6b7280;
     font-size: 16px;
-    margin: 0 0 24px 0;
-}
-
-.successBenefits {
-    text-align: left;
-}
-
-.successBenefits .benefit {
-    font-size: 16px;
-    font-weight: 500;
-    color: #059669;
-}
-
-/* Trust Indicators */
-.trustIndicators {
-    display: flex;
-    justify-content: center;
-    gap: 24px;
-    padding-top: 20px;
-    border-top: 1px solid #e5e7eb;
-    margin-top: 24px;
-}
-
-.trustItem {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 13px;
-    color: #6b7280;
-}
-
-.trustItem svg {
-    color: #10b981;
-}
-
-/* Auth Required Upload Styles */
-.authRequired {
-    background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
-    border: 2px dashed #0ea5e9;
-    border-radius: 16px;
-    padding: 40px 24px;
-    text-align: center;
-}
-
-.authPrompt {
-    max-width: 400px;
-    margin: 0 auto;
-}
-
-.authIcon {
-    color: #0ea5e9;
-    margin-bottom: 16px;
-}
-
-.authPrompt h3 {
-    font-size: 24px;
-    font-weight: 700;
-    color: #0c4a6e;
-    margin: 0 0 12px 0;
-}
-
-.authPrompt p {
-    color: #0369a1;
-    font-size: 16px;
-    margin: 0 0 24px 0;
+    margin: 0;
     line-height: 1.5;
-}
-
-.authButtons {
-    margin-bottom: 24px;
-}
-
-.authButtons button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    margin: 0 auto;
-    padding: 14px 28px;
-    font-size: 16px;
-    font-weight: 600;
-}
-
-.benefits {
-    text-align: left;
-    max-width: 300px;
-    margin: 0 auto;
-}
-
-.benefit {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 8px;
-    font-size: 14px;
-    color: #0369a1;
-}
-
-.checkmark {
-    color: #10b981;
-    font-weight: 700;
-    font-size: 16px;
 }
 
 /* Responsive Design */
 @media (max-width: 640px) {
-    .modalContent {
-        margin: 16px;
-        padding: 24px;
-        max-height: calc(100vh - 32px);
+    .modalOverlay {
+        padding: 16px;
     }
 
-    .modalHeader h2 {
+    .modalContent {
+        max-width: none;
+        width: 100%;
+    }
+
+    .modalHeader {
+        padding: 24px 24px 0;
+        margin-bottom: 20px;
+    }
+
+    .modalTitle {
         font-size: 20px;
     }
 
-    .trustIndicators {
+    .modalBody {
+        padding: 0 24px 24px;
+    }
+
+    .subtitle {
+        font-size: 15px;
+        margin-bottom: 24px;
+    }
+
+    .benefits,
+    .signupOptions {
+        margin-bottom: 24px;
+    }
+
+    .licenseCard {
+        padding: 16px;
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
+    }
+
+    .modalFooter {
         flex-direction: column;
         gap: 12px;
     }
 
-    .authRequired {
-        padding: 24px 16px;
+    .input,
+    .googleButton,
+    .emailButton,
+    .submitButton {
+        font-size: 16px;
+        /* Prevent iOS zoom */
+    }
+}
+
+@media (max-width: 480px) {
+    .modalHeader {
+        padding: 20px 20px 0;
+        margin-bottom: 16px;
     }
 
-    .authPrompt h3 {
+    .modalTitle {
+        font-size: 18px;
+    }
+
+    .modalBody {
+        padding: 0 20px 20px;
+    }
+
+    .benefit span {
+        font-size: 14px;
+    }
+
+    .successContent {
+        padding: 32px 0;
+    }
+
+    .successIcon {
+        width: 64px;
+        height: 64px;
+        margin-bottom: 20px;
+    }
+
+    .successContent h3 {
         font-size: 20px;
+    }
+
+    .successContent p {
+        font-size: 15px;
     }
 }

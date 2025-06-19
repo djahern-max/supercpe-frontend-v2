@@ -1,4 +1,4 @@
-// src/contexts/AuthContext.js - Fixed with missing functions
+// src/contexts/AuthContext.js - Complete with password management features
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { apiService } from '../services/api';
 import { toast } from 'react-hot-toast';
@@ -17,6 +17,10 @@ export const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [user, setUser] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+
+    // 🔥 NEW: Password setup state
+    const [requiresPasswordSetup, setRequiresPasswordSetup] = useState(false);
+    const [temporaryPassword, setTemporaryPassword] = useState(null);
 
     // Make auth context globally available for API interceptors
     useEffect(() => {
@@ -84,11 +88,12 @@ export const AuthProvider = ({ children }) => {
     const clearAuthState = () => {
         setIsAuthenticated(false);
         setUser(null);
+        setRequiresPasswordSetup(false);
+        setTemporaryPassword(null);
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
     };
 
-    // MISSING FUNCTION 1: loginWithGoogle
     const loginWithGoogle = async () => {
         try {
             const authData = await apiService.getGoogleAuthUrl();
@@ -105,7 +110,6 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    // MISSING FUNCTION 2: createAccountWithEmail  
     const createAccountWithEmail = async (userData) => {
         try {
             const response = await apiService.createAccountWithEmail(userData);
@@ -119,6 +123,12 @@ export const AuthProvider = ({ children }) => {
 
                 setIsAuthenticated(true);
                 setUser(response.user);
+
+                // 🔥 NEW: Handle temporary password from signup
+                if (response.temporary_password) {
+                    setTemporaryPassword(response.temporary_password);
+                    setRequiresPasswordSetup(true);
+                }
             }
 
             return response;
@@ -126,6 +136,64 @@ export const AuthProvider = ({ children }) => {
             console.error('Account creation error:', error);
             throw error;
         }
+    };
+
+    // 🔥 NEW: Email/password login function
+    const loginWithEmail = async (email, password) => {
+        try {
+            const response = await apiService.loginWithEmail(email, password);
+
+            // Store tokens
+            localStorage.setItem('access_token', response.access_token);
+            if (response.refresh_token) {
+                localStorage.setItem('refresh_token', response.refresh_token);
+            }
+
+            // Update auth state
+            setIsAuthenticated(true);
+            setUser(response.user);
+
+            // 🔥 Check if password reset is required
+            if (response.requires_password_reset) {
+                setRequiresPasswordSetup(true);
+                // Could set temp password here if provided
+            }
+
+            return { success: true };
+        } catch (error) {
+            console.error('Email login error:', error);
+            return {
+                success: false,
+                error: error.response?.data?.detail || 'Login failed'
+            };
+        }
+    };
+
+    // 🔥 NEW: Set password function
+    const setPassword = async (newPassword) => {
+        try {
+            await apiService.setPassword(newPassword);
+            setRequiresPasswordSetup(false);
+            setTemporaryPassword(null);
+
+            // Refresh user data to clear password reset flag
+            const userProfile = await apiService.getCurrentUser();
+            setUser(userProfile);
+
+            return { success: true };
+        } catch (error) {
+            console.error('Set password error:', error);
+            return {
+                success: false,
+                error: error.response?.data?.detail || 'Failed to set password'
+            };
+        }
+    };
+
+    // 🔥 NEW: Complete password setup (for skip option)
+    const completePasswordSetup = () => {
+        setRequiresPasswordSetup(false);
+        setTemporaryPassword(null);
     };
 
     const login = async (accessToken, refreshToken, userProfile) => {
@@ -148,11 +216,13 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const setAuthToken = (token) => {
+    const setAuthToken = (token, refreshToken = null) => {
         if (token) {
             localStorage.setItem('access_token', token);
+            if (refreshToken) {
+                localStorage.setItem('refresh_token', refreshToken);
+            }
             setIsAuthenticated(true);
-            // Remove this line: checkAuthStatus();
         }
     };
 
@@ -238,9 +308,16 @@ export const AuthProvider = ({ children }) => {
     };
 
     const value = {
+        // Existing auth state
         isAuthenticated,
         user,
         isLoading,
+
+        // 🔥 NEW: Password setup state
+        requiresPasswordSetup,
+        temporaryPassword,
+
+        // Existing auth functions
         login,
         loginWithGoogle,
         createAccountWithEmail,
@@ -252,7 +329,12 @@ export const AuthProvider = ({ children }) => {
         handleAuthError,
         setIsAuthenticated,
         setUser,
-        setAuthToken
+        setAuthToken,
+
+        // 🔥 NEW: Password management functions
+        loginWithEmail,
+        setPassword,
+        completePasswordSetup
     };
 
     return (
