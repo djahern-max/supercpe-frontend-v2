@@ -1,4 +1,4 @@
-// src/contexts/AuthContext.js - Fixed to prevent 401 errors
+// src/contexts/AuthContext.js - Fixed with missing functions
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { apiService } from '../services/api';
 import { toast } from 'react-hot-toast';
@@ -59,16 +59,10 @@ export const AuthProvider = ({ children }) => {
         }
 
         try {
-            // Only try to get current user if we have a token
-            const authStatus = await apiService.checkAuthStatus();
-
-            if (authStatus.isAuthenticated && authStatus.user) {
-                setIsAuthenticated(true);
-                setUser(authStatus.user);
-            } else {
-                // Clear any stale data
-                clearAuthState();
-            }
+            // Try to get current user if we have a token
+            const userProfile = await apiService.getCurrentUser();
+            setIsAuthenticated(true);
+            setUser(userProfile);
         } catch (error) {
             console.error('Auth check failed:', error);
 
@@ -92,6 +86,46 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
+    };
+
+    // MISSING FUNCTION 1: loginWithGoogle
+    const loginWithGoogle = async () => {
+        try {
+            const authData = await apiService.getGoogleAuthUrl();
+
+            if (authData && authData.auth_url) {
+                // Redirect to Google OAuth
+                window.location.href = authData.auth_url;
+            } else {
+                throw new Error('Invalid auth URL received');
+            }
+        } catch (error) {
+            console.error('Google login error:', error);
+            throw error;
+        }
+    };
+
+    // MISSING FUNCTION 2: createAccountWithEmail  
+    const createAccountWithEmail = async (userData) => {
+        try {
+            const response = await apiService.createAccountWithEmail(userData);
+
+            if (response.success && response.access_token) {
+                // Store tokens and update auth state
+                localStorage.setItem('access_token', response.access_token);
+                if (response.refresh_token) {
+                    localStorage.setItem('refresh_token', response.refresh_token);
+                }
+
+                setIsAuthenticated(true);
+                setUser(response.user);
+            }
+
+            return response;
+        } catch (error) {
+            console.error('Account creation error:', error);
+            throw error;
+        }
     };
 
     const login = async (accessToken, refreshToken, userProfile) => {
@@ -200,6 +234,8 @@ export const AuthProvider = ({ children }) => {
         user,
         isLoading,
         login,
+        loginWithGoogle,        // ADDED: Missing function
+        createAccountWithEmail, // ADDED: Missing function
         logout,
         refreshUser,
         connectLicense,
