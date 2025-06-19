@@ -1,159 +1,219 @@
-/* src/styles/components/CompactPeriodSelector.module.css */
+/* src/styles/components/PeriodSelector.module.css */
 
-.compactSelector {
+.periodSelector {
     background: white;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--gray-200);
-    padding: var(--space-6);
-    border-left: 4px solid var(--primary-600);
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    margin-top: 1.5rem;
 }
 
-/* Selector Content */
-.selectorContent {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-4);
-}
-
-/* Header */
 .selectorHeader {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    gap: 0.75rem;
+    padding: 1.5rem 1.5rem 1rem;
+    border-bottom: 1px solid #f1f5f9;
 }
 
-.label {
-    font-weight: 600;
-    color: var(--gray-900);
-    font-size: var(--text-lg);
+.selectorHeader h3 {
     margin: 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #111827;
+    flex: 1;
+}
+
+.selectorHeader svg {
+    color: #6b7280;
+    flex-shrink: 0;
 }
 
 .analyzing {
     display: flex;
     align-items: center;
-    gap: var(--space-2);
-    font-size: var(--text-sm);
-    color: var(--primary-600);
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: #3b82f6;
+    font-weight: 500;
 }
 
-/* Loading State */
-.loading {
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
-    justify-content: center;
-    padding: var(--space-4);
-    color: var(--gray-600);
+.selectorContent {
+    padding: 1rem 1.5rem 1.5rem;
 }
 
-/* Selector Row */
-.selectorRow {
-    display: flex;
-    align-items: center;
-    gap: var(--space-4);
-    flex-wrap: wrap;
+.dropdownWrapper {
+    position: relative;
+    margin-bottom: 1rem;
 }
 
-/* Dropdown */
 .dropdown {
-    flex: 1;
-    min-width: 300px;
-    padding: var(--space-3) var(--space-4);
-    border: 2px solid var(--gray-300);
-    border-radius: var(--radius-md);
-    font-size: var(--text-base);
+    width: 100%;
+    padding: 0.875rem 1rem;
+    font-size: 0.875rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
     background: white;
-    color: var(--gray-900);
-    transition: border-color var(--transition-fast);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=US-ASCII,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'><polyline points='6,9 12,15 18,9'></polyline></svg>");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 16px;
+    padding-right: 2.5rem;
 }
 
 .dropdown:focus {
     outline: none;
-    border-color: var(--primary-500);
-    box-shadow: 0 0 0 3px rgb(14 165 233 / 0.1);
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .dropdown:disabled {
-    background: var(--gray-100);
+    opacity: 0.6;
     cursor: not-allowed;
-    opacity: 0.7;
 }
 
-/* Selected Period Info */
-.selectedPeriodInfo {
+.selectedPeriodCard {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.periodInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.periodTitle {
     display: flex;
     align-items: center;
-    gap: var(--space-3);
-    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.periodLabel {
+    font-weight: 600;
+    color: #111827;
+    font-size: 1rem;
 }
 
 .periodDetails {
-    font-size: var(--text-sm);
-    color: var(--gray-600);
-    background: var(--gray-50);
-    padding: var(--space-1) var(--space-3);
-    border-radius: var(--radius-md);
-    border: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: #6b7280;
+    font-weight: 500;
 }
 
-/* Tracking Message */
-.trackingMessage {
-    background: linear-gradient(135deg, var(--primary-50) 0%, white 100%);
-    border-left: 4px solid var(--primary-400);
-    padding: var(--space-4);
-    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+.periodDetails svg {
+    color: #9ca3af;
+    flex-shrink: 0;
 }
 
-.trackingMessage p {
-    margin: 0;
-    line-height: var(--leading-relaxed);
+.currentPeriodNote {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+    border-radius: 6px;
+    font-size: 0.875rem;
+    color: #166534;
+    font-weight: 500;
 }
 
-.trackingMessage p:first-child {
-    color: var(--primary-700);
-    font-weight: 600;
-    margin-bottom: var(--space-2);
+.currentPeriodNote svg {
+    color: #22c55e;
+    flex-shrink: 0;
 }
 
-.messageText {
-    font-size: var(--text-sm);
-    color: var(--gray-600);
+.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 2rem;
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+.spinner {
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 2px solid #e5e7eb;
+    border-top: 2px solid #3b82f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .compactSelector {
-        padding: var(--space-4);
+    .selectorHeader {
+        padding: 1rem;
+        flex-wrap: wrap;
+        gap: 0.5rem;
     }
 
-    .selectorHeader {
+    .selectorContent {
+        padding: 0.75rem 1rem 1rem;
+    }
+
+    .periodTitle {
         flex-direction: column;
         align-items: flex-start;
-        gap: var(--space-2);
-    }
-
-    .selectorRow {
-        flex-direction: column;
-        align-items: stretch;
-        gap: var(--space-3);
+        gap: 0.5rem;
     }
 
     .dropdown {
-        min-width: auto;
-        width: 100%;
+        font-size: 0.875rem;
+        padding: 0.75rem;
+        padding-right: 2.25rem;
     }
 
-    .selectedPeriodInfo {
-        justify-content: space-between;
+    .selectedPeriodCard {
+        padding: 0.875rem;
+    }
+
+    .analyzing {
+        width: 100%;
+        justify-content: center;
+        padding: 0.5rem;
+        background: #f0f4ff;
+        border-radius: 6px;
     }
 }
 
 @media (max-width: 480px) {
-    .selectedPeriodInfo {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: var(--space-2);
+    .selectorHeader h3 {
+        font-size: 1rem;
+    }
+
+    .periodLabel {
+        font-size: 0.875rem;
+    }
+
+    .periodDetails {
+        font-size: 0.8125rem;
+    }
+
+    .currentPeriodNote {
+        font-size: 0.8125rem;
     }
 }

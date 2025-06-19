@@ -1,12 +1,12 @@
-// src/components/compliance/ProfessionalCPEDashboard.js - Updated with Authentication
+// src/components/compliance/ProfessionalCPEDashboard.js - Updated with Redesigned Upload Section
 import React, { useState, useEffect } from 'react';
 import { Upload, FileText, BarChart3, Clock, AlertTriangle, CheckCircle, Eye, Download, Shield, Database, Trash2 } from 'lucide-react';
 import PeriodSelector from './PeriodSelector';
 import styles from '../../styles/components/ProfessionalCPEDashboard.module.css';
 import DeleteCertificateButton from './DeleteCertificateButton';
-import AuthRequiredUploadSection from './AuthRequiredUploadSection'; // Import new component
+import RedesignedUploadSection from './RedesignedUploadSection'; // Import new redesigned component
 import { apiService } from '../../services/api';
-import { useAuth } from '../../contexts/AuthContext'; // Import auth context
+import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'react-hot-toast';
 
 const ProfessionalCPEDashboard = ({ licenseNumber }) => {
@@ -14,8 +14,6 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
     const [dashboardData, setDashboardData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [uploading, setUploading] = useState(false);
-    const [selectedFiles, setSelectedFiles] = useState([]);
     const [selectedPeriod, setSelectedPeriod] = useState(null);
     const [periodAnalysis, setPeriodAnalysis] = useState(null);
 
@@ -56,6 +54,14 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
 
         // Reload dashboard data
         await loadDashboardData(licenseNumber);
+    };
+
+    const handlePeriodSelect = (period) => {
+        setSelectedPeriod(period);
+    };
+
+    const handleAnalysisLoad = (analysis) => {
+        setPeriodAnalysis(analysis);
     };
 
     // Loading state
@@ -143,19 +149,19 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
                 </div>
             </div>
 
-            {/* Upload Section - Now requires authentication */}
-            <div className={styles.uploadSection}>
-                <h2>
-                    <Upload className={styles.sectionIcon} />
-                    Upload CPE Certificate
-                </h2>
+            {/* Redesigned Upload Section */}
+            <RedesignedUploadSection
+                licenseNumber={licenseNumber}
+                cpaName={cpaName}
+                onUploadSuccess={handleUploadSuccess}
+            />
 
-                <AuthRequiredUploadSection
-                    licenseNumber={licenseNumber}
-                    cpaName={cpaName}
-                    onUploadSuccess={handleUploadSuccess}
-                />
-            </div>
+            {/* Period Selector - Now directly below upload */}
+            <PeriodSelector
+                licenseNumber={licenseNumber}
+                onPeriodSelect={handlePeriodSelect}
+                onAnalysisLoad={handleAnalysisLoad}
+            />
 
             {/* Certificates Section */}
             <div className={styles.certificatesSection}>
@@ -240,28 +246,21 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
                 )}
             </div>
 
-            {/* Period Analysis Section */}
-            <div className={styles.periodSection}>
-                <h2>
-                    <BarChart3 className={styles.sectionIcon} />
-                    Compliance Period Analysis
-                </h2>
-
-                <PeriodSelector
-                    licenseNumber={licenseNumber}
-                    onPeriodSelect={setSelectedPeriod}
-                    onAnalysisLoad={setPeriodAnalysis}
-                />
-
-                {periodAnalysis && (
+            {/* Period Analysis Results */}
+            {periodAnalysis && (
+                <div className={styles.periodSection}>
+                    <h2>
+                        <BarChart3 className={styles.sectionIcon} />
+                        Period Analysis Results
+                    </h2>
                     <div className={styles.periodAnalysis}>
-                        <h3>Period Analysis Results</h3>
+                        <h3>Analysis for {selectedPeriod?.label}</h3>
                         <div className={styles.analysisContent}>
                             <pre>{JSON.stringify(periodAnalysis, null, 2)}</pre>
                         </div>
                     </div>
-                )}
-            </div>
+                </div>
+            )}
         </div>
     );
 };

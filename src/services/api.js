@@ -1,4 +1,4 @@
-// src/services/api.js - Enhanced with Authentication
+// src/services/api.js - Clean and Organized API Service
 import axios from 'axios';
 
 const API_BASE_URL = process.env.NODE_ENV === 'production'
@@ -79,7 +79,15 @@ export const apiService = {
     },
 
     /**
-     * Login with email and password (if you implement this)
+     * Create account with email and password (signup)
+     */
+    async createAccountWithEmail(userData) {
+        const response = await apiClient.post('/api/auth/signup-with-email', userData);
+        return response.data;
+    },
+
+    /**
+     * Login with email and password (if implemented)
      */
     async loginWithEmail(email, password) {
         const response = await apiClient.post('/api/auth/login', { email, password });
@@ -105,13 +113,29 @@ export const apiService = {
     },
 
     /**
-     * Connect license to user account
+     * Connect CPA license to user account
      */
     async connectLicense(licenseNumber) {
         const response = await apiClient.post('/api/auth/connect-license', {
             license_number: licenseNumber
         });
         return response.data;
+    },
+
+    /**
+     * Logout user
+     */
+    async logout() {
+        try {
+            await apiClient.post('/api/auth/logout');
+        } catch (error) {
+            console.error('Logout error:', error);
+            // Continue with client-side cleanup even if server logout fails
+        } finally {
+            // Clear tokens from localStorage
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+        }
     },
 
     /**
@@ -132,10 +156,10 @@ export const apiService = {
         }
     },
 
-    // ===== EXISTING METHODS (Updated to require auth where needed) =====
+    // ===== CPA METHODS (PUBLIC) =====
 
     /**
-     * Search CPAs by name or license number (Public - No auth required)
+     * Search CPAs by name or license number
      */
     async searchCPAs(query, limit = 10) {
         const response = await apiClient.get(`/api/cpas/search`, {
@@ -145,7 +169,7 @@ export const apiService = {
     },
 
     /**
-     * Get CPA by license number (Public - No auth required)
+     * Get CPA by license number
      */
     async getCPAByLicense(licenseNumber) {
         const response = await apiClient.get(`/api/cpas/${licenseNumber}`);
@@ -153,7 +177,17 @@ export const apiService = {
     },
 
     /**
-     * Get compliance dashboard (Public - No auth required)
+     * Get CPA statistics summary
+     */
+    async getCPAStats() {
+        const response = await apiClient.get('/api/cpas/stats/summary');
+        return response.data;
+    },
+
+    // ===== UPLOAD METHODS =====
+
+    /**
+     * Get compliance dashboard data (PUBLIC)
      */
     async getComplianceDashboard(licenseNumber) {
         const response = await apiClient.get(`/api/upload/compliance-dashboard/${licenseNumber}`);
@@ -161,7 +195,7 @@ export const apiService = {
     },
 
     /**
-     * Get free tier status (Public - No auth required)
+     * Get free tier status (PUBLIC)
      */
     async getFreeTierStatus(licenseNumber) {
         const response = await apiClient.get(`/api/upload/free-tier-status/${licenseNumber}`);
@@ -169,45 +203,7 @@ export const apiService = {
     },
 
     /**
-     * Upload certificate (REQUIRES AUTHENTICATION)
-     */
-    async uploadCertificateAuthenticated(licenseNumber, file) {
-        const formData = new FormData();
-        formData.append('file', file);
-
-        const response = await apiClient.post(
-            `/api/upload/upload-certificate-authenticated/${licenseNumber}`,
-            formData,
-            {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            }
-        );
-        return response.data;
-    },
-
-    /**
-     * Upload certificate premium (REQUIRES AUTHENTICATION)
-     */
-    async uploadCertificatePremium(licenseNumber, file) {
-        const formData = new FormData();
-        formData.append('file', file);
-
-        const response = await apiClient.post(
-            `/api/upload/upload-cpe-certificate/${licenseNumber}`,
-            formData,
-            {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            }
-        );
-        return response.data;
-    },
-
-    /**
-     * Analyze certificate preview (Public - No auth required)
+     * Analyze certificate for preview (PUBLIC - Free analysis)
      */
     async analyzeCertificatePreview(licenseNumber, file) {
         const formData = new FormData();
@@ -226,7 +222,26 @@ export const apiService = {
     },
 
     /**
-     * Save reviewed certificate (REQUIRES AUTHENTICATION)
+     * Upload and save certificate (REQUIRES AUTHENTICATION)
+     */
+    async uploadCertificateAuthenticated(licenseNumber, file) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await apiClient.post(
+            `/api/upload/upload-certificate-authenticated/${licenseNumber}`,
+            formData,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            }
+        );
+        return response.data;
+    },
+
+    /**
+     * Save reviewed certificate data (REQUIRES AUTHENTICATION)
      */
     async saveReviewedCertificate(licenseNumber, reviewData) {
         const response = await apiClient.post(
@@ -234,70 +249,6 @@ export const apiService = {
             reviewData
         );
         return response.data;
-    },
-
-    // ===== PAYMENT & SUBSCRIPTION METHODS =====
-
-    /**
-     * Create account and initiate payment process (REQUIRES AUTHENTICATION)
-     */
-    async createAccountForPayment(accountData) {
-        try {
-            const response = await apiClient.post(
-                `/api/payments/create-account-for-payment`,
-                accountData
-            );
-            return response.data;
-        } catch (error) {
-            console.error('Error creating account for payment:', error);
-            throw error;
-        }
-    },
-
-    /**
-     * Get subscription status (REQUIRES AUTHENTICATION)
-     */
-    async getSubscriptionStatus(licenseNumber) {
-        const response = await apiClient.get(`/api/payments/subscription-status/${licenseNumber}`);
-        return response.data;
-    },
-
-    /**
-     * Get pricing plans (Public - No auth required)
-     */
-    async getPricingPlans() {
-        const response = await apiClient.get('/api/payments/pricing');
-        return response.data;
-    },
-
-    // ===== UTILITY METHODS =====
-
-    /**
-     * Get document URL (REQUIRES AUTHENTICATION)
-     */
-    async getDocumentUrl(certificateId, licenseNumber) {
-        try {
-            const response = await apiClient.get(`/api/upload/document/${certificateId}`, {
-                params: { license_number: licenseNumber }
-            });
-            return response.data;
-        } catch (error) {
-            console.error('Error getting document URL:', error);
-            throw error;
-        }
-    },
-
-    /**
-     * View document (REQUIRES AUTHENTICATION)
-     */
-    async viewDocument(certificateId, licenseNumber) {
-        try {
-            const url = `${this.baseURL}/api/upload/view-document/${certificateId}?license_number=${licenseNumber}`;
-            window.open(url, '_blank');
-        } catch (error) {
-            console.error('Error viewing document:', error);
-            throw error;
-        }
     },
 
     /**
@@ -310,14 +261,93 @@ export const apiService = {
         return response.data;
     },
 
-    // ===== LEGACY METHODS (Keep for compatibility) =====
+    /**
+     * Get document URL (REQUIRES AUTHENTICATION)
+     */
+    async getDocumentUrl(certificateId, licenseNumber) {
+        const response = await apiClient.get(`/api/upload/document/${certificateId}`, {
+            params: { license_number: licenseNumber }
+        });
+        return response.data;
+    },
 
     /**
-     * @deprecated Use analyzeCertificatePreview instead
+     * View document in new tab (REQUIRES AUTHENTICATION)
      */
-    async uploadCertificateEnhancedFree(licenseNumber, file) {
-        console.warn('uploadCertificateEnhancedFree is deprecated. This will now redirect to authentication.');
-        throw new Error('Authentication required. Please sign in to upload certificates.');
+    async viewDocument(certificateId, licenseNumber) {
+        const url = `${this.baseURL}/api/upload/view-document/${certificateId}?license_number=${licenseNumber}`;
+        window.open(url, '_blank');
+    },
+
+    // ===== TIME WINDOWS / COMPLIANCE METHODS =====
+
+    /**
+     * Get available compliance periods for a CPA
+     */
+    async getAvailablePeriods(licenseNumber) {
+        const response = await apiClient.get(`/api/time-windows/${licenseNumber}/available`);
+        return response.data;
+    },
+
+    /**
+     * Analyze a specific time window
+     */
+    async analyzeTimeWindow(licenseNumber, windowData) {
+        const response = await apiClient.post(`/api/time-windows/${licenseNumber}/analyze`, windowData);
+        return response.data;
+    },
+
+    /**
+     * Get current period analysis
+     */
+    async getCurrentPeriodAnalysis(licenseNumber) {
+        const response = await apiClient.get(`/api/time-windows/${licenseNumber}/current-period`);
+        return response.data;
+    },
+
+    // ===== PAYMENT & SUBSCRIPTION METHODS =====
+
+    /**
+     * Create account and initiate payment process
+     */
+    async createAccountForPayment(accountData) {
+        const response = await apiClient.post(
+            `/api/payments/create-account-for-payment`,
+            accountData
+        );
+        return response.data;
+    },
+
+    /**
+     * Get subscription status (REQUIRES AUTHENTICATION)
+     */
+    async getSubscriptionStatus(licenseNumber) {
+        const response = await apiClient.get(`/api/payments/subscription-status/${licenseNumber}`);
+        return response.data;
+    },
+
+    /**
+     * Get pricing plans (PUBLIC)
+     */
+    async getPricingPlans() {
+        const response = await apiClient.get('/api/payments/pricing');
+        return response.data;
+    },
+
+    // ===== LEGACY COMPATIBILITY METHODS =====
+
+    /**
+     * Alias for getCPAByLicense (backward compatibility)
+     */
+    async getCPA(licenseNumber) {
+        return this.getCPAByLicense(licenseNumber);
+    },
+
+    /**
+     * Alias for getAvailablePeriods (backward compatibility)
+     */
+    async getAvailableWindows(licenseNumber) {
+        return this.getAvailablePeriods(licenseNumber);
     }
 };
 

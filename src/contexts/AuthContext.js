@@ -141,7 +141,8 @@ export const AuthProvider = ({ children }) => {
 
     const createAccountWithEmail = async (accountData) => {
         try {
-            const response = await apiService.createAccountForPayment(accountData);
+            // Call the correct signup endpoint instead of payment endpoint
+            const response = await apiService.createAccountWithEmail(accountData);
 
             if (response.success && response.access_token) {
                 localStorage.setItem('access_token', response.access_token);
