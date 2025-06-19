@@ -1,4 +1,4 @@
-// src/components/compliance/QuickSignupModal.js - Fixed version
+// src/components/compliance/QuickSignupModal.js - Fixed Google OAuth to preserve license
 import React, { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { X, Mail, User, Shield, Check, ArrowRight } from 'lucide-react';
@@ -9,26 +9,47 @@ import styles from '../../styles/components/QuickSignupModal.module.css';
 const QuickSignupModal = ({
     licenseNumber,
     cpaName,
-    cpaData,  // Add this prop
+    cpaData,
     onClose,
     onSuccess,
-    isPasscodeVerified = false  // Add this prop for passcode flow
+    isPasscodeVerified = false
 }) => {
-    const [step, setStep] = useState('method'); // 'method', 'email', 'success'
+    const [step, setStep] = useState('method');
     const [email, setEmail] = useState('');
     const [name, setName] = useState(cpaName || '');
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const { loginWithGoogle, createAccountWithEmail, setAuthToken } = useAuth();  // Add setAuthToken
+    const { loginWithGoogle, createAccountWithEmail, setAuthToken } = useAuth();
 
     const handleGoogleSignup = async () => {
         try {
             setIsSubmitting(true);
+
+            // CRITICAL FIX: Store license data for OAuth callback to use
+            if (isPasscodeVerified && cpaData) {
+                console.log('Storing license data for OAuth flow:', {
+                    license: cpaData.license_number,
+                    name: cpaData.full_name
+                });
+
+                // Store the license information in sessionStorage so AuthCallback can find it
+                sessionStorage.setItem('pending_license_link', cpaData.license_number);
+                sessionStorage.setItem('pending_cpa_name', cpaData.full_name);
+
+                // Also store that this came from passcode verification
+                sessionStorage.setItem('oauth_from_passcode', 'true');
+            }
+
             await loginWithGoogle();
             // Google OAuth will redirect, so we don't need to handle success here
         } catch (error) {
             console.error('Google signup error:', error);
             toast.error('Google signup failed. Please try again.');
             setIsSubmitting(false);
+
+            // Clear the stored license data if OAuth fails
+            sessionStorage.removeItem('pending_license_link');
+            sessionStorage.removeItem('pending_cpa_name');
+            sessionStorage.removeItem('oauth_from_passcode');
         }
     };
 
@@ -115,188 +136,213 @@ const QuickSignupModal = ({
             } else {
                 toast.error(result.error || 'Failed to create account. Please try again.');
             }
+
         } catch (error) {
-            console.error('Account creation error:', error);
-            toast.error('Network error. Please check your connection and try again.');
+            console.error('Email signup error:', error);
+            toast.error('Account creation failed. Please try again.');
         } finally {
             setIsSubmitting(false);
         }
     };
 
-    const handleBackToMethod = () => {
-        setStep('method');
-        setEmail('');
-        setName(cpaName || '');
+    const closeModal = () => {
+        // Clean up any stored OAuth data when modal is closed
+        sessionStorage.removeItem('pending_license_link');
+        sessionStorage.removeItem('pending_cpa_name');
+        sessionStorage.removeItem('oauth_from_passcode');
+        onClose();
     };
 
     return (
-        <div className={styles.modalOverlay} onClick={onClose}>
-            <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-                {/* Close Button */}
-                <button className={styles.closeButton} onClick={onClose}>
-                    <X size={24} />
-                </button>
+        <div className={styles.modalOverlay}>
+            <div className={styles.modalContent}>
+                {/* Header */}
+                <div className={styles.modalHeader}>
+                    {step === 'email' && (
+                        <button
+                            onClick={() => setStep('method')}
+                            className={styles.backButton}
+                            disabled={isSubmitting}
+                        >
+                            ← Back
+                        </button>
+                    )}
+                    <h2 className={styles.modalTitle}>
+                        {step === 'method' ? 'Create Your Free Account' :
+                            step === 'email' ? 'Create Account' : 'Welcome!'}
+                    </h2>
+                    <button
+                        onClick={closeModal}
+                        className={styles.closeButton}
+                        disabled={isSubmitting}
+                    >
+                        <X size={24} />
+                    </button>
+                </div>
 
-                {step === 'method' && (
-                    <>
-                        {/* Header */}
-                        <div className={styles.modalHeader}>
-                            <div className={styles.iconWrapper}>
-                                <Shield className={styles.headerIcon} />
-                            </div>
-                            <h2>Create Your Free Account</h2>
-                            <p>Sign up to securely upload and track your CPE certificates</p>
-                        </div>
+                {/* Content */}
+                <div className={styles.modalBody}>
+                    {step === 'method' && (
+                        <>
+                            <p className={styles.subtitle}>
+                                Sign up to securely upload and track your CPE certificates
+                            </p>
 
-                        {/* Benefits */}
-                        <div className={styles.benefits}>
-                            <div className={styles.benefit}>
-                                <Check className={styles.checkIcon} />
-                                <span>10 free uploads with full functionality</span>
-                            </div>
-                            <div className={styles.benefit}>
-                                <Check className={styles.checkIcon} />
-                                <span>Secure cloud storage & AI analysis</span>
-                            </div>
-                            <div className={styles.benefit}>
-                                <Check className={styles.checkIcon} />
-                                <span>Professional compliance reports</span>
-                            </div>
-                        </div>
-
-                        {/* Sign up options */}
-                        <div className={styles.signupOptions}>
-                            {/* Google Signup */}
-                            <Button
-                                onClick={handleGoogleSignup}
-                                variant="outline"
-                                disabled={isSubmitting}
-                                loading={isSubmitting}
-                                className={styles.googleButton}
-                            >
-                                <Mail size={16} />
-                                Continue with Google
-                            </Button>
-
-                            <div className={styles.divider}>
-                                <span>or</span>
+                            {/* Benefits */}
+                            <div className={styles.benefits}>
+                                <div className={styles.benefit}>
+                                    <Check className={styles.checkIcon} />
+                                    <span>10 free uploads with full functionality</span>
+                                </div>
+                                <div className={styles.benefit}>
+                                    <Check className={styles.checkIcon} />
+                                    <span>Secure cloud storage & AI analysis</span>
+                                </div>
+                                <div className={styles.benefit}>
+                                    <Check className={styles.checkIcon} />
+                                    <span>Professional compliance reports</span>
+                                </div>
                             </div>
 
-                            {/* Email Signup */}
-                            <Button
-                                onClick={() => setStep('email')}
-                                variant="primary"
-                                disabled={isSubmitting}
-                                className={styles.emailButton}
-                            >
-                                <User size={16} />
-                                Continue with Email
-                            </Button>
-                        </div>
-                    </>
-                )}
-
-                {step === 'email' && (
-                    <>
-                        {/* Email signup form */}
-                        <div className={styles.modalHeader}>
-                            <button onClick={handleBackToMethod} className={styles.backButton}>
-                                ← Back
-                            </button>
-                            <h2>Create Account</h2>
-                            <p>Enter your details to get started</p>
-                        </div>
-
-                        <form onSubmit={handleEmailSignup} className={styles.emailForm}>
-                            <div className={styles.formGroup}>
-                                <label htmlFor="email">Email Address</label>
-                                <input
-                                    id="email"
-                                    type="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    placeholder="your.email@example.com"
-                                    required
+                            {/* Sign up options */}
+                            <div className={styles.signupOptions}>
+                                {/* Google Signup */}
+                                <Button
+                                    onClick={handleGoogleSignup}
+                                    variant="outline"
                                     disabled={isSubmitting}
-                                />
-                            </div>
+                                    loading={isSubmitting}
+                                    className={styles.googleButton}
+                                >
+                                    <Mail size={16} />
+                                    Continue with Google
+                                </Button>
 
-                            <div className={styles.formGroup}>
-                                <label htmlFor="name">Full Name</label>
-                                <input
-                                    id="name"
-                                    type="text"
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                    placeholder="Your full name"
-                                    required
+                                <div className={styles.divider}>
+                                    <span>or</span>
+                                </div>
+
+                                {/* Email Signup */}
+                                <Button
+                                    onClick={() => setStep('email')}
+                                    variant="primary"
                                     disabled={isSubmitting}
-                                />
+                                    className={styles.emailButton}
+                                >
+                                    <User size={16} />
+                                    Continue with Email
+                                </Button>
                             </div>
 
-                            <Button
-                                type="submit"
-                                variant="primary"
-                                disabled={isSubmitting || !email || !name}
-                                loading={isSubmitting}
-                                className={styles.submitButton}
-                            >
-                                Create Account
-                                <ArrowRight size={16} />
-                            </Button>
-                        </form>
+                            {/* License info */}
+                            {licenseNumber && (
+                                <div className={styles.licenseInfo}>
+                                    <div className={styles.licenseCard}>
+                                        <div className={styles.licenseDetails}>
+                                            <strong>{cpaName}</strong>
+                                            <br />
+                                            <span>License: {licenseNumber}</span>
+                                        </div>
+                                        <Shield className={styles.licenseIcon} />
+                                    </div>
+                                </div>
+                            )}
 
-                        {/* License verification note */}
-                        <div className={styles.verificationNote}>
-                            <Shield size={16} />
-                            <span>
-                                {isPasscodeVerified
-                                    ? `Verified access for license ${licenseNumber}`
-                                    : `We'll verify your account with license ${licenseNumber}`
-                                }
-                            </span>
-                        </div>
-                    </>
-                )}
+                            {/* Footer */}
+                            <div className={styles.modalFooter}>
+                                <div className={styles.securityInfo}>
+                                    <Shield size={16} />
+                                    <span>Secure & Encrypted</span>
+                                </div>
+                                <div className={styles.securityInfo}>
+                                    <Check size={16} />
+                                    <span>No Credit Card Required</span>
+                                </div>
+                            </div>
+                        </>
+                    )}
 
-                {step === 'success' && (
-                    <>
-                        {/* Success State */}
-                        <div className={styles.successState}>
+                    {step === 'email' && (
+                        <>
+                            <p className={styles.subtitle}>
+                                Enter your details to get started
+                            </p>
+
+                            <form onSubmit={handleEmailSignup} className={styles.form}>
+                                <div className={styles.inputGroup}>
+                                    <label htmlFor="email" className={styles.label}>
+                                        Email Address
+                                    </label>
+                                    <input
+                                        id="email"
+                                        type="email"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        className={styles.input}
+                                        placeholder="your.email@example.com"
+                                        disabled={isSubmitting}
+                                        required
+                                    />
+                                </div>
+
+                                <div className={styles.inputGroup}>
+                                    <label htmlFor="name" className={styles.label}>
+                                        Full Name
+                                    </label>
+                                    <input
+                                        id="name"
+                                        type="text"
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        className={styles.input}
+                                        placeholder="Your full name"
+                                        disabled={isSubmitting}
+                                        required
+                                    />
+                                </div>
+
+                                <Button
+                                    type="submit"
+                                    variant="primary"
+                                    disabled={isSubmitting || !email || !name}
+                                    loading={isSubmitting}
+                                    className={styles.submitButton}
+                                >
+                                    Create Account <ArrowRight size={16} />
+                                </Button>
+                            </form>
+
+                            {/* License verification display */}
+                            {licenseNumber && (
+                                <div className={styles.verificationInfo}>
+                                    <Shield size={16} />
+                                    <span>Verified access for license {licenseNumber}</span>
+                                </div>
+                            )}
+
+                            {/* Footer */}
+                            <div className={styles.modalFooter}>
+                                <div className={styles.securityInfo}>
+                                    <Shield size={16} />
+                                    <span>Secure & Encrypted</span>
+                                </div>
+                                <div className={styles.securityInfo}>
+                                    <Check size={16} />
+                                    <span>No Credit Card Required</span>
+                                </div>
+                            </div>
+                        </>
+                    )}
+
+                    {step === 'success' && (
+                        <div className={styles.successContent}>
                             <div className={styles.successIcon}>
                                 <Check size={48} />
                             </div>
-                            <h2>Account Created Successfully!</h2>
-                            <p>You can now upload and track your CPE certificates securely.</p>
-
-                            <div className={styles.successBenefits}>
-                                <div className={styles.benefit}>
-                                    <Check className={styles.checkIcon} />
-                                    <span>✨ 10 free uploads activated</span>
-                                </div>
-                                <div className={styles.benefit}>
-                                    <Check className={styles.checkIcon} />
-                                    <span>🔒 Secure account created</span>
-                                </div>
-                                <div className={styles.benefit}>
-                                    <Check className={styles.checkIcon} />
-                                    <span>📋 Ready to upload certificates</span>
-                                </div>
-                            </div>
+                            <h3>Account Created Successfully!</h3>
+                            <p>Welcome to SuperCPE. Redirecting you to your dashboard...</p>
                         </div>
-                    </>
-                )}
-
-                {/* Trust indicators */}
-                <div className={styles.trustIndicators}>
-                    <div className={styles.trustItem}>
-                        <Shield size={16} />
-                        <span>Secure & Encrypted</span>
-                    </div>
-                    <div className={styles.trustItem}>
-                        <Check size={16} />
-                        <span>No Credit Card Required</span>
-                    </div>
+                    )}
                 </div>
             </div>
         </div>

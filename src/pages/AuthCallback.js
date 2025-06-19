@@ -1,4 +1,4 @@
-// src/pages/AuthCallback.js - Enhanced to handle license linking directly
+// src/pages/AuthCallback.js - Fixed OAuth redirect to dashboard
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -90,87 +90,58 @@ const AuthCallback = () => {
                 // Clean up URL params before deciding what to do next
                 window.history.replaceState({}, document.title, '/auth/callback');
 
-                // Check for pending license link FIRST (highest priority)
+                // ===============================================
+                // REDIRECT DECISION LOGIC - SIMPLIFIED & ROBUST
+                // ===============================================
+
+                console.log('=== REDIRECT DECISION ===');
+
+                // Get all possible sources of license number
                 const pendingLicense = sessionStorage.getItem('pending_license_link');
                 const pendingCpaName = sessionStorage.getItem('pending_cpa_name');
+                const finalLicense = userProfile.license_number || userLicense || pendingLicense;
 
-                if (pendingLicense && !userProfile.license_number) {
-                    setStatus('Linking your selected license...');
-                    console.log(`Found pending license link: ${pendingLicense}`);
+                console.log('License sources:', {
+                    userProfileLicense: userProfile.license_number,
+                    oauthLicense: userLicense,
+                    pendingLicense: pendingLicense,
+                    finalLicense: finalLicense
+                });
 
-                    try {
-                        await connectLicense(pendingLicense);
+                if (finalLicense) {
+                    // WE HAVE A LICENSE - GO TO DASHBOARD
+                    console.log(`✅ REDIRECTING TO DASHBOARD: /dashboard/${finalLicense}`);
 
-                        // Clear pending license
-                        sessionStorage.removeItem('pending_license_link');
-                        sessionStorage.removeItem('pending_cpa_name');
-
-                        setStatus('Redirecting to your dashboard...');
-
-                        toast.success(`Welcome, ${userProfile.name}! License ${pendingLicense} has been linked to your account.`, {
-                            duration: 4000
-                        });
-
-                        // Direct redirect to dashboard with default (Reporting Requirements) view
-                        setTimeout(() => {
-                            navigate(`/dashboard/${pendingLicense}`, { replace: true });
-                        }, 1000);
-
-                        return; // Exit early - we're done!
-
-                    } catch (error) {
-                        console.error('Failed to link pending license:', error);
-
-                        // Clear the pending license even if it failed
-                        sessionStorage.removeItem('pending_license_link');
-                        sessionStorage.removeItem('pending_cpa_name');
-
-                        toast.error(`Failed to link license ${pendingLicense}. You can try selecting it again from the home page.`);
-
-                        // Fall through to normal redirect logic
+                    // Handle pending license if needed
+                    if (pendingLicense && !userProfile.license_number) {
+                        setStatus('Linking your selected license...');
+                        try {
+                            await connectLicense(pendingLicense);
+                            sessionStorage.removeItem('pending_license_link');
+                            sessionStorage.removeItem('pending_cpa_name');
+                            toast.success(`Welcome, ${userProfile.name}! License linked successfully.`);
+                        } catch (error) {
+                            console.error('Failed to link pending license:', error);
+                            // Continue anyway if license linking fails
+                        }
+                    } else {
+                        toast.success(`Welcome back, ${userProfile.name}!`);
                     }
-                }
 
-                // Normal redirect logic (no pending license)
-                if (userProfile.license_number) {
-                    // User has a license - go to default dashboard view (Reporting Requirements)
                     setStatus('Redirecting to your dashboard...');
-                    const redirectPath = `/dashboard/${userProfile.license_number}`;
-                    console.log('Redirecting to:', redirectPath);
-
-                    toast.success(`Welcome back, ${userProfile.name}!`, {
-                        duration: 2000
-                    });
-
                     setTimeout(() => {
-                        navigate(redirectPath, { replace: true });
-                    }, 800);
-
-                } else if (userLicense) {
-                    // Backend provided a license number - go to default dashboard view
-                    setStatus('Redirecting to your dashboard...');
-                    const redirectPath = `/dashboard/${userLicense}`;
-                    console.log('Redirecting to:', redirectPath);
-
-                    toast.success(`Welcome, ${userProfile.name}!`, {
-                        duration: 2000
-                    });
-
-                    setTimeout(() => {
-                        navigate(redirectPath, { replace: true });
+                        navigate(`/dashboard/${finalLicense}`, { replace: true });
                     }, 800);
 
                 } else {
-                    // No license number - go to home with clear instructions
-                    setStatus('Redirecting to home...');
-                    console.log('Redirecting to: / (no license)');
+                    // NO LICENSE - GO TO HOME FOR SETUP
+                    console.log('❌ NO LICENSE FOUND - REDIRECTING TO HOME');
+                    console.log('User needs to select a license');
 
-                    // Clear any existing toasts first
-                    toast.dismiss();
+                    setStatus('Redirecting to complete setup...');
 
-                    // Show success message with clear next steps
-                    toast.success(`Welcome, ${userProfile.name}! Please search for and select your CPA license below to link it to your account.`, {
-                        duration: 6000
+                    toast.success(`Welcome, ${userProfile.name}! Please search for and select your CPA license below to complete your account setup.`, {
+                        duration: 8000
                     });
 
                     setTimeout(() => {
@@ -179,7 +150,8 @@ const AuthCallback = () => {
                             state: {
                                 justLoggedIn: true,
                                 userName: userProfile.name,
-                                needsLicense: true
+                                needsLicense: true,
+                                fromOAuth: true
                             }
                         });
                     }, 1000);
