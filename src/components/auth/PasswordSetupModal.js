@@ -1,7 +1,7 @@
 // src/components/auth/PasswordSetupModal.js
 import React, { useState } from 'react';
 import { toast } from 'react-hot-toast';
-import { X, Lock, Eye, EyeOff, Check, AlertCircle } from 'lucide-react';
+import { X, Lock, Eye, EyeOff, Check, AlertCircle, CheckCircle } from 'lucide-react';
 import Button from '../ui/Button';
 import styles from '../../styles/components/PasswordSetupModal.module.css';
 
