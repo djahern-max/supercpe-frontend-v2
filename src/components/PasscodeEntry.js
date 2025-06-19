@@ -105,9 +105,7 @@ const PasscodeEntry = () => {
                             )}
                         </div>
 
-                        <div className={styles.exclusiveHint}>
-                            🔐 Access by invitation only
-                        </div>
+
 
                         <div className={styles.switchMode}>
                             Already have an account?
