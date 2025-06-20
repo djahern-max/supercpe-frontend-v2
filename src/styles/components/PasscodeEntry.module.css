@@ -9,7 +9,8 @@
     margin-bottom: 16px;
 }
 
-.searchInput, .loginInput {
+.searchInput,
+.loginInput {
     width: 100%;
     padding: 16px 20px;
     font-size: 18px;
@@ -20,7 +21,8 @@
     background: white;
 }
 
-.searchInput:focus, .loginInput:focus {
+.searchInput:focus,
+.loginInput:focus {
     border-color: #3b82f6;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
@@ -65,9 +67,14 @@
 
 .switchMode {
     text-align: center;
-    font-size: 14px;
-    color: #6b7280;
-    margin-top: 16px;
+    font-size: 16px;
+    /* Increased from 14px */
+    color: #374151;
+    /* Darker color for better visibility */
+    margin-top: 20px;
+    /* Increased spacing */
+    font-weight: 500;
+    /* Added weight */
 }
 
 .switchMode button {
@@ -77,7 +84,10 @@
     cursor: pointer;
     text-decoration: underline;
     margin-left: 4px;
-    font-size: 14px;
+    font-size: 16px;
+    /* Increased from 14px */
+    font-weight: 600;
+    /* Made button text bolder */
 }
 
 .switchMode button:hover {
@@ -112,8 +122,13 @@
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* Responsive Design */
@@ -121,12 +136,13 @@
     .entryContainer {
         padding: 0 16px;
     }
-    
-    .searchInput, .loginInput {
+
+    .searchInput,
+    .loginInput {
         font-size: 16px;
         padding: 14px 16px;
     }
-    
+
     .loginForm button {
         padding: 12px;
         font-size: 15px;

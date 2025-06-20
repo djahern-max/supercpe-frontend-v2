@@ -95,13 +95,16 @@ const Header = () => {
                             >
                                 Home
                             </Link>
-                            <Link
-                                to="/docs"
-                                className={`${styles.navLink} ${isActive('/docs') ? styles.navLinkActive : ''}`}
+                            {/* Changed from Link to anchor tag for external URL */}
+                            <a
+                                href="https://supercpe.com/docs"
+                                className={styles.navLink}
+                                target="_blank"
+                                rel="noopener noreferrer"
                             >
                                 Docs
-                            </Link>
-                            <Link
+                            </a>
+                            {/* <Link
                                 to="/privacy"
                                 className={`${styles.navLink} ${isActive('/privacy') ? styles.navLinkActive : ''}`}
                             >
@@ -112,7 +115,7 @@ const Header = () => {
                                 className={`${styles.navLink} ${isActive('/terms') ? styles.navLinkActive : ''}`}
                             >
                                 Terms
-                            </Link>
+                            </Link> */}
                         </nav>
 
                         {/* Authentication Section */}

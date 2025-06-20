@@ -96,7 +96,7 @@ const AuthRequiredUploadSection = ({ licenseNumber, cpaName, onUploadSuccess }) 
                 ? await apiService.uploadCertificatePremium(licenseNumber, file)
                 : await apiService.uploadCertificateAuthenticated(licenseNumber, file);
 
-            toast.success('Certificate processed successfully!', { id: 'upload' });
+            // toast.success('Certificate processed successfully!', { id: 'upload' });
 
             if (onUploadSuccess) {
                 onUploadSuccess(result);

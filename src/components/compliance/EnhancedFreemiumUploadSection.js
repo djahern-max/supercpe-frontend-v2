@@ -67,7 +67,7 @@ const EnhancedFreemiumUploadSection = ({ licenseNumber, onUploadSuccess }) => {
                 ? await apiService.uploadCertificatePremium(licenseNumber, file)
                 : await apiService.uploadCertificateEnhancedFree(licenseNumber, file);
 
-            toast.success('Certificate processed successfully!', { id: 'upload' });
+            // toast.success('Certificate processed successfully!', { id: 'upload' });
 
             onUploadSuccess({
                 id: result.compliance_tracking?.database_record_id || Date.now(),

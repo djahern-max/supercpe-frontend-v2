@@ -6,8 +6,10 @@
 .hero {
     text-align: center;
     padding: var(--space-20) 0;
-    background: linear-gradient(135deg, var(--primary-50) 0%, white 100%);
+    background: white;
     border-radius: var(--radius-2xl);
+    border: 1px solid var(--gray-300);
+    /* Faint border */
     margin-bottom: var(--space-16);
 }
 
@@ -34,7 +36,8 @@
 
 .heroDescription {
     font-size: var(--text-lg);
-    color: var(--gray-600);
+    color: var(--warning-600);
+    /* Changed to #d97706 */
     margin-bottom: var(--space-8);
     line-height: var(--leading-relaxed);
     max-width: 600px;
