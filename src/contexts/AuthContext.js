@@ -1,9 +1,13 @@
-// src/contexts/AuthContext.js - Complete fix for authentication state synchronization
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+// src/contexts/AuthContext.js - Enhanced with automatic logout after 1 hour of inactivity
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { apiService } from '../services/api';
 import { toast } from 'react-hot-toast';
 
 const AuthContext = createContext();
+
+// Auto-logout configuration
+const INACTIVITY_TIMEOUT = 60 * 60 * 1000; // 1 hour in milliseconds
+const WARNING_TIME = 5 * 60 * 1000; // Show warning 5 minutes before logout
 
 export const useAuth = () => {
     const context = useContext(AuthContext);
@@ -22,6 +26,12 @@ export const AuthProvider = ({ children }) => {
     const [requiresPasswordSetup, setRequiresPasswordSetup] = useState(false);
     const [temporaryPassword, setTemporaryPassword] = useState(null);
 
+    // Auto-logout state
+    const [showInactivityWarning, setShowInactivityWarning] = useState(false);
+    const inactivityTimer = useRef(null);
+    const warningTimer = useRef(null);
+    const lastActivity = useRef(Date.now());
+
     // Debug function to log auth state changes
     const logAuthChange = useCallback((action, data = {}) => {
         console.log(`🔐 AuthContext [${action}]:`, {
@@ -33,20 +43,136 @@ export const AuthProvider = ({ children }) => {
         });
     }, [isAuthenticated, user, isLoading]);
 
+    // Clear all timers
+    const clearTimers = useCallback(() => {
+        if (inactivityTimer.current) {
+            clearTimeout(inactivityTimer.current);
+            inactivityTimer.current = null;
+        }
+        if (warningTimer.current) {
+            clearTimeout(warningTimer.current);
+            warningTimer.current = null;
+        }
+        setShowInactivityWarning(false);
+    }, []);
+
+    // Handle automatic logout due to inactivity
+    const handleInactivityLogout = useCallback(async () => {
+        console.log('🔐 AuthContext: Auto-logout due to inactivity');
+
+        clearTimers();
+
+        try {
+            await logout();
+            toast.error('You have been logged out due to inactivity.');
+        } catch (error) {
+            console.error('Auto-logout error:', error);
+            // Force logout even if server call fails
+            clearAuthState();
+            toast.error('Session expired. Please sign in again.');
+        }
+
+        // Redirect to home page
+        if (window.location.pathname !== '/') {
+            window.location.href = '/';
+        }
+    }, []);
+
+    // Show inactivity warning
+    const showInactivityWarningDialog = useCallback(() => {
+        console.log('🔐 AuthContext: Showing inactivity warning');
+        setShowInactivityWarning(true);
+
+        // Set timer for final logout
+        inactivityTimer.current = setTimeout(() => {
+            handleInactivityLogout();
+        }, WARNING_TIME);
+    }, [handleInactivityLogout]);
+
+    // Reset inactivity timer
+    const resetInactivityTimer = useCallback(() => {
+        if (!isAuthenticated) return;
+
+        lastActivity.current = Date.now();
+
+        // Clear existing timers
+        clearTimers();
+
+        // Set warning timer (logout time minus warning time)
+        warningTimer.current = setTimeout(() => {
+            showInactivityWarningDialog();
+        }, INACTIVITY_TIMEOUT - WARNING_TIME);
+
+        console.log('🔐 AuthContext: Inactivity timer reset');
+    }, [isAuthenticated, clearTimers, showInactivityWarningDialog]);
+
+    // Extend session (called when user dismisses warning)
+    const extendSession = useCallback(() => {
+        console.log('🔐 AuthContext: Session extended by user');
+        setShowInactivityWarning(false);
+        resetInactivityTimer();
+    }, [resetInactivityTimer]);
+
+    // Track user activity
+    useEffect(() => {
+        if (!isAuthenticated) {
+            clearTimers();
+            return;
+        }
+
+        const activityEvents = [
+            'mousedown',
+            'mousemove',
+            'keypress',
+            'scroll',
+            'touchstart',
+            'click'
+        ];
+
+        const throttledResetTimer = (() => {
+            let timeoutId;
+            return () => {
+                if (timeoutId) return; // Throttle to once per second
+
+                timeoutId = setTimeout(() => {
+                    resetInactivityTimer();
+                    timeoutId = null;
+                }, 1000);
+            };
+        })();
+
+        // Add event listeners for user activity
+        activityEvents.forEach(event => {
+            document.addEventListener(event, throttledResetTimer, { passive: true });
+        });
+
+        // Initial timer setup
+        resetInactivityTimer();
+
+        // Cleanup
+        return () => {
+            activityEvents.forEach(event => {
+                document.removeEventListener(event, throttledResetTimer);
+            });
+            clearTimers();
+        };
+    }, [isAuthenticated, resetInactivityTimer, clearTimers]);
+
     // Make auth context globally available for API interceptors
     useEffect(() => {
         window.authContext = {
             setIsAuthenticated,
             setUser,
             clearAuthState: () => clearAuthState(),
-            checkAuthStatus: () => checkAuthStatus()
+            checkAuthStatus: () => checkAuthStatus(),
+            resetInactivityTimer
         };
 
         // Cleanup on unmount
         return () => {
             delete window.authContext;
         };
-    }, []);
+    }, [resetInactivityTimer]);
 
     // Make toast globally available for API interceptors
     useEffect(() => {
@@ -64,12 +190,15 @@ export const AuthProvider = ({ children }) => {
         const handleVisibilityChange = () => {
             if (!document.hidden) {
                 checkAuthStatus();
+                if (isAuthenticated) {
+                    resetInactivityTimer(); // Reset timer when tab becomes active
+                }
             }
         };
 
         document.addEventListener('visibilitychange', handleVisibilityChange);
         return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-    }, []);
+    }, [isAuthenticated, resetInactivityTimer]);
 
     // Log auth state changes for debugging
     useEffect(() => {
@@ -77,139 +206,96 @@ export const AuthProvider = ({ children }) => {
     }, [isAuthenticated, user, isLoading, logAuthChange]);
 
     const clearAuthState = useCallback(() => {
-        console.log('🔐 AuthContext: Clearing auth state');
+        console.log('🔐 AuthContext: Clearing authentication state');
+
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
+
         setIsAuthenticated(false);
         setUser(null);
         setRequiresPasswordSetup(false);
         setTemporaryPassword(null);
-    }, []);
+
+        // Clear inactivity timers
+        clearTimers();
+    }, [clearTimers]);
 
     const checkAuthStatus = useCallback(async () => {
-        console.log('🔐 AuthContext: Checking auth status...');
-        setIsLoading(true);
+        console.log('🔐 AuthContext: Checking authentication status');
 
         const accessToken = localStorage.getItem('access_token');
 
-        // If no token, user is not authenticated
         if (!accessToken) {
             console.log('🔐 AuthContext: No access token found');
             setIsAuthenticated(false);
             setUser(null);
             setIsLoading(false);
+            clearTimers();
             return;
         }
 
         try {
-            // Try to get current user if we have a token
-            console.log('🔐 AuthContext: Fetching current user with token...');
+            setIsLoading(true);
+            const { apiService } = await import('../services/api');
             const userProfile = await apiService.getCurrentUser();
-            console.log('🔐 AuthContext: User profile fetched successfully:', userProfile);
 
-            // Force update the authentication state
+            console.log('🔐 AuthContext: User authenticated successfully');
             setIsAuthenticated(true);
             setUser(userProfile);
 
-            // Force a re-render by updating the state slightly
-            setTimeout(() => {
-                setIsAuthenticated(true);
-            }, 0);
+            // Start inactivity timer for authenticated users
+            resetInactivityTimer();
 
         } catch (error) {
-            console.error('🔐 AuthContext: Auth check failed:', error);
-
-            // If token is invalid, clear everything
-            if (error.response?.status === 401) {
-                console.log('🔐 AuthContext: Invalid token (401), clearing auth state');
-                clearAuthState();
-            } else {
-                // For other errors, keep current state but stop loading
-                console.log('🔐 AuthContext: Network error, keeping current state');
-                setIsAuthenticated(false);
-                setUser(null);
-            }
+            console.error('🔐 AuthContext: Authentication check failed:', error);
+            clearAuthState();
         } finally {
             setIsLoading(false);
         }
-    }, [clearAuthState]);
+    }, [clearAuthState, resetInactivityTimer]);
 
-    const loginWithGoogle = async () => {
+    const forceAuthCheck = useCallback(() => {
+        console.log('🔐 AuthContext: Forcing authentication check');
+        checkAuthStatus();
+    }, [checkAuthStatus]);
+
+    const connectLicense = async (licenseNumber) => {
         try {
-            console.log('🔐 AuthContext: Google login initiated');
+            console.log('🔐 AuthContext: Connecting license', licenseNumber);
+            const response = await apiService.connectLicense(licenseNumber);
 
-            // Get the OAuth URL from backend
-            const response = await apiService.getGoogleAuthUrl();
-
-            if (response.oauth_url) {
-                // Redirect to Google OAuth
-                console.log('🔐 Redirecting to Google OAuth:', response.oauth_url);
-                window.location.href = response.oauth_url;
-                return true;
+            if (response.success) {
+                // Refresh user data to get updated license info
+                await refreshUser();
+                return { success: true };
             }
 
-            throw new Error('No OAuth URL received from backend');
+            return { success: false, error: response.message || 'Failed to connect license' };
         } catch (error) {
-            console.error('🔐 Google login failed:', error);
-            toast.error('Failed to initiate Google login. Please try again.');
-            return false;
-        }
-    };
-
-    const loginWithEmail = async (email, password) => {
-        try {
-            console.log('🔐 AuthContext: Email login initiated for:', email);
-            const response = await apiService.loginWithEmail(email, password);
-
-            if (response.access_token) {
-                const success = await login(
-                    response.access_token,
-                    response.refresh_token,
-                    response.user
-                );
-
-                // Handle password reset requirement
-                if (response.requires_password_reset) {
-                    setRequiresPasswordSetup(true);
-                }
-
-                return { success, requiresPasswordReset: response.requires_password_reset };
-            }
-
-            return { success: false };
-        } catch (error) {
-            console.error('🔐 Email login failed:', error);
-            const errorMessage = error.response?.data?.detail || 'Login failed';
+            console.error('🔐 Connect license failed:', error);
             return {
                 success: false,
-                error: errorMessage
+                error: error.response?.data?.detail || 'Failed to connect license'
             };
         }
     };
 
-    const createAccountWithEmail = async (email, password, name, licenseNumber) => {
+    const signupWithPasscode = async (email, name, passcode) => {
         try {
-            console.log('🔐 AuthContext: Creating account with email for:', email);
-            const response = await apiService.signupWithEmail({
-                email,
-                password,
-                name,
-                license_number: licenseNumber
-            });
+            console.log('🔐 AuthContext: Signing up with passcode');
+            const response = await apiService.signupWithPasscode(email, name, passcode);
 
-            if (response.success && response.access_token) {
-                const success = await login(
-                    response.access_token,
-                    response.refresh_token,
-                    response.user
-                );
-
-                return { success, user: response.user };
+            if (response.success) {
+                if (response.requires_password_setup) {
+                    setRequiresPasswordSetup(true);
+                    setTemporaryPassword(response.temporary_password);
+                }
+                return { success: true, data: response };
             }
 
-            return { success: false, error: response.message || 'Account creation failed' };
+            return { success: false, error: response.message || 'Failed to create account' };
         } catch (error) {
-            console.error('🔐 Account creation failed:', error);
+            console.error('🔐 Signup failed:', error);
             const errorMessage = error.response?.data?.detail || 'Failed to create account';
             return {
                 success: false,
@@ -262,6 +348,9 @@ export const AuthProvider = ({ children }) => {
             // Update state immediately and force re-render
             setIsAuthenticated(true);
             setUser(userProfile);
+
+            // Start inactivity timer
+            resetInactivityTimer();
 
             // Force another state update to ensure all components re-render
             setTimeout(() => {
@@ -326,100 +415,43 @@ export const AuthProvider = ({ children }) => {
                     window.toast.error('Your session has expired. Please sign in again.');
                 }
             }
-
             throw error;
         }
-    };
-
-    const connectLicense = async (licenseNumber) => {
-        try {
-            console.log('🔐 AuthContext: Connecting license:', licenseNumber);
-            const response = await apiService.connectLicense(licenseNumber);
-
-            // Update user state with new license
-            if (response.user) {
-                setUser(prevUser => ({
-                    ...prevUser,
-                    license_number: response.user.license_number
-                }));
-            }
-
-            return response;
-        } catch (error) {
-            console.error('🔐 License connection failed:', error);
-
-            const errorMessage = error.response?.data?.detail || 'Failed to connect license';
-            if (window.toast) {
-                window.toast.error(errorMessage);
-            }
-
-            throw error;
-        }
-    };
-
-    // Handle authentication errors globally
-    const handleAuthError = (error) => {
-        if (error.response?.status === 401) {
-            const errorMessage = error.response?.data?.detail;
-
-            if (errorMessage === 'User account no longer exists') {
-                if (window.toast) {
-                    window.toast.error('Your account is no longer available. Please sign in again.');
-                }
-            } else {
-                if (window.toast) {
-                    window.toast.error('Your session has expired. Please sign in again.');
-                }
-            }
-
-            clearAuthState();
-
-            // Redirect to home if not already there
-            if (window.location.pathname !== '/') {
-                window.location.href = '/';
-            }
-        }
-    };
-
-    // Force auth check function that can be called from outside
-    const forceAuthCheck = useCallback(() => {
-        console.log('🔐 AuthContext: Force auth check requested');
-        checkAuthStatus();
-    }, [checkAuthStatus]);
-
-    const value = {
-        // Auth state
-        isAuthenticated,
-        user,
-        isLoading,
-
-        // Password setup state
-        requiresPasswordSetup,
-        temporaryPassword,
-
-        // Auth functions
-        login,
-        loginWithGoogle,
-        loginWithEmail,
-        createAccountWithEmail,
-        logout,
-        refreshUser,
-        connectLicense,
-        checkAuthStatus,
-        forceAuthCheck,
-        clearAuthState,
-        handleAuthError,
-        setIsAuthenticated,
-        setUser,
-        setAuthToken,
-
-        // Password management functions
-        setPassword,
-        completePasswordSetup
     };
 
     return (
-        <AuthContext.Provider value={value}>
+        <AuthContext.Provider value={{
+            // Auth state
+            isAuthenticated,
+            user,
+            isLoading,
+
+            // Password setup state
+            requiresPasswordSetup,
+            temporaryPassword,
+
+            // Inactivity state
+            showInactivityWarning,
+
+            // Auth methods
+            login,
+            logout,
+            checkAuthStatus,
+            forceAuthCheck,
+            clearAuthState,
+            setAuthToken,
+            refreshUser,
+
+            // Account creation
+            connectLicense,
+            signupWithPasscode,
+            setPassword,
+            completePasswordSetup,
+
+            // Inactivity methods
+            extendSession,
+            resetInactivityTimer
+        }}>
             {children}
         </AuthContext.Provider>
     );

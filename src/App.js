@@ -14,6 +14,7 @@ import SecurityPage from './pages/SecurityPage';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
 import AuthCallback from './pages/AuthCallback';
+import InactivityWarning from './components/InactivityWarning';
 
 // Import your layout components
 import Header from './components/layout/Header';
@@ -49,6 +50,7 @@ function App() {
                     <div className="App">
                         {/* Header */}
                         <Header />
+                        <InactivityWarning />
 
                         {/* Main Content */}
                         <main className="main-content">
