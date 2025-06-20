@@ -64,7 +64,7 @@ const Header = () => {
                     <div className={styles.headerContent}>
                         <Link to="/" className={styles.logo}>
                             <span className={styles.logoText}>SuperCPE</span>
-                            <span className={styles.logoSubtext}>Professional</span>
+                            <span className={styles.logoSubtext}>New Hampshire</span>
                         </Link>
 
                         <div className={styles.authLoading}>
@@ -84,7 +84,7 @@ const Header = () => {
                         {/* Logo */}
                         <Link to="/" className={styles.logo}>
                             <span className={styles.logoText}>SuperCPE</span>
-                            <span className={styles.logoSubtext}>Professional</span>
+                            <span className={styles.logoSubtext}>New Hampshire</span>
                         </Link>
 
                         {/* Main Navigation - Always visible, responsive */}
