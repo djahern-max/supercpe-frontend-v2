@@ -63,7 +63,7 @@ const SimpleAuthModal = ({ onClose, onSuccess }) => {
                         forceAuthCheck();
                     }, 100);
 
-                    toast.success('Welcome back!');
+
 
                     // Call success callback first
                     if (onSuccess) {

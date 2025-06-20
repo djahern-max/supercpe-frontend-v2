@@ -68,7 +68,7 @@ const PasscodeEntry = () => {
                 const data = await response.json();
                 setAuthToken(data.access_token);
                 navigate(`/dashboard/${data.user.license_number}`);
-                toast.success('Welcome back!');
+
             } else {
                 toast.error('Invalid email or password.');
             }

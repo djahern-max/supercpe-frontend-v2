@@ -66,7 +66,7 @@ function App() {
                         </main>
 
                         {/* Footer */}
-
+                        {/* <Footer /> */}
 
                         {/* Toast notifications */}
                         <Toaster

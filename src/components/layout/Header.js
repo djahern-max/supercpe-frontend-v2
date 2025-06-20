@@ -53,7 +53,7 @@ const Header = () => {
     const handleAuthSuccess = () => {
         console.log('Header: Auth success callback');
         setShowAuthModal(false);
-        toast.success('Welcome back!');
+
     };
 
     // Show loading state
