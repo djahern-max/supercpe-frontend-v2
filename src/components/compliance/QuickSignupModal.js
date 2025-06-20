@@ -220,43 +220,26 @@ const QuickSignupModal = ({
                 {/* Enhanced Header */}
                 <div className={styles.modalHeader}>
                     <h2 className={styles.modalTitle}>Create Your Professional Account</h2>
-                    <p className={styles.subtitle}>
-                        Join New Hampshire CPAs using AI-powered compliance tracking
-                    </p>
+
                 </div>
 
-                {/* Enhanced Value Proposition */}
-                <div className={styles.valueProposition}>
-                    <div className={styles.feature}>
-                        <CheckCircle className={styles.featureIcon} size={20} />
-                        <div>
-                            <strong>AI Certificate Analysis</strong>
-                            <p>Automatically extract CPE hours, subjects, and compliance data</p>
-                        </div>
+                {/* Minimalist Benefits Row */}
+                <div className={styles.featureGrid}>
+                    <div className={styles.featureItem}>
+                        <CheckCircle size={18} />
+                        <span>AI-Powered</span>
                     </div>
-
-                    <div className={styles.feature}>
-                        <Shield className={styles.featureIcon} size={20} />
-                        <div>
-                            <strong>Secure Cloud Storage</strong>
-                            <p>Bank-level encryption for all your professional documents</p>
-                        </div>
+                    <div className={styles.featureItem}>
+                        <Shield size={18} />
+                        <span>Secure Storage</span>
                     </div>
-
-                    <div className={styles.feature}>
-                        <BarChart3 className={styles.featureIcon} size={20} />
-                        <div>
-                            <strong>Compliance Reporting</strong>
-                            <p>Generate professional reports for license renewal</p>
-                        </div>
+                    <div className={styles.featureItem}>
+                        <BarChart3 size={18} />
+                        <span>Compliance Reports</span>
                     </div>
-
-                    <div className={styles.feature}>
-                        <Clock className={styles.featureIcon} size={20} />
-                        <div>
-                            <strong>Time Tracking</strong>
-                            <p>Monitor progress toward your 80-hour requirement</p>
-                        </div>
+                    <div className={styles.featureItem}>
+                        <Clock size={18} />
+                        <span>Time Tracking</span>
                     </div>
                 </div>
 
@@ -322,21 +305,7 @@ const QuickSignupModal = ({
                     </div>
                 )}
 
-                {/* Trust Indicators */}
-                <div className={styles.trustIndicators}>
-                    <div className={styles.trustItem}>
-                        <Shield size={16} />
-                        <span>SOC 2 Compliant</span>
-                    </div>
-                    <div className={styles.trustItem}>
-                        <Lock size={16} />
-                        <span>256-bit Encryption</span>
-                    </div>
-                    <div className={styles.trustItem}>
-                        <CheckCircle size={16} />
-                        <span>AICPA Approved</span>
-                    </div>
-                </div>
+
 
                 {/* Close Button */}
                 <button

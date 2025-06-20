@@ -6,13 +6,13 @@ const Privacy = () => {
         <div className={styles.container}>
             <div className={styles.content}>
                 <h1>Privacy Policy</h1>
-                <p className={styles.lastUpdated}>Last updated: December 2024</p>
+                <p className={styles.lastUpdated}>Last updated: June 2025</p>
 
                 <section>
                     <h2>1. Information We Collect</h2>
                     <p>SuperCPE collects the following information to provide our CPE compliance tracking service:</p>
                     <ul>
-                        <li><strong>Google Account Information:</strong> When you sign in with Google, we collect your email address, name, and profile picture to create and manage your account.</li>
+                        <li><strong>Account Information:</strong> When you sign up, we collect your email address, name, and password to create and manage your account.</li>
                         <li><strong>CPA License Information:</strong> Your New Hampshire CPA license number to verify your professional status.</li>
                         <li><strong>CPE Certificates:</strong> Digital copies of your continuing education certificates for compliance tracking.</li>
                         <li><strong>Usage Data:</strong> Information about how you use our service to improve functionality.</li>
@@ -35,7 +35,7 @@ const Privacy = () => {
                     <h2>3. Information Sharing</h2>
                     <p>We do not sell, trade, or share your personal information with third parties except:</p>
                     <ul>
-                        <li><strong>Service Providers:</strong> Secure cloud storage (Digital Ocean) and payment processing (Stripe)</li>
+                        <li><strong>Service Providers:</strong> Secure cloud storage (DigitalOcean Spaces) and payment processing (Stripe)</li>
                         <li><strong>Legal Requirements:</strong> When required by law or to protect our rights</li>
                         <li><strong>With Your Consent:</strong> When you explicitly authorize sharing</li>
                     </ul>
@@ -65,22 +65,17 @@ const Privacy = () => {
                 </section>
 
                 <section>
-                    <h2>6. Google OAuth Integration</h2>
-                    <p>Our Google OAuth integration only accesses your basic profile information (email, name, profile picture) to create your account. We do not access your Google Drive, Gmail, or other Google services.</p>
-                </section>
-
-                <section>
-                    <h2>7. Contact Information</h2>
+                    <h2>6. Contact Information</h2>
                     <p>For privacy-related questions or requests:</p>
                     <ul>
                         <li>Email: support@supercpe.com</li>
-                        <li>Website: https://nh.supercpe.com</li>
+                        <li>Website: <a href="https://nh.supercpe.com" target="_blank" rel="noopener noreferrer">nh.supercpe.com</a></li>
                     </ul>
                 </section>
 
                 <section>
-                    <h2>8. Changes to This Policy</h2>
-                    <p>We may update this privacy policy periodically. We will notify users of significant changes via email or prominent website notice.</p>
+                    <h2>7. Changes to This Policy</h2>
+                    <p>We may update this privacy policy periodically. We will notify users of significant changes via email or a prominent notice on our website.</p>
                 </section>
             </div>
         </div>

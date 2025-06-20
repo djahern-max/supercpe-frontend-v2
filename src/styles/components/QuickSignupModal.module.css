@@ -269,6 +269,32 @@
     cursor: not-allowed;
 }
 
+.featureGrid {
+    display: flex;
+    justify-content: space-between;
+    padding: 16px 32px;
+    border-bottom: 1px solid #f3f4f6;
+    background-color: #f9fafb;
+    flex-wrap: wrap;
+    gap: 12px;
+    text-align: center;
+}
+
+.featureItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    color: #1e3b5a;
+    font-size: 13px;
+    font-weight: 500;
+    flex: 1 1 20%;
+}
+
+.featureItem svg {
+    color: #059669;
+}
+
 /* Responsive Design */
 @media (max-width: 640px) {
     .modalOverlay {

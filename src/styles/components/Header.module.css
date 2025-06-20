@@ -1,11 +1,11 @@
 /* src/styles/components/Header.module.css - Streamlined, no hamburger menu */
 .header {
-    background: white;
-    border-bottom: 1px solid #e5e7eb;
-    position: sticky;
-    top: 0;
-    z-index: 50;
-    backdrop-filter: blur(8px);
+    background: #1e3b5a;
+    /* match hero background */
+    border-bottom: none;
+    /* cleaner look */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    /* optional soft shadow */
 }
 
 .headerContent {
@@ -29,12 +29,14 @@
 .logoText {
     font-size: 1.25rem;
     font-weight: 700;
-    color: #3b82f6;
+    color: white;
+    /* previously #3b82f6 */
 }
 
 .logoSubtext {
     font-size: 0.875rem;
-    color: #6b7280;
+    color: #93c5fd;
+    /* soft light blue for accent */
     font-weight: 500;
 }
 
@@ -107,43 +109,24 @@
 .userMenuButton {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.5rem;
+    gap: 0.5rem;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 0.375rem;
     padding: 0.5rem 0.75rem;
     cursor: pointer;
     transition: all 0.15s ease;
     min-width: 0;
+    color: #6b7280;
+    font-size: 0.875rem;
 }
 
 .userMenuButton:hover {
-    border-color: #3b82f6;
-    background: #f8fafc;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    border-color: #e5e7eb;
+    background: #f9fafb;
+    color: #374151;
 }
 
-.userAvatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    object-fit: cover;
-    flex-shrink: 0;
-}
-
-.userAvatarPlaceholder {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.875rem;
-    font-weight: 600;
-    flex-shrink: 0;
-}
 
 .userInfo {
     display: flex;
@@ -151,11 +134,13 @@
     align-items: flex-start;
     min-width: 0;
     flex: 1;
+    gap: 0.2rem;
 }
 
 .userName {
-    font-weight: 600;
-    color: #111827;
+    font-weight: 500;
+    color: var(--primary-500);
+    /* Using the app's light blue: #0ea5e9 */
     font-size: 0.875rem;
     white-space: nowrap;
     overflow: hidden;
@@ -163,9 +148,11 @@
     max-width: 150px;
 }
 
+/* License number with amber color */
 .userLicense {
     font-size: 0.75rem;
-    color: #6b7280;
+    color: #fbbf24;
+    /* Amber color as requested */
     font-weight: 500;
 }
 
@@ -173,6 +160,8 @@
     color: #9ca3af;
     transition: transform 0.15s ease;
     flex-shrink: 0;
+    width: 14px;
+    height: 14px;
 }
 
 .userMenuIconOpen {
@@ -204,6 +193,17 @@
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* Ensure colors remain consistent in hover state */
+.userMenuButton:hover .userName {
+    color: var(--primary-600);
+    /* Slightly darker blue on hover */
+}
+
+.userMenuButton:hover .userLicense {
+    color: #f59e0b;
+    /* Slightly darker amber on hover */
 }
 
 .userMenuHeader {

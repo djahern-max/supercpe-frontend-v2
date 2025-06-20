@@ -6,10 +6,10 @@
 .hero {
     text-align: center;
     padding: var(--space-20) 0;
-    background: white;
+    background: #1e3b5a;
+    /* Dark blue */
     border-radius: var(--radius-2xl);
-    border: 1px solid var(--gray-300);
-    /* Faint border */
+    border: none;
     margin-bottom: var(--space-16);
 }
 
@@ -21,7 +21,8 @@
 .heroTitle {
     font-size: var(--text-4xl);
     font-weight: 700;
-    color: var(--gray-900);
+    color: white;
+    /* Change from var(--gray-900) */
     margin-bottom: var(--space-4);
     line-height: var(--leading-tight);
 }
@@ -29,21 +30,23 @@
 .heroSubtitle {
     display: block;
     font-size: var(--text-2xl);
-    color: var(--primary-600);
+    color: #93c5fd;
+    /* Light blue to contrast dark background */
     font-weight: 600;
     margin-top: var(--space-2);
 }
 
 .heroDescription {
     font-size: var(--text-lg);
-    color: var(--warning-600);
-    /* Changed to #d97706 */
+    color: #fbbf24;
+    /* Keep this warm tone for contrast */
     margin-bottom: var(--space-8);
     line-height: var(--leading-relaxed);
     max-width: 600px;
     margin-left: auto;
     margin-right: auto;
 }
+
 
 .lookupForm {
     margin-bottom: var(--space-6);

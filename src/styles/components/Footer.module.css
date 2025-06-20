@@ -1,5 +1,36 @@
 .footer {
-    margin-top: auto;
-    padding: 1rem 0;
-    background-color: white;
+    background-color: #1e3b5a;
+    color: #e5e7eb;
+    padding: 2rem 0;
+    margin-top: var(--space-16);
+}
+
+.footerContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1rem;
+}
+
+.links {
+    display: flex;
+    gap: 1.5rem;
+    font-size: 0.875rem;
+    flex-wrap: wrap;
+}
+
+.links a {
+    color: #93c5fd;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.links a:hover {
+    color: white;
+}
+
+.copy {
+    font-size: 0.75rem;
+    color: #9ca3af;
 }
