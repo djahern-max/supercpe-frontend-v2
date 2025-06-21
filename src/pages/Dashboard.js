@@ -134,25 +134,6 @@ const Dashboard = () => {
     return (
         <div className={styles.dashboard}>
             <div className="container">
-                {/* Dashboard Header */}
-                <div className={styles.dashboardHeader}>
-                    <div className={styles.headerInfo}>
-                        <h1 className={styles.pageTitle}>Professional Dashboard</h1>
-                        <div className={styles.cpaInfo}>
-                            <h2 className={styles.cpaName}>
-                                {cpa.full_name || 'Unknown CPA'}
-                            </h2>
-                            <p className={styles.licenseNumber}>
-                                License: {cpa.license_number}
-                            </p>
-                            <p className={styles.licenseStatus}>
-                                Status: <span className={styles.statusActive}>
-                                    {cpa.status || 'Active'}
-                                </span>
-                            </p>
-                        </div>
-                    </div>
-                </div>
 
                 {/* Dashboard Mode Toggle */}
                 {ProfessionalCPEDashboard && (
@@ -273,12 +254,6 @@ const BasicDashboardView = ({ cpa, licenseNumber, onEnhanceToggle }) => {
             {/* Rule Change Explanation */}
             <Card className={styles.ruleCard}>
                 <h3>February 2023 Rule Changes - How They Affect You</h3>
-
-                <div className={styles.yourSituation}>
-                    <strong>Your Situation:</strong> {wasLicensedBeforeRuleChange
-                        ? 'Existing CPA (licensed before February 2023)'
-                        : 'New CPA (licensed after February 2023)'}
-                </div>
 
                 <div className={styles.changesGrid}>
                     <div className={styles.changesSection}>

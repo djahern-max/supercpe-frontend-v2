@@ -1,212 +1,192 @@
-/* src/styles/pages/Dashboard.module.css */
+/* Enhanced Dashboard Styles with Better Spacing and Rose Color */
 
+/* Main Container - Add proper centering and padding */
 .dashboard {
-    padding: var(--space-8) 0;
+    padding: var(--space-8) var(--space-4);
     min-height: 100vh;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
 }
 
-/* Loading State */
-.loading {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 4rem 2rem;
-    text-align: center;
+.dashboard .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--space-4);
 }
 
-.loading p {
-    margin-top: 1rem;
-    color: var(--gray-600);
-    font-size: var(--text-lg);
-}
-
-.loading .loading-spinner {
-    width: 3rem;
-    height: 3rem;
-    border: 4px solid var(--gray-200);
-    border-top: 4px solid var(--primary-600);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
-/* Error State */
-.error {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: var(--space-16);
-    text-align: center;
-    background: white;
-    border-radius: var(--radius-2xl);
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--gray-200);
-    margin: 2rem auto;
-    max-width: 600px;
-}
-
-.error h2 {
-    color: var(--red-600);
-    margin-bottom: var(--space-4);
-    font-size: var(--text-2xl);
-    font-weight: 600;
-}
-
-.error p {
-    color: var(--gray-600);
-    margin-bottom: var(--space-6);
-    line-height: var(--leading-relaxed);
-}
-
-.errorActions {
-    display: flex;
-    gap: var(--space-4);
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-/* CPA Header - Name and Credentials at Top */
+/* Header Section - Add margin and spacing */
 .cpaHeader {
     text-align: center;
-    margin-bottom: var(--space-8);
+    margin-bottom: var(--space-12);
+    padding: var(--space-8);
+    background: white;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--gray-200);
 }
 
 .cpaName {
     font-size: var(--text-3xl);
     font-weight: 700;
-    color: var(--gray-900);
-    margin: 0 0 var(--space-2) 0;
+    color: var(--primary-600);
+    margin: 0 0 var(--space-3) 0;
+    background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .cpaCredentials {
     font-size: var(--text-base);
     color: var(--gray-600);
     margin: 0;
+    font-weight: 500;
 }
 
-/* Upload Section - Simple Button */
-.uploadSection {
-    text-align: center;
-    padding: var(--space-8);
-    background: linear-gradient(135deg, var(--primary-50) 0%, white 100%);
+/* Tab Navigation - Add spacing */
+.dashboardControls {
+    display: flex;
+    justify-content: center;
+    margin-bottom: var(--space-12);
+}
+
+.controlGroup {
+    display: flex;
+    background: white;
+    border-radius: var(--radius-xl);
+    padding: var(--space-4);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--gray-200);
+    gap: var(--space-8);
+}
+
+.controlButton {
+    padding: var(--space-4) var(--space-12);
     border-radius: var(--radius-lg);
-    border: 2px dashed var(--primary-300);
-    margin-bottom: var(--space-8);
+    font-weight: 500;
+    transition: all var(--transition-fast);
+    white-space: nowrap;
 }
 
-/* Clean Header - Simple and Professional */
-.dashboardHeader {
-    display: none;
-    /* Remove completely */
-}
-
-.pageTitle {
-    font-size: var(--text-4xl);
-    font-weight: 700;
-    color: var(--gray-900);
-    margin-bottom: var(--space-2);
-}
-
-.cpaName {
-    font-size: var(--text-2xl);
-    font-weight: 600;
-    color: var(--primary-600);
-    margin-bottom: var(--space-1);
-}
-
-.licenseNumber {
-    font-size: var(--text-lg);
-    color: var(--gray-600);
-    margin-bottom: var(--space-1);
-}
-
-.licenseStatus {
-    font-size: var(--text-base);
-    color: var(--gray-500);
-}
-
-.statusActive {
-    font-weight: 600;
-    color: var(--green-600);
-}
-
-/* Basic Dashboard Layout */
+/* Basic Dashboard Layout - Much tighter spacing between cards */
 .basicDashboard {
     display: flex;
     flex-direction: column;
-    gap: var(--space-8);
+    gap: var(--space-3);
     max-width: 1000px;
     margin: 0 auto;
 }
 
-/* Cards - Clean styling like Home page */
+/* Card Base Styles - Very tight margins and very thin borders */
 .statusCard,
 .ruleCard,
-.requirementsCard,
 .factsCard {
     background: white;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-xl);
     padding: var(--space-8);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--gray-200);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: var(--space-2);
 }
 
-/* Status Card */
+/* Status Card (Blue) - Very thin border */
 .statusCard {
-    border-left: 4px solid var(--primary-600);
+    border-left: 2px solid var(--primary-500);
 }
 
-.statusHeader {
+.statusCard::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(180deg, var(--primary-500), var(--primary-600));
+}
+
+/* Rule Changes Card (Rose/Pink) - Very thin border */
+.ruleCard {
+    border-left: 2px solid #ec4899;
+    /* Rose-500 */
+}
+
+.ruleCard::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(180deg, #ec4899, #db2777);
+    /* Rose gradient */
+}
+
+/* Key Facts Card (Green) - Very thin border */
+.factsCard {
+    border-left: 2px solid var(--success-500);
+}
+
+.factsCard::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(180deg, var(--success-500), var(--success-600));
+}
+
+/* Card Headers - Add consistent spacing */
+.statusHeader,
+.ruleHeader,
+.factsHeader {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--space-6);
+    gap: var(--space-4);
+    margin-bottom: var(--space-8);
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid var(--gray-200);
 }
 
-.statusHeader h3 {
-    margin: 0;
-    color: var(--gray-900);
-    font-size: var(--text-xl);
+/* Card Titles */
+.statusCard h3,
+.ruleCard h3,
+.factsCard h3 {
+    font-size: var(--text-2xl);
     font-weight: 600;
+    color: var(--gray-900);
+    margin: 0;
 }
 
-.periodInfo {
-    background: linear-gradient(135deg, var(--primary-50) 0%, white 100%);
-    padding: var(--space-6);
-    border-radius: var(--radius-lg);
-}
-
+/* License Status Period Grid */
 .periodDates {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: var(--space-4);
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--space-6);
+    margin-top: var(--space-6);
 }
 
 .dateItem {
-    background-color: white;
-    padding: var(--space-4);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-sm);
-    text-align: center;
+    background: linear-gradient(135deg, var(--gray-50), white);
+    padding: var(--space-6);
+    border-radius: var(--radius-lg);
     border: 1px solid var(--gray-200);
+    text-align: center;
+    transition: transform var(--transition-fast);
+    box-shadow: var(--shadow-sm);
+}
+
+.dateItem:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
 }
 
 .label {
     display: block;
     font-size: var(--text-sm);
     color: var(--gray-600);
-    margin-bottom: var(--space-1);
+    margin-bottom: var(--space-2);
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -214,51 +194,51 @@
 
 .value {
     display: block;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--gray-900);
-    font-size: var(--text-lg);
+    font-size: var(--text-xl);
 }
 
 .value.urgent {
-    color: var(--red-600);
+    color: var(--error-600);
+    background: var(--error-50);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--error-200);
 }
 
-/* Rule Changes Card */
-.ruleCard {
-    border-left: 4px solid var(--yellow-500);
-}
-
-.ruleCard h3 {
-    color: var(--gray-900);
-    font-size: var(--text-xl);
-    font-weight: 600;
-    margin-bottom: var(--space-6);
-}
-
+/* Rule Changes Section - Updated with Rose Colors and very thin border */
 .yourSituation {
-    background: linear-gradient(135deg, var(--blue-50) 0%, white 100%);
-    border-left: 4px solid var(--blue-400);
-    padding: var(--space-4);
-    margin: var(--space-4) 0;
-    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    background: linear-gradient(135deg, #fdf2f8, #fce7f3);
+    /* Rose background */
+    border-left: 2px solid #ec4899;
+    /* Very thin rose border */
+    padding: var(--space-6);
+    margin: var(--space-6) 0;
+    border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+    box-shadow: var(--shadow-sm);
 }
 
 .yourSituation strong {
-    color: var(--blue-700);
+    color: #be185d;
+    /* Rose-700 */
+    font-weight: 600;
 }
 
+/* Changes Grid */
 .changesGrid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: var(--space-6);
-    margin: var(--space-6) 0;
+    gap: var(--space-8);
+    margin: var(--space-8) 0;
 }
 
 .changesSection {
-    background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+    background: linear-gradient(135deg, var(--gray-50), white);
     padding: var(--space-6);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-lg);
     border: 1px solid var(--gray-200);
+    box-shadow: var(--shadow-sm);
 }
 
 .changesSection h4 {
@@ -266,8 +246,31 @@
     margin: 0 0 var(--space-4) 0;
     font-size: var(--text-lg);
     font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--gray-200);
 }
 
+.changesSection h4::before {
+    content: '';
+    width: 2px;
+    height: 1.5rem;
+    border-radius: var(--radius-sm);
+}
+
+.changesSection:first-child h4::before {
+    background: #ec4899;
+    /* Rose for "What Changed" */
+}
+
+.changesSection:last-child h4::before {
+    background: var(--success-500);
+    /* Green for "What Stayed" */
+}
+
+/* Changes List */
 .changesSection ul {
     list-style: none;
     padding: 0;
@@ -275,392 +278,221 @@
 }
 
 .changesSection li {
-    padding: var(--space-2) 0;
+    padding: var(--space-3) 0;
     color: var(--gray-700);
     font-size: var(--text-base);
     border-bottom: 1px solid var(--gray-200);
     line-height: var(--leading-relaxed);
+    position: relative;
+    padding-left: var(--space-6);
+}
+
+.changesSection li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    font-weight: 700;
+    font-size: var(--text-lg);
+}
+
+.changesSection:first-child li::before {
+    color: #ec4899;
+    /* Rose bullets */
+}
+
+.changesSection:last-child li::before {
+    color: var(--success-500);
+    /* Green bullets */
 }
 
 .changesSection li:last-child {
     border-bottom: none;
 }
 
+/* Explanation Box - Very thin border */
 .explanation {
-    background: linear-gradient(135deg, var(--green-50) 0%, white 100%);
-    border-left: 4px solid var(--green-400);
-    padding: var(--space-4);
-    border-radius: 0 var(--radius-md) var(--radius-md) 0;
-    margin-top: var(--space-6);
+    background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+    /* Green background */
+    border-left: 2px solid var(--success-500);
+    padding: var(--space-6);
+    border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+    margin-top: var(--space-8);
+    box-shadow: var(--shadow-sm);
 }
 
 .explanation p {
     margin: 0;
     color: var(--gray-700);
     line-height: var(--leading-relaxed);
+    font-weight: 500;
 }
 
-/* Requirements Card */
-.requirementsCard {
-    border-left: 4px solid var(--green-500);
-}
-
-.requirementsCard h3 {
-    color: var(--gray-900);
-    font-size: var(--text-xl);
-    font-weight: 600;
-    margin-bottom: var(--space-6);
-}
-
-.requirementsList {
+/* Key Facts List */
+.factsList {
     display: flex;
     flex-direction: column;
-    gap: var(--space-6);
-}
-
-.requirement {
-    background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
-    padding: var(--space-6);
-    border-radius: var(--radius-md);
-    border: 1px solid var(--gray-200);
-}
-
-.requirementHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--space-3);
-}
-
-.requirementHeader .label {
-    font-size: var(--text-lg);
-    font-weight: 600;
-    color: var(--gray-900);
-    text-transform: none;
-    letter-spacing: normal;
-}
-
-.requirementHeader .value {
-    font-size: var(--text-xl);
-    font-weight: 700;
-    color: var(--primary-600);
-}
-
-.progressBar {
-    width: 100%;
-    height: 8px;
-    background-color: var(--gray-200);
-    border-radius: 4px;
-    overflow: hidden;
-    margin-bottom: var(--space-2);
-}
-
-.progressFill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--primary-500) 0%, var(--primary-600) 100%);
-    transition: width 0.3s ease;
-}
-
-.note {
-    margin: 0;
-    font-size: var(--text-sm);
-    color: var(--gray-600);
-    text-transform: none;
-    letter-spacing: normal;
-}
-
-/* Facts Card */
-.factsCard {
-    border-left: 4px solid var(--purple-500);
-}
-
-.factsCard h3 {
-    color: var(--gray-900);
-    font-size: var(--text-xl);
-    font-weight: 600;
-    margin-bottom: var(--space-6);
-}
-
-.factsList {
-    display: grid;
     gap: var(--space-4);
-}
-
-.fact {
-    background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
-    padding: var(--space-4);
-    border-radius: var(--radius-md);
-    border-left: 4px solid var(--blue-400);
-    border: 1px solid var(--gray-200);
-}
-
-.fact strong {
-    color: var(--gray-900);
-}
-
-/* Actions */
-.actions {
-    text-align: center;
-    padding: var(--space-8);
-    background: linear-gradient(135deg, var(--primary-50) 0%, white 100%);
-    border-radius: var(--radius-lg);
-    border: 2px dashed var(--primary-300);
-}
-
-.actionNote {
-    margin: var(--space-4) 0 0 0;
-    color: var(--gray-600);
-    font-size: var(--text-base);
-}
-
-.actionButtons {
-    display: flex;
-    gap: var(--space-4);
-    justify-content: center;
-    flex-wrap: wrap;
     margin-top: var(--space-6);
 }
 
-/* Error Card for Basic Dashboard */
-.errorCard {
-    border: 2px solid var(--red-200);
-    background: var(--red-50);
-}
-
-/* Dashboard Controls - if ever needed */
-.dashboardControls {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 2rem;
-}
-
-.controlGroup {
-    display: flex;
-    gap: 0.5rem;
-    justify-content: flex-start;
-    align-items: center;
-}
-
-.controlButton {
-    min-width: 200px;
-    text-align: center;
-    padding: 0.75rem 1rem;
-    font-weight: 500;
-}
-
-
-/* Legacy styles for compatibility - cleaner versions */
-.cpaInfoCard {
-    background: white;
+.factItem {
+    background: linear-gradient(135deg, var(--gray-50), white);
+    padding: var(--space-5);
     border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-sm);
     border: 1px solid var(--gray-200);
-    padding: var(--space-8);
-}
-
-.cpaDetails {
-    display: grid;
-    gap: var(--space-4);
-}
-
-.cpaField {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: var(--space-4);
-    background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
-    border-radius: var(--radius-md);
-    border: 1px solid var(--gray-200);
+    box-shadow: var(--shadow-sm);
 }
 
-.fieldLabel {
+.factLabel {
     font-weight: 600;
     color: var(--gray-700);
+    font-size: var(--text-base);
 }
 
-.fieldValue {
-    font-weight: 500;
+.factValue {
     color: var(--gray-900);
+    font-weight: 700;
+    font-size: var(--text-base);
 }
 
-.currentPeriodCard {
-    border-left: 4px solid var(--primary-600);
-    background: white;
+/* Upload Button - Perfectly centered with container */
+.uploadButton {
+    margin: var(--space-8) auto 0 auto;
+    padding: var(--space-4) var(--space-8);
+    background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+    color: white;
+    border: none;
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    font-size: var(--text-base);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    box-shadow: var(--shadow-md);
+    display: block;
+    text-align: center;
+    width: max-content;
 }
 
-.currentPeriodCard.urgent {
-    border-left-color: var(--red-500);
-    background: linear-gradient(135deg, var(--red-50) 0%, white 100%);
+/* Upload Button Container - Ensure proper centering */
+.uploadSection {
+    text-align: center;
+    padding: var(--space-8);
+    margin-top: var(--space-6);
 }
 
-.currentPeriodCard.expired {
-    border-left-color: var(--red-700);
-    background: linear-gradient(135deg, var(--red-100) 0%, white 100%);
+/* Fix white gap by ensuring full coverage */
+.dashboard {
+    padding: var(--space-8) var(--space-4) 0 var(--space-4);
+    min-height: calc(100vh - 120px);
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
 }
 
-.periodHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: var(--space-4);
+/* Ensure no gap at bottom */
+.factsCard:last-child {
+    margin-bottom: 0;
 }
 
-.currentPeriodInfo {
+/* Add padding to bottom of basicDashboard */
+.basicDashboard {
     display: flex;
     flex-direction: column;
-    gap: var(--space-6);
+    gap: var(--space-3);
+    max-width: 1000px;
+    margin: 0 auto;
+    padding-bottom: var(--space-8);
 }
 
-.periodRange {
-    font-size: var(--text-xl);
-    font-weight: 700;
-    color: var(--gray-900);
-    margin: 0 0 var(--space-2) 0;
-}
-
-.daysRemaining {
-    font-size: var(--text-lg);
-    font-weight: 500;
-    color: var(--gray-600);
-    margin: 0;
-}
-
-.requirementsGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: var(--space-4);
-}
-
-.requirementNumber {
-    font-size: var(--text-3xl);
-    font-weight: 700;
-    color: var(--primary-600);
-    margin-bottom: var(--space-2);
-}
-
-.requirementLabel {
-    font-size: var(--text-sm);
-    font-weight: 500;
-    color: var(--gray-600);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.statusInfo {
-    display: grid;
-    gap: var(--space-4);
-}
-
-.statusItem {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--space-3);
-    background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
-    border-radius: var(--radius-md);
-    border: 1px solid var(--gray-200);
-}
-
-.statusLabel {
-    font-weight: 500;
-    color: var(--gray-700);
-}
-
-.statusValue {
-    font-weight: 600;
-    color: var(--green-600);
+.uploadButton:hover {
+    background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
     .dashboard {
-        padding: var(--space-6) 0;
+        padding: var(--space-4) var(--space-2);
     }
 
-    .uploadSection {
-        padding: var(--space-8);
-    }
-
-    .uploadTitle {
-        font-size: var(--text-2xl);
+    .dashboard .container {
+        padding: 0 var(--space-2);
     }
 
     .basicDashboard {
-        gap: var(--space-6);
-        padding: 0 var(--space-4);
+        gap: var(--space-2);
+    }
+
+    .statusCard,
+    .ruleCard,
+    .factsCard {
+        padding: var(--space-6);
+        margin-bottom: var(--space-1);
     }
 
     .changesGrid {
         grid-template-columns: 1fr;
+        gap: var(--space-4);
     }
 
     .periodDates {
         grid-template-columns: 1fr;
-    }
-
-    .statusHeader {
-        flex-direction: column;
-        align-items: flex-start;
         gap: var(--space-4);
     }
 
-    .cpaField {
+    .cpaName {
+        font-size: var(--text-2xl);
+    }
+
+    .statusHeader,
+    .ruleHeader,
+    .factsHeader {
         flex-direction: column;
-        gap: var(--space-2);
         text-align: center;
+        gap: var(--space-2);
     }
 
-    .actionButtons {
+    .controlGroup {
         flex-direction: column;
-        align-items: center;
-    }
-
-    .actionButtons>* {
         width: 100%;
-        max-width: 300px;
     }
 
-    .errorActions {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .errorActions>* {
-        width: 100%;
-        max-width: 250px;
-    }
-
-    .requirementsGrid {
-        grid-template-columns: 1fr;
-    }
-
-    .statusItem {
+    .factItem {
         flex-direction: column;
         gap: var(--space-2);
         text-align: center;
     }
 }
 
-@media (max-width: 480px) {
-    .basicDashboard {
-        gap: var(--space-4);
+/* Animation for smooth loading */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
     }
 
-    .statusCard,
-    .ruleCard,
-    .requirementsCard,
-    .factsCard {
-        padding: var(--space-6);
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
+}
 
-    .periodInfo,
-    .changesSection,
-    .requirement {
-        padding: var(--space-4);
-    }
+.statusCard,
+.ruleCard,
+.factsCard {
+    animation: slideIn 0.5s ease-out;
+}
 
-    .uploadSection {
-        padding: var(--space-6);
-    }
+.statusCard {
+    animation-delay: 0.1s;
+}
+
+.ruleCard {
+    animation-delay: 0.2s;
+}
+
+.factsCard {
+    animation-delay: 0.3s;
 }
