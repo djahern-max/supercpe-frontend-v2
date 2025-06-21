@@ -1,9 +1,9 @@
-/* Enhanced Dashboard Styles with Better Spacing and Rose Color */
+/* Enhanced Dashboard Styles with Dark Blue Header and Styled Navigation - COMPLETE FILE */
 
 /* Main Container - Add proper centering and padding */
 .dashboard {
-    padding: var(--space-8) var(--space-4);
-    min-height: 100vh;
+    padding: var(--space-8) var(--space-4) 0 var(--space-4);
+    min-height: calc(100vh - 120px);
     background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
 }
 
@@ -13,13 +13,14 @@
     padding: 0 var(--space-4);
 }
 
-/* Header Section - Add margin and spacing */
+/* Header Section with Dark Blue Background to Match Home Page */
 .cpaHeader {
     text-align: center;
     margin-top: 0;
     margin-bottom: var(--space-4);
     padding: var(--space-6);
-    background: white;
+    background: #1e3b5a;
+    /* Dark blue to match home page hero */
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-lg);
     border: 1px solid var(--gray-200);
@@ -28,61 +29,52 @@
 .cpaName {
     font-size: var(--text-3xl);
     font-weight: 700;
-    color: var(--primary-600);
+    color: white;
+    /* White text on dark background */
     margin: 0 0 var(--space-1) 0;
-    /* Reduced from var(--space-3) to var(--space-1) */
-    background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
 }
 
 .cpaCredentials {
     font-size: var(--text-base);
-    color: var(--gray-600);
+    color: #93c5fd;
+    /* Light blue to match home page subtitle */
     margin: 0;
     font-weight: 500;
 }
 
-
-/* Tab Navigation - Add spacing */
+/* Tab Navigation - Improved styling to match design system */
 .dashboardControls {
     display: flex;
     justify-content: center;
     margin: 0;
     padding: 0 0 var(--space-6) 0;
-    /* Add bottom padding */
 }
 
 .controlGroup {
     display: flex;
     background: white;
     border-radius: var(--radius-xl);
-    padding: var(--space-2);
-    /* Add some internal padding */
+    padding: var(--space-1);
     box-shadow: var(--shadow-md);
     border: 1px solid var(--gray-200);
-    gap: var(--space-2);
-    /* Add gap between buttons */
+    gap: 0;
     margin: 0;
 }
 
+/* Navigation Buttons - Styled like professional tab interface */
 .controlButton {
-    padding: var(--space-3) var(--space-8);
-    /* Adjust button padding */
-    border-radius: var(--radius-lg);
-    /* Restore border radius for individual buttons */
-    font-weight: 500;
+    padding: var(--space-3) var(--space-6);
+    font-weight: 600;
     transition: all var(--transition-fast);
     white-space: nowrap;
     margin: 0;
     border: none;
-    background: transparent;
-    color: var(--gray-600);
     cursor: pointer;
+    font-size: var(--text-sm);
+    border-radius: var(--radius-lg);
 }
 
-/* Add border radius only to first and last buttons */
+/* First and last button styling */
 .controlButton:first-child {
     border-radius: var(--radius-xl) 0 0 var(--radius-xl);
 }
@@ -91,16 +83,42 @@
     border-radius: 0 var(--radius-xl) var(--radius-xl) 0;
 }
 
-/* Basic Dashboard Layout - Much tighter spacing between cards */
+/* Button state styling */
+.controlButton[data-variant="outline"],
+.controlButton.outline {
+    background: transparent;
+    color: var(--gray-600);
+}
+
+.controlButton[data-variant="outline"]:hover,
+.controlButton.outline:hover {
+    background: var(--gray-50);
+    color: var(--gray-800);
+}
+
+.controlButton[data-variant="primary"],
+.controlButton.primary {
+    background: var(--primary-600);
+    color: white;
+    box-shadow: var(--shadow-sm);
+}
+
+.controlButton[data-variant="primary"]:hover,
+.controlButton.primary:hover {
+    background: var(--primary-700);
+}
+
+/* Basic Dashboard Layout */
 .basicDashboard {
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
     max-width: 1000px;
     margin: 0 auto;
+    padding-bottom: var(--space-8);
 }
 
-/* Card Base Styles - Very tight margins and very thin borders */
+/* Card Base Styles */
 .statusCard,
 .ruleCard,
 .factsCard {
@@ -112,11 +130,13 @@
     position: relative;
     overflow: hidden;
     margin-bottom: var(--space-2);
+    animation: slideIn 0.5s ease-out;
 }
 
-/* Status Card (Blue) - Very thin border */
+/* Status Card (Blue) */
 .statusCard {
     border-left: 2px solid var(--primary-500);
+    animation-delay: 0.1s;
 }
 
 .statusCard::before {
@@ -129,10 +149,10 @@
     background: linear-gradient(180deg, var(--primary-500), var(--primary-600));
 }
 
-/* Rule Changes Card (Rose/Pink) - Very thin border */
+/* Rule Changes Card (Rose/Pink) */
 .ruleCard {
     border-left: 2px solid #ec4899;
-    /* Rose-500 */
+    animation-delay: 0.2s;
 }
 
 .ruleCard::before {
@@ -143,12 +163,12 @@
     width: 2px;
     height: 100%;
     background: linear-gradient(180deg, #ec4899, #db2777);
-    /* Rose gradient */
 }
 
-/* Key Facts Card (Green) - Very thin border */
+/* Key Facts Card (Green) */
 .factsCard {
     border-left: 2px solid var(--success-500);
+    animation-delay: 0.3s;
 }
 
 .factsCard::before {
@@ -161,7 +181,12 @@
     background: linear-gradient(180deg, var(--success-500), var(--success-600));
 }
 
-/* Card Headers - Add consistent spacing */
+/* Ensure no gap at bottom */
+.factsCard:last-child {
+    margin-bottom: 0;
+}
+
+/* Card Headers */
 .statusHeader,
 .ruleHeader,
 .factsHeader {
@@ -231,12 +256,32 @@
     border: 1px solid var(--error-200);
 }
 
-/* Rule Changes Section - Updated with Rose Colors and very thin border */
+/* Renewal Reminder */
+.renewalReminder {
+    margin-top: var(--space-6);
+    padding: var(--space-4);
+    background: linear-gradient(135deg, var(--warning-50), #fef3c7);
+    border: 1px solid var(--warning-200);
+    border-radius: var(--radius-lg);
+    border-left: 4px solid var(--warning-500);
+}
+
+.renewalReminder p {
+    margin: 0;
+    color: var(--warning-800);
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+}
+
+/* Period Info */
+.periodInfo {
+    margin-top: var(--space-6);
+}
+
+/* Rule Changes Section */
 .yourSituation {
     background: linear-gradient(135deg, #fdf2f8, #fce7f3);
-    /* Rose background */
     border-left: 2px solid #ec4899;
-    /* Very thin rose border */
     padding: var(--space-6);
     margin: var(--space-6) 0;
     border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
@@ -245,7 +290,6 @@
 
 .yourSituation strong {
     color: #be185d;
-    /* Rose-700 */
     font-weight: 600;
 }
 
@@ -286,12 +330,10 @@
 
 .changesSection:first-child h4::before {
     background: #ec4899;
-    /* Rose for "What Changed" */
 }
 
 .changesSection:last-child h4::before {
     background: var(--success-500);
-    /* Green for "What Stayed" */
 }
 
 /* Changes List */
@@ -321,22 +363,19 @@
 
 .changesSection:first-child li::before {
     color: #ec4899;
-    /* Rose bullets */
 }
 
 .changesSection:last-child li::before {
     color: var(--success-500);
-    /* Green bullets */
 }
 
 .changesSection li:last-child {
     border-bottom: none;
 }
 
-/* Explanation Box - Very thin border */
+/* Explanation Box */
 .explanation {
     background: linear-gradient(135deg, #ecfdf5, #d1fae5);
-    /* Green background */
     border-left: 2px solid var(--success-500);
     padding: var(--space-6);
     border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
@@ -382,7 +421,7 @@
     font-size: var(--text-base);
 }
 
-/* Upload Button - Perfectly centered with container */
+/* Upload Button */
 .uploadButton {
     margin: var(--space-8) auto 0 auto;
     padding: var(--space-4) var(--space-8);
@@ -400,39 +439,54 @@
     width: max-content;
 }
 
-/* Upload Button Container - Ensure proper centering */
+.uploadButton:hover {
+    background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Upload Button Container */
 .uploadSection {
     text-align: center;
     padding: var(--space-8);
     margin-top: var(--space-6);
 }
 
-/* Fix white gap by ensuring full coverage */
-.dashboard {
-    padding: var(--space-8) var(--space-4) 0 var(--space-4);
-    min-height: calc(100vh - 120px);
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-}
-
-/* Ensure no gap at bottom */
-.factsCard:last-child {
-    margin-bottom: 0;
-}
-
-/* Add padding to bottom of basicDashboard */
-.basicDashboard {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
-    max-width: 1000px;
-    margin: 0 auto;
-    padding-bottom: var(--space-8);
-}
-
-.uploadButton:hover {
-    background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
-    transform: translateY(-2px);
+/* Error Card Styles */
+.errorCard {
+    background: white;
+    border-radius: var(--radius-xl);
+    padding: var(--space-8);
     box-shadow: var(--shadow-lg);
+    border: 1px solid var(--error-200);
+    border-left: 4px solid var(--error-500);
+    text-align: center;
+}
+
+.errorCard h3 {
+    color: var(--error-600);
+    margin-bottom: var(--space-4);
+    font-size: var(--text-xl);
+    font-weight: 600;
+}
+
+.errorCard p {
+    color: var(--gray-600);
+    margin-bottom: var(--space-6);
+    line-height: var(--leading-relaxed);
+}
+
+/* Animation for smooth loading */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Responsive Design */
@@ -481,6 +535,20 @@
     .controlGroup {
         flex-direction: column;
         width: 100%;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    .controlButton {
+        width: 100%;
+        text-align: center;
+        border-radius: var(--radius-lg) !important;
+        margin-bottom: var(--space-1);
+    }
+
+    .controlButton:first-child,
+    .controlButton:last-child {
+        border-radius: var(--radius-lg) !important;
     }
 
     .factItem {
@@ -490,33 +558,23 @@
     }
 }
 
-/* Animation for smooth loading */
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
+/* Very small screens */
+@media (max-width: 480px) {
+    .cpaHeader {
+        padding: var(--space-4);
     }
 
-    to {
-        opacity: 1;
-        transform: translateY(0);
+    .cpaName {
+        font-size: var(--text-xl);
     }
-}
 
-.statusCard,
-.ruleCard,
-.factsCard {
-    animation: slideIn 0.5s ease-out;
-}
+    .dateItem {
+        padding: var(--space-4);
+    }
 
-.statusCard {
-    animation-delay: 0.1s;
-}
-
-.ruleCard {
-    animation-delay: 0.2s;
-}
-
-.factsCard {
-    animation-delay: 0.3s;
+    .statusCard,
+    .ruleCard,
+    .factsCard {
+        padding: var(--space-4);
+    }
 }
