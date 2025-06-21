@@ -1,12 +1,28 @@
-/* src/styles/components/ComplianceStatusSection.module.css */
+/* Enhanced ComplianceStatusSection Styles - Matching Reporting Dashboard */
 
 .complianceStatusSection {
     background: white;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-sm);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
     border: 1px solid var(--gray-200);
     padding: var(--space-8);
-    border-left: 4px solid var(--primary-600);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: var(--space-2);
+
+    /* Blue border like reporting dashboard */
+    border-left: 2px solid var(--primary-500);
+}
+
+/* Add gradient border effect */
+.complianceStatusSection::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(180deg, var(--primary-500), var(--primary-600));
 }
 
 /* Status Header */
@@ -15,6 +31,8 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: var(--space-6);
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid var(--gray-200);
 }
 
 .statusHeader h3 {
@@ -28,7 +46,6 @@
 .complianceGrid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    /* 3 equal columns */
     gap: var(--space-6);
     margin-bottom: var(--space-8);
 }
@@ -39,6 +56,7 @@
     padding: var(--space-6);
     border-radius: var(--radius-md);
     border: 1px solid var(--gray-200);
+    box-shadow: var(--shadow-sm);
 }
 
 .progressHeader {
@@ -87,6 +105,7 @@
     padding: var(--space-6);
     border-radius: var(--radius-md);
     border: 1px solid var(--gray-200);
+    box-shadow: var(--shadow-sm);
 }
 
 .annualRequirements h4 {

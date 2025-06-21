@@ -1,238 +1,114 @@
-/* Enhanced Compliance Dashboard Styles - COMPLETE FILE - Matching Reporting Dashboard Design */
+/* Enhanced ProfessionalCPEDashboard Styles - Focus on Header Section */
 
-/* Main Container - Match reporting dashboard */
-.complianceDashboard {
-    padding: var(--space-8) var(--space-4) 0 var(--space-4);
-    min-height: calc(100vh - 120px);
+.dashboard {
+    min-height: 100vh;
     background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    padding: 1.5rem;
 }
 
-/* Header Section - Dark blue header like reporting dashboard */
-.complianceHeader {
-    margin-bottom: var(--space-4);
-    padding-top: 0;
+.container {
     max-width: 1200px;
-    margin: 0 auto var(--space-4) auto;
-    padding: 0 var(--space-4);
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
-.breadcrumb {
-    margin-bottom: var(--space-4);
-}
-
-.backLink {
-    color: var(--primary-600);
-    text-decoration: none;
-    font-size: var(--text-sm);
-    font-weight: 500;
-    transition: color var(--transition-fast);
-}
-
-.backLink:hover {
-    color: var(--primary-700);
-}
-
-/* CPA Header Card - Dark blue to match reporting dashboard */
-.headerContent {
-    text-align: center;
-    padding: var(--space-6);
+/* Header Section - Dark Blue Background to Match Reporting Dashboard */
+.header {
     background: #1e3b5a;
-    /* Dark blue to match home page and reporting dashboard */
+    /* Dark blue to match reporting dashboard */
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-lg);
     border: 1px solid var(--gray-200);
-    margin-bottom: var(--space-6);
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 1.5rem;
 }
 
-.headerContent h1 {
-    font-size: var(--text-3xl);
+.cpaInfo h1 {
+    font-size: 1.5rem;
     font-weight: 700;
     color: white;
     /* White text on dark background */
-    margin: 0 0 var(--space-1) 0;
-}
-
-.cpaInfo h2 {
-    font-size: var(--text-xl);
-    font-weight: 600;
-    color: #93c5fd;
-    /* Light blue to match home page subtitle */
-    margin: 0 0 var(--space-1) 0;
+    margin: 0 0 0.5rem 0;
 }
 
 .cpaInfo p {
-    font-size: var(--text-base);
     color: #93c5fd;
-    /* Light blue for consistency */
-    margin: 0;
+    /* Light blue to match reporting dashboard */
+    margin: 0.25rem 0;
+    font-size: 0.875rem;
     font-weight: 500;
 }
 
-/* Dashboard Content - Match reporting dashboard layout */
-.dashboardContent {
+.userEmail {
     display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
-    /* Consistent spacing with reporting dashboard */
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 var(--space-4);
-    padding-bottom: var(--space-8);
+    align-items: center;
+    gap: 0.5rem;
+    color: #93c5fd;
+    /* Light blue to match other text */
+    font-weight: 500;
 }
 
-/* Card Base Styles - Match reporting dashboard cards */
-.complianceStatusSection,
-.periodSelector,
-.freemiumUploadSection,
-.uploadedCertificatesSection,
-.gettingStartedCard {
-    background: white;
-    border-radius: var(--radius-xl);
-    padding: var(--space-8);
-    box-shadow: var(--shadow-lg);
-    border: 1px solid var(--gray-200);
-    position: relative;
-    overflow: hidden;
-    margin-bottom: var(--space-2);
-    animation: slideIn 0.5s ease-out;
+.complianceOverview {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
 }
 
-/* Compliance Status Section - Blue border */
-.complianceStatusSection {
-    border-left: 2px solid var(--primary-500);
-    animation-delay: 0.1s;
+.statCard {
+    text-align: center;
+    min-width: 120px;
+    background: rgba(255, 255, 255, 0.1);
+    /* Semi-transparent white background */
+    padding: 1rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.complianceStatusSection::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 2px;
-    height: 100%;
-    background: linear-gradient(180deg, var(--primary-500), var(--primary-600));
+.statNumber {
+    font-size: 2rem;
+    font-weight: 700;
+    color: white;
+    /* White numbers on dark background */
+    display: block;
 }
 
-/* Period Selector - Purple border */
-.periodSelector {
-    border-left: 2px solid #8b5cf6;
-    animation-delay: 0.2s;
+.statLabel {
+    font-size: 0.875rem;
+    color: #93c5fd;
+    /* Light blue labels */
+    margin-top: 0.25rem;
+    font-weight: 500;
 }
 
-.periodSelector::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 2px;
-    height: 100%;
-    background: linear-gradient(180deg, #8b5cf6, #7c3aed);
-}
-
-/* Upload Section - Green border */
-.freemiumUploadSection {
-    border-left: 2px solid var(--success-500);
-    animation-delay: 0.3s;
-}
-
-.freemiumUploadSection::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 2px;
-    height: 100%;
-    background: linear-gradient(180deg, var(--success-500), var(--success-600));
-}
-
-/* Certificates Section - Orange border */
-.uploadedCertificatesSection {
-    border-left: 2px solid #f59e0b;
-    animation-delay: 0.4s;
-}
-
-.uploadedCertificatesSection::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 2px;
-    height: 100%;
-    background: linear-gradient(180deg, #f59e0b, #d97706);
-}
-
-/* Getting Started Card - Blue gradient background */
-.gettingStartedCard {
-    background: linear-gradient(135deg, var(--primary-50) 0%, white 100%);
-    border-left: 4px solid var(--primary-600);
-    animation-delay: 0.1s;
-}
-
-.gettingStartedCard h3 {
-    color: var(--gray-900);
-    margin-bottom: var(--space-4);
-    font-size: var(--text-xl);
-    font-weight: 600;
-}
-
-.gettingStartedCard ul {
-    margin: var(--space-4) 0;
-    padding-left: var(--space-6);
-}
-
-.gettingStartedCard li {
-    margin-bottom: var(--space-2);
-    color: var(--gray-700);
-    line-height: var(--leading-relaxed);
-}
-
-/* Card Headers - Consistent with reporting dashboard */
-.complianceStatusSection h3,
-.periodSelector h3,
-.freemiumUploadSection h3,
-.uploadedCertificatesSection h3 {
-    font-size: var(--text-xl);
-    font-weight: 600;
-    color: var(--gray-900);
-    margin: 0 0 var(--space-6) 0;
-    padding-bottom: var(--space-4);
-    border-bottom: 1px solid var(--gray-200);
-}
-
-/* Ensure no gap at bottom */
-.uploadedCertificatesSection:last-child,
-.freemiumUploadSection:last-child {
-    margin-bottom: 0;
-}
-
-/* Loading State */
+/* Loading and Error States */
 .loading {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 4rem 2rem;
+    padding: 3rem;
     text-align: center;
-    background: white;
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-lg);
-    border: 1px solid var(--gray-200);
-    animation: slideIn 0.5s ease-out;
 }
 
 .loading p {
-    margin-top: 1rem;
-    color: var(--gray-600);
-    font-size: var(--text-lg);
+    margin: 1rem 0 0.5rem 0;
+    color: #6b7280;
 }
 
-.loadingSpinner {
+.spinner {
     width: 2rem;
     height: 2rem;
-    border: 3px solid var(--gray-200);
-    border-top: 3px solid var(--primary-600);
+    border: 3px solid #e5e7eb;
+    border-top: 3px solid #2563eb;
     border-radius: 50%;
     animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
 }
 
 @keyframes spin {
@@ -245,310 +121,353 @@
     }
 }
 
-/* Error State */
 .error {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: var(--space-16);
+    padding: 3rem;
     text-align: center;
-    background: white;
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-lg);
-    border: 1px solid var(--error-200);
-    border-left: 4px solid var(--error-500);
-    margin: 2rem auto;
-    max-width: 600px;
-    animation: slideIn 0.5s ease-out;
 }
 
-.error h2 {
-    color: var(--error-600);
-    margin-bottom: var(--space-4);
-    font-size: var(--text-2xl);
-    font-weight: 600;
+.errorIcon {
+    width: 3rem;
+    height: 3rem;
+    color: #ef4444;
+    margin-bottom: 1rem;
+}
+
+.error h3 {
+    margin: 0 0 0.5rem 0;
+    color: #111827;
 }
 
 .error p {
-    color: var(--gray-600);
-    margin-bottom: var(--space-6);
-    line-height: var(--leading-relaxed);
+    color: #6b7280;
+    margin: 0 0 1.5rem 0;
 }
 
-.errorActions {
-    display: flex;
-    gap: var(--space-4);
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-/* Container for proper width constraint */
-.complianceDashboard .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 var(--space-4);
-}
-
-/* Tab Navigation Support - if needed for future consistency */
-.tabNavigation {
-    display: flex;
-    justify-content: center;
-    margin: 0;
-    padding: 0 0 var(--space-6) 0;
-}
-
-.tabGroup {
-    display: flex;
-    background: white;
-    border-radius: var(--radius-xl);
-    padding: var(--space-1);
-    box-shadow: var(--shadow-md);
-    border: 1px solid var(--gray-200);
-    gap: 0;
-    margin: 0;
-}
-
-.tabButton {
-    padding: var(--space-3) var(--space-6);
-    font-weight: 600;
-    transition: all var(--transition-fast);
-    white-space: nowrap;
-    margin: 0;
-    border: none;
-    cursor: pointer;
-    font-size: var(--text-sm);
-    border-radius: var(--radius-lg);
-}
-
-.tabButton:first-child {
-    border-radius: var(--radius-xl) 0 0 var(--radius-xl);
-}
-
-.tabButton:last-child {
-    border-radius: 0 var(--radius-xl) var(--radius-xl) 0;
-}
-
-.tabButton.active {
-    background: var(--primary-600);
+.retryButton {
+    padding: 0.75rem 1.5rem;
+    background-color: #2563eb;
     color: white;
-    box-shadow: var(--shadow-sm);
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
 }
 
-.tabButton.inactive {
-    background: transparent;
-    color: var(--gray-600);
+.retryButton:hover {
+    background-color: #1d4ed8;
 }
 
-.tabButton.inactive:hover {
-    background: var(--gray-50);
-    color: var(--gray-800);
-}
-
-/* Progress Elements */
-.progressSection {
-    margin-top: var(--space-4);
+.noData {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
     text-align: center;
 }
 
-.progressBar {
-    width: 100%;
-    height: 8px;
-    background-color: var(--gray-200);
-    border-radius: 4px;
-    overflow: hidden;
-    margin-bottom: var(--space-2);
+.noDataIcon {
+    width: 3rem;
+    height: 3rem;
+    color: #9ca3af;
+    margin-bottom: 1rem;
 }
 
-.progressFill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--primary-500) 0%, var(--primary-600) 100%);
-    transition: width 0.3s ease;
+.noData h3 {
+    margin: 0 0 0.5rem 0;
+    color: #111827;
 }
 
-/* Status Badges */
-.statusBadge {
-    display: inline-flex;
+.noData p {
+    color: #6b7280;
+    margin: 0;
+}
+
+/* Upload Section */
+.uploadSection {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+    padding: 1.5rem;
+}
+
+.uploadSection h2 {
+    display: flex;
     align-items: center;
-    gap: var(--space-1);
-    padding: var(--space-1) var(--space-2);
-    border-radius: var(--radius-md);
-    font-size: var(--text-xs);
+    gap: 0.5rem;
+    margin: 0 0 1.5rem 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.sectionIcon {
+    width: 1.25rem;
+    height: 1.25rem;
+    color: #6b7280;
+}
+
+/* Certificates Section */
+.certificatesSection {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+    padding: 1.5rem;
+}
+
+.certificatesSection h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0 0 1.5rem 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.noCertificates {
+    text-align: center;
+    padding: 3rem;
+    color: #6b7280;
+}
+
+.noCertificatesIcon {
+    width: 3rem;
+    height: 3rem;
+    color: #9ca3af;
+    margin: 0 auto 1rem;
+}
+
+.noCertificates h3 {
+    margin: 0 0 0.5rem 0;
+    color: #111827;
+    font-weight: 600;
+}
+
+.noCertificates p {
+    margin: 0;
+}
+
+/* Certificate Cards */
+.certificatesList {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.certificateCard {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    background-color: #fafbff;
+    transition: box-shadow 0.2s;
+}
+
+.certificateCard:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.certificateHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.fileInfo {
+    flex: 1;
+}
+
+.fileName {
+    margin: 0 0 0.5rem 0;
+    color: #111827;
+    font-size: 1.125rem;
+    font-weight: 600;
+}
+
+.fileMeta {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.certificateActions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.certificateDetails {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.dataGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    flex: 1;
+}
+
+.dataItem {
+    background: white;
+    padding: 0.75rem;
+    border-radius: 0.375rem;
+    border: 1px solid #e5e7eb;
+    text-align: center;
+}
+
+.dataLabel {
+    display: block;
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-bottom: 0.25rem;
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.025em;
 }
 
-.statusBadge.current {
-    background: var(--success-100);
-    color: var(--success-700);
-}
-
-.statusBadge.expired {
-    background: var(--error-100);
-    color: var(--error-700);
-}
-
-.statusBadge.upcoming {
-    background: var(--warning-100);
-    color: var(--warning-700);
-}
-
-/* Info Cards */
-.infoCard {
-    background: linear-gradient(135deg, var(--blue-50) 0%, white 100%);
-    border-left: 4px solid var(--primary-400);
-    padding: var(--space-4);
-    border-radius: 0 var(--radius-md) var(--radius-md) 0;
-    margin: var(--space-4) 0;
-}
-
-.infoCard h4 {
-    margin: 0 0 var(--space-2) 0;
-    color: var(--gray-900);
-    font-size: var(--text-lg);
-    font-weight: 600;
-}
-
-.infoCard p {
-    margin: 0;
-    color: var(--gray-700);
-    line-height: var(--leading-relaxed);
-}
-
-/* Summary Stats */
-.summaryStats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: var(--space-4);
-    margin: var(--space-6) 0;
-}
-
-.statCard {
-    background: white;
-    padding: var(--space-4);
-    border-radius: var(--radius-md);
-    text-align: center;
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--gray-200);
-}
-
-.statNumber {
+.dataValue {
     display: block;
-    font-size: var(--text-2xl);
-    font-weight: 700;
-    color: var(--primary-600);
-    margin-bottom: var(--space-1);
+    font-weight: 600;
+    color: #111827;
 }
 
-.statLabel {
-    font-size: var(--text-sm);
-    color: var(--gray-600);
+.certificateMeta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.processingBadge,
+.storageTier {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
     font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
 }
 
-/* Smooth animation for cards */
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
+.aiProcessed,
+.premiumTier {
+    background: #dcfce7;
+    color: #166534;
+}
 
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.manualEntry,
+.freeTier {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+/* Period Section */
+.periodSection {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+    padding: 1.5rem;
+}
+
+.periodSection h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0 0 1.5rem 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.periodAnalysis {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background-color: var(--gray-50);
+    border-radius: 0.375rem;
+    border: 1px solid #e5e7eb;
+}
+
+.periodAnalysis h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.analysisContent {
+    background-color: #1f2937;
+    color: var(--gray-50);
+    padding: 1rem;
+    border-radius: 0.375rem;
+    font-family: 'Monaco', 'Courier New', monospace;
+    font-size: 0.875rem;
+    overflow-x: auto;
+}
+
+.analysisContent pre {
+    margin: 0;
+    white-space: pre-wrap;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .complianceDashboard {
-        padding: var(--space-4) var(--space-2);
+    .dashboard {
+        padding: 1rem;
     }
 
-    .complianceHeader,
-    .dashboardContent {
-        padding-left: var(--space-2);
-        padding-right: var(--space-2);
-    }
-
-    .dashboardContent {
-        gap: var(--space-2);
-    }
-
-    .complianceStatusSection,
-    .periodSelector,
-    .freemiumUploadSection,
-    .uploadedCertificatesSection,
-    .gettingStartedCard {
-        padding: var(--space-6);
-        margin-bottom: var(--space-1);
-    }
-
-    .headerContent h1 {
-        font-size: var(--text-2xl);
-    }
-
-    .cpaInfo h2 {
-        font-size: var(--text-lg);
-    }
-
-    .errorActions {
+    .header {
         flex-direction: column;
-        align-items: center;
+        align-items: stretch;
     }
 
-    .errorActions>* {
-        width: 100%;
-        max-width: 250px;
+    .complianceOverview {
+        justify-content: space-between;
     }
 
-    .tabGroup {
+    .statCard {
+        flex: 1;
+        min-width: 100px;
+    }
+
+    .certificateHeader {
         flex-direction: column;
-        width: 100%;
-        max-width: 400px;
-        margin: 0 auto;
+        align-items: stretch;
+        gap: 0.75rem;
     }
 
-    .tabButton {
-        width: 100%;
-        text-align: center;
-        border-radius: var(--radius-lg) !important;
-        margin-bottom: var(--space-1);
+    .certificateActions {
+        justify-content: flex-end;
     }
 
-    .tabButton:first-child,
-    .tabButton:last-child {
-        border-radius: var(--radius-lg) !important;
+    .certificateDetails {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
     }
 
-    .summaryStats {
-        grid-template-columns: repeat(3, 1fr);
+    .certificateMeta {
+        align-items: flex-start;
+        flex-direction: row;
+        justify-content: space-between;
     }
 }
 
-/* Very small screens */
 @media (max-width: 480px) {
-    .headerContent {
-        padding: var(--space-4);
-    }
-
-    .headerContent h1 {
-        font-size: var(--text-xl);
-    }
-
-    .complianceStatusSection,
-    .periodSelector,
-    .freemiumUploadSection,
-    .uploadedCertificatesSection,
-    .gettingStartedCard {
-        padding: var(--space-4);
-    }
-
-    .summaryStats {
-        grid-template-columns: 1fr;
+    .complianceOverview {
+        flex-direction: column;
+        gap: 1rem;
     }
 
     .statCard {
@@ -556,5 +475,13 @@
         justify-content: space-between;
         align-items: center;
         text-align: left;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 0.375rem;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .statNumber {
+        font-size: 1.5rem;
     }
 }

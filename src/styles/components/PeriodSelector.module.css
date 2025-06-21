@@ -1,31 +1,49 @@
-/* src/styles/components/PeriodSelector.module.css */
+/* Enhanced PeriodSelector Styles - Matching Reporting Dashboard */
 
 .periodSelector {
     background: white;
-    border-radius: 12px;
-    border: 1px solid #e5e7eb;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-    margin-top: 1.5rem;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--gray-200);
+    padding: var(--space-8);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: var(--space-2);
+
+    /* Purple border for variety */
+    border-left: 2px solid #8b5cf6;
+}
+
+/* Add gradient border effect */
+.periodSelector::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(180deg, #8b5cf6, #7c3aed);
 }
 
 .selectorHeader {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    padding: 1.5rem 1.5rem 1rem;
-    border-bottom: 1px solid #f1f5f9;
+    margin-bottom: var(--space-6);
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid var(--gray-200);
 }
 
 .selectorHeader h3 {
     margin: 0;
-    font-size: 1.125rem;
+    font-size: var(--text-xl);
     font-weight: 600;
-    color: #111827;
+    color: var(--gray-900);
     flex: 1;
 }
 
 .selectorHeader svg {
-    color: #6b7280;
+    color: var(--gray-600);
     flex-shrink: 0;
 }
 
@@ -33,40 +51,40 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    font-size: 0.875rem;
-    color: #3b82f6;
+    font-size: var(--text-sm);
+    color: var(--primary-600);
     font-weight: 500;
 }
 
 .selectorContent {
-    padding: 1rem 1.5rem 1.5rem;
+    padding: 0;
 }
 
 .dropdownWrapper {
     position: relative;
-    margin-bottom: 1rem;
+    margin-bottom: var(--space-4);
 }
 
 .dropdown {
     width: 100%;
-    padding: 0.875rem 1rem;
-    font-size: 0.875rem;
-    border: 2px solid #e5e7eb;
-    border-radius: 8px;
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--text-base);
+    border: 2px solid var(--gray-300);
+    border-radius: var(--radius-lg);
     background: white;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--transition-fast);
     appearance: none;
     background-image: url("data:image/svg+xml;charset=US-ASCII,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'><polyline points='6,9 12,15 18,9'></polyline></svg>");
     background-repeat: no-repeat;
-    background-position: right 0.75rem center;
+    background-position: right var(--space-3) center;
     background-size: 16px;
     padding-right: 2.5rem;
 }
 
 .dropdown:focus {
     outline: none;
-    border-color: #3b82f6;
+    border-color: var(--primary-500);
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
@@ -76,42 +94,43 @@
 }
 
 .selectedPeriodCard {
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 1rem;
+    background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    box-shadow: var(--shadow-sm);
 }
 
 .periodInfo {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: var(--space-4);
 }
 
 .periodTitle {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 1rem;
+    gap: var(--space-4);
 }
 
 .periodLabel {
     font-weight: 600;
-    color: #111827;
-    font-size: 1rem;
+    color: var(--gray-900);
+    font-size: var(--text-lg);
 }
 
 .periodDetails {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    font-size: 0.875rem;
-    color: #6b7280;
+    font-size: var(--text-sm);
+    color: var(--gray-600);
     font-weight: 500;
 }
 
 .periodDetails svg {
-    color: #9ca3af;
+    color: var(--gray-500);
     flex-shrink: 0;
 }
 
@@ -119,12 +138,12 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    margin-top: 0.75rem;
-    padding: 0.5rem 0.75rem;
+    margin-top: var(--space-4);
+    padding: var(--space-3) var(--space-4);
     background: rgba(34, 197, 94, 0.1);
     border: 1px solid rgba(34, 197, 94, 0.2);
-    border-radius: 6px;
-    font-size: 0.875rem;
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
     color: #166534;
     font-weight: 500;
 }
@@ -138,19 +157,18 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.75rem;
-    padding: 2rem;
-    color: #6b7280;
-    font-size: 0.875rem;
+    padding: var(--space-8);
+    color: var(--gray-600);
 }
 
-.spinner {
-    width: 1.25rem;
-    height: 1.25rem;
-    border: 2px solid #e5e7eb;
-    border-top: 2px solid #3b82f6;
+.loadingSpinner {
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 2px solid var(--gray-200);
+    border-top: 2px solid var(--primary-600);
     border-radius: 50%;
     animation: spin 1s linear infinite;
+    margin-right: var(--space-2);
 }
 
 @keyframes spin {
@@ -165,55 +183,23 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .selectorHeader {
-        padding: 1rem;
-        flex-wrap: wrap;
-        gap: 0.5rem;
+    .periodSelector {
+        padding: var(--space-6);
     }
 
-    .selectorContent {
-        padding: 0.75rem 1rem 1rem;
+    .selectorHeader {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-2);
     }
 
     .periodTitle {
         flex-direction: column;
         align-items: flex-start;
-        gap: 0.5rem;
-    }
-
-    .dropdown {
-        font-size: 0.875rem;
-        padding: 0.75rem;
-        padding-right: 2.25rem;
+        gap: var(--space-2);
     }
 
     .selectedPeriodCard {
-        padding: 0.875rem;
-    }
-
-    .analyzing {
-        width: 100%;
-        justify-content: center;
-        padding: 0.5rem;
-        background: #f0f4ff;
-        border-radius: 6px;
-    }
-}
-
-@media (max-width: 480px) {
-    .selectorHeader h3 {
-        font-size: 1rem;
-    }
-
-    .periodLabel {
-        font-size: 0.875rem;
-    }
-
-    .periodDetails {
-        font-size: 0.8125rem;
-    }
-
-    .currentPeriodNote {
-        font-size: 0.8125rem;
+        padding: var(--space-4);
     }
 }
