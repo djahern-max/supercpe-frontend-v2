@@ -148,6 +148,12 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
                     </div>
                 </div>
             </div>
+            {/* Period Selector - Now directly below upload */}
+            <PeriodSelector
+                licenseNumber={licenseNumber}
+                onPeriodSelect={handlePeriodSelect}
+                onAnalysisLoad={handleAnalysisLoad}
+            />
 
             {/* Redesigned Upload Section */}
             <RedesignedUploadSection
@@ -156,12 +162,7 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
                 onUploadSuccess={handleUploadSuccess}
             />
 
-            {/* Period Selector - Now directly below upload */}
-            <PeriodSelector
-                licenseNumber={licenseNumber}
-                onPeriodSelect={handlePeriodSelect}
-                onAnalysisLoad={handleAnalysisLoad}
-            />
+
 
             {/* Certificates Section */}
             <div className={styles.certificatesSection}>

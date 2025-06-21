@@ -106,17 +106,7 @@ const RedesignedUploadSection = ({ licenseNumber, cpaName, onUploadSuccess }) =>
         // Authenticated user - show full upload interface
         return (
             <div className={styles.uploadContainer}>
-                <div className={styles.uploadHeader}>
-                    <div className={styles.headerContent}>
-                        <div className={styles.iconWrapper}>
-                            <Upload className={styles.uploadIcon} size={24} />
-                        </div>
-                        <div className={styles.headerText}>
-                            <h2>Upload CPE Certificate</h2>
-                            <p>Drag and drop your certificate or click to browse</p>
-                        </div>
-                    </div>
-                </div>
+
 
                 <div
                     className={`${styles.uploadZone} ${dragActive ? styles.dragActive : ''} ${uploading ? styles.uploading : ''}`}
@@ -154,20 +144,6 @@ const RedesignedUploadSection = ({ licenseNumber, cpaName, onUploadSuccess }) =>
                     </div>
                 </div>
 
-                <div className={styles.features}>
-                    <div className={styles.feature}>
-                        <Zap size={16} />
-                        <span>AI-powered extraction</span>
-                    </div>
-                    <div className={styles.feature}>
-                        <Shield size={16} />
-                        <span>Secure cloud storage</span>
-                    </div>
-                    <div className={styles.feature}>
-                        <Clock size={16} />
-                        <span>Instant compliance tracking</span>
-                    </div>
-                </div>
             </div>
         );
     }
