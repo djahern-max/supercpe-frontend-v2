@@ -13,7 +13,7 @@
     --primary-900: #0c4a6e;
 
     /* Professional Grays */
-    --gray-50: #f9fafb;
+    --gray-50: var(--gray-50);
     --gray-100: #f3f4f6;
     --gray-200: #e5e7eb;
     --gray-300: #d1d5db;

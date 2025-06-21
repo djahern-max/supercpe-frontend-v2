@@ -88,7 +88,7 @@
 }
 
 .input:disabled {
-    background-color: #f9fafb;
+    background-color: var(--gray-50);
     color: #6b7280;
     cursor: not-allowed;
 }
@@ -151,7 +151,7 @@
 .footer {
     padding: 1rem 1.5rem;
     border-top: 1px solid #e5e7eb;
-    background-color: #f9fafb;
+    background-color: var(--gray-50);
     border-radius: 0 0 12px 12px;
 }
 

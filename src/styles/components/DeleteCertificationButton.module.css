@@ -103,7 +103,7 @@
 }
 
 .cancelButton:hover {
-    background-color: #f9fafb;
+    background-color: var(--gray-50);
 }
 
 .confirmButton {

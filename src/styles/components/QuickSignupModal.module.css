@@ -63,7 +63,7 @@
 /* Value Proposition Section */
 .valueProposition {
     padding: 24px 32px;
-    background: #f9fafb;
+    background: var(--gray-50);
     border-bottom: 1px solid #f3f4f6;
 }
 
@@ -138,7 +138,7 @@
 }
 
 .input:disabled {
-    background-color: #f9fafb;
+    background-color: var(--gray-50);
     color: #6b7280;
     cursor: not-allowed;
 }
@@ -223,7 +223,7 @@
     display: flex;
     justify-content: space-around;
     padding: 20px 32px;
-    background: #f9fafb;
+    background: var(--gray-50);
     border-top: 1px solid #f3f4f6;
 }
 
@@ -274,7 +274,7 @@
     justify-content: space-between;
     padding: 16px 32px;
     border-bottom: 1px solid #f3f4f6;
-    background-color: #f9fafb;
+    background-color: var(--gray-50);
     flex-wrap: wrap;
     gap: 12px;
     text-align: center;

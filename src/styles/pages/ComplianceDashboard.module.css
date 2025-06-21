@@ -1,16 +1,18 @@
 /* src/styles/pages/ComplianceDashboard.module.css */
 
 .complianceDashboard {
-    padding: var(--space-4) 0;
-    /* Reduced from var(--space-8) */
+    padding: var(--space-2) 0;
+    /* Reduced from var(--space-4) to var(--space-2) */
     min-height: 100vh;
     background: var(--gray-50);
 }
 
 /* Header Section */
 .complianceHeader {
-    margin-bottom: var(--space-4);
-    /* Reduced from var(--space-8) */
+    margin-bottom: 0;
+    /* Remove bottom margin */
+    padding-top: var(--space-4);
+    /* Small top padding only */
 }
 
 .breadcrumb {
@@ -33,7 +35,8 @@
     font-size: var(--text-3xl);
     font-weight: 700;
     color: var(--gray-900);
-    margin: 0 0 var(--space-2) 0;
+    margin: 0 0 var(--space-1) 0;
+    /* Reduced from var(--space-2) to var(--space-1) */
 }
 
 .cpaInfo h2 {
@@ -41,6 +44,7 @@
     font-weight: 600;
     color: var(--primary-600);
     margin: 0 0 var(--space-1) 0;
+    /* Reduced from var(--space-1) to keep tight */
 }
 
 .cpaInfo p {

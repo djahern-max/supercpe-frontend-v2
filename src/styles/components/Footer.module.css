@@ -1,8 +1,11 @@
+/* src/styles/components/Footer.module.css - Fixed Version */
+
 .footer {
     background-color: #1e3b5a;
     color: #e5e7eb;
     padding: 2rem 0;
-    margin-top: var(--space-16);
+    margin-top: 0;
+    /* Remove the margin that creates white space */
 }
 
 .footerContent {

@@ -16,8 +16,9 @@
 /* Header Section - Add margin and spacing */
 .cpaHeader {
     text-align: center;
-    margin-bottom: var(--space-12);
-    padding: var(--space-8);
+    margin-top: 0;
+    margin-bottom: var(--space-4);
+    padding: var(--space-6);
     background: white;
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-lg);
@@ -28,7 +29,8 @@
     font-size: var(--text-3xl);
     font-weight: 700;
     color: var(--primary-600);
-    margin: 0 0 var(--space-3) 0;
+    margin: 0 0 var(--space-1) 0;
+    /* Reduced from var(--space-3) to var(--space-1) */
     background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -42,29 +44,51 @@
     font-weight: 500;
 }
 
+
 /* Tab Navigation - Add spacing */
 .dashboardControls {
     display: flex;
     justify-content: center;
-    margin-bottom: var(--space-12);
+    margin: 0;
+    padding: 0 0 var(--space-6) 0;
+    /* Add bottom padding */
 }
 
 .controlGroup {
     display: flex;
     background: white;
     border-radius: var(--radius-xl);
-    padding: var(--space-4);
+    padding: var(--space-2);
+    /* Add some internal padding */
     box-shadow: var(--shadow-md);
     border: 1px solid var(--gray-200);
-    gap: var(--space-8);
+    gap: var(--space-2);
+    /* Add gap between buttons */
+    margin: 0;
 }
 
 .controlButton {
-    padding: var(--space-4) var(--space-12);
+    padding: var(--space-3) var(--space-8);
+    /* Adjust button padding */
     border-radius: var(--radius-lg);
+    /* Restore border radius for individual buttons */
     font-weight: 500;
     transition: all var(--transition-fast);
     white-space: nowrap;
+    margin: 0;
+    border: none;
+    background: transparent;
+    color: var(--gray-600);
+    cursor: pointer;
+}
+
+/* Add border radius only to first and last buttons */
+.controlButton:first-child {
+    border-radius: var(--radius-xl) 0 0 var(--radius-xl);
+}
+
+.controlButton:last-child {
+    border-radius: 0 var(--radius-xl) var(--radius-xl) 0;
 }
 
 /* Basic Dashboard Layout - Much tighter spacing between cards */
