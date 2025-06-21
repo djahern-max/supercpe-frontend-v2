@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
+import FreemiumUploadSection from './FreemiumUploadSection'; // Add freemium upload
 import { apiService } from '../../services/api';
 import { formatDate } from '../../utils/dateUtils';
 import styles from '../../styles/pages/Dashboard.module.css'; // Use same styles as BasicDashboardView
@@ -10,10 +11,12 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
     const [cpa, setCpa] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [uploadCount, setUploadCount] = useState(0); // Track upload count
 
     useEffect(() => {
         if (licenseNumber) {
             loadCPAData();
+            loadUploadCount(); // Load current upload count
         }
     }, [licenseNumber]);
 
@@ -37,6 +40,24 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const loadUploadCount = async () => {
+        try {
+            // Get current upload count for freemium tracking
+            const status = await apiService.getFreeTierStatus(licenseNumber);
+            setUploadCount(status.uploads_used || 0);
+        } catch (error) {
+            console.error('Error loading upload count:', error);
+            // Don't show error to user, just default to 0
+            setUploadCount(0);
+        }
+    };
+
+    const handleUploadSuccess = async (result) => {
+        console.log('Upload successful:', result);
+        // Refresh upload count after successful upload
+        await loadUploadCount();
     };
 
     // Show loading state
@@ -94,7 +115,14 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
 
 
 
-            {/* TODO: Add new CPE-specific cards here as you build them */}
+            {/* Upload Certificate Section - First section after header */}
+            <FreemiumUploadSection
+                licenseNumber={licenseNumber}
+                uploadCount={uploadCount}
+                onUploadSuccess={handleUploadSuccess}
+            />
+
+            {/* TODO: Add more CPE-specific cards here as you build them */}
 
         </div>
     );
