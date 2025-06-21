@@ -423,7 +423,7 @@
 
 /* Upload Button */
 .uploadButton {
-    margin: var(--space-8) auto 0 auto;
+    margin: var(--space-4) auto 0 auto;
     padding: var(--space-4) var(--space-8);
     background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
     color: white;
@@ -448,8 +448,8 @@
 /* Upload Button Container */
 .uploadSection {
     text-align: center;
-    padding: var(--space-8);
-    margin-top: var(--space-6);
+    padding: var(--space-4);
+    margin-top: var(--space-4);
 }
 
 /* Error Card Styles */
