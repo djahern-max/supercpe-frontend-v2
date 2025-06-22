@@ -1,14 +1,16 @@
-// Create this file: src/pages/PaymentSuccessPage.js
+// src/pages/PaymentSuccessPage.js - Updated to get license number from user profile
 
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { CheckCircle, Loader } from 'lucide-react';
+import { CheckCircle, Loader, X } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import apiService from '../services/api';
 
 const PaymentSuccessPage = () => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const [status, setStatus] = useState('processing'); // 'processing', 'success', 'error'
+    const [userLicense, setUserLicense] = useState(null);
     const sessionId = searchParams.get('session_id');
 
     useEffect(() => {
@@ -21,21 +23,39 @@ const PaymentSuccessPage = () => {
             }
 
             try {
-                // Give Stripe webhooks a moment to process
-                await new Promise(resolve => setTimeout(resolve, 2000));
+                // First, get the current user to determine license number
+                const currentUser = await apiService.getCurrentUser();
+                setUserLicense(currentUser.license_number);
 
-                // Show success and redirect to dashboard
+                // Give Stripe webhooks a moment to process
+                console.log('Waiting for webhook processing...');
+                await new Promise(resolve => setTimeout(resolve, 3000));
+
+                // Optionally verify the payment was processed by calling our test endpoint
+                try {
+                    const testResult = await fetch('https://nh.supercpe.com/api/payments/test-webhook', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ session_id: sessionId })
+                    });
+
+                    if (testResult.ok) {
+                        console.log('Payment processed successfully via test endpoint');
+                    }
+                } catch (error) {
+                    console.log('Test endpoint call failed, but continuing...');
+                }
+
+                // Show success
                 setStatus('success');
                 toast.success('🎉 Subscription activated successfully!');
 
                 // Redirect to dashboard after showing success message
                 setTimeout(() => {
-                    // Try to get the license number from localStorage or other state
-                    const lastLicenseNumber = localStorage.getItem('lastViewedLicense') ||
-                        sessionStorage.getItem('currentLicense');
-
-                    if (lastLicenseNumber) {
-                        navigate(`/dashboard/${lastLicenseNumber}`);
+                    if (currentUser.license_number) {
+                        navigate(`/dashboard/${currentUser.license_number}`);
                     } else {
                         // Fallback to home page
                         navigate('/');
@@ -83,7 +103,7 @@ const PaymentSuccessPage = () => {
                             background: '#dbeafe',
                             borderRadius: '50%'
                         }}>
-                            <Loader size={32} color="#3b82f6" className="animate-spin" />
+                            <Loader size={32} color="#3b82f6" style={{ animation: 'spin 1s linear infinite' }} />
                         </div>
                         <h1 style={{
                             fontSize: '24px',
@@ -145,7 +165,7 @@ const PaymentSuccessPage = () => {
                                 fontSize: '14px',
                                 margin: 0
                             }}>
-                                Redirecting you to your dashboard...
+                                Redirecting you to your dashboard{userLicense ? ` (${userLicense})` : ''}...
                             </p>
                         </div>
                     </>
@@ -193,6 +213,25 @@ const PaymentSuccessPage = () => {
                 }}>
                     Session ID: {sessionId ? `${sessionId.substring(0, 20)}...` : 'Not found'}
                 </div>
+
+                {/* Manual redirect button for fallback */}
+                {status === 'success' && (
+                    <button
+                        onClick={() => navigate(userLicense ? `/dashboard/${userLicense}` : '/')}
+                        style={{
+                            marginTop: '16px',
+                            padding: '12px 24px',
+                            background: '#3b82f6',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '8px',
+                            fontSize: '14px',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        Go to Dashboard Now
+                    </button>
+                )}
             </div>
         </div>
     );
