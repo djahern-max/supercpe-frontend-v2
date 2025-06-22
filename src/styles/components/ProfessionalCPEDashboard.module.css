@@ -1,4 +1,4 @@
-/* Enhanced ProfessionalCPEDashboard Styles - COMPLETE FILE - Matching Reporting Requirements Design */
+/* Enhanced ProfessionalCPEDashboard Styles - COMPLETE FILE - With CE Broker Integration */
 
 .dashboard {
     min-height: 100vh;
@@ -12,40 +12,46 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
-    /* Same spacing as Reporting Requirements */
     padding: 0 var(--space-4);
     padding-bottom: var(--space-8);
 }
 
 /* Header Section - Dark Blue Background to Match Reporting Dashboard */
-.header {
+.header,
+.cpaHeader {
     background: #1e3b5a;
-    /* Dark blue to match reporting dashboard */
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-lg);
     border: 1px solid var(--gray-200);
     padding: var(--space-6);
-    /* Match reporting dashboard padding */
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     flex-wrap: wrap;
     gap: 1.5rem;
     margin-bottom: var(--space-2);
-    /* Consistent with other cards */
+    text-align: center;
 }
 
-.cpaInfo h1 {
+/* Ensure CPA header has dark blue background */
+.cpaHeader {
+    display: block;
+    text-align: center;
+}
+
+.cpaInfo h1,
+.cpaHeader h1,
+.cpaName {
     font-size: var(--text-3xl);
     font-weight: 700;
     color: white;
-    /* White text on dark background */
     margin: 0 0 var(--space-1) 0;
 }
 
-.cpaInfo p {
+.cpaInfo p,
+.cpaHeader p,
+.cpaCredentials {
     color: #93c5fd;
-    /* Light blue to match reporting dashboard */
     margin: 0.25rem 0;
     font-size: var(--text-base);
     font-weight: 500;
@@ -56,7 +62,6 @@
     align-items: center;
     gap: 0.5rem;
     color: #93c5fd;
-    /* Light blue to match other text */
     font-weight: 500;
 }
 
@@ -66,31 +71,27 @@
     flex-wrap: wrap;
 }
 
-/* FIXED: Clean stat cards without ugly semi-transparent backgrounds */
+/* Clean stat cards */
 .statCard {
     text-align: center;
     min-width: 120px;
     background: white;
-    /* Clean white background instead of semi-transparent */
     padding: var(--space-4);
     border-radius: var(--radius-lg);
     border: 1px solid rgba(255, 255, 255, 0.3);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    /* Subtle shadow for depth */
 }
 
 .statNumber {
     font-size: var(--text-2xl);
     font-weight: 700;
     color: var(--primary-600);
-    /* Blue numbers for contrast */
     display: block;
 }
 
 .statLabel {
     font-size: var(--text-sm);
     color: var(--gray-600);
-    /* Darker gray for readability */
     margin-top: 0.25rem;
     font-weight: 500;
 }
@@ -98,7 +99,8 @@
 /* Card sections with proper spacing and color borders */
 .uploadSection,
 .certificatesSection,
-.periodSection {
+.periodSection,
+.statusCard {
     background: white;
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-lg);
@@ -109,27 +111,14 @@
     margin-bottom: var(--space-2);
 }
 
-/* Period Selector - Purple border */
-.periodSection {
-    border-left: 2px solid #8b5cf6;
-}
-
-.periodSection::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 2px;
-    height: 100%;
-    background: linear-gradient(180deg, #8b5cf6, #7c3aed);
-}
-
 /* Upload Section - Green border */
-.uploadSection {
+.uploadSection,
+.statusCard {
     border-left: 2px solid var(--success-500);
 }
 
-.uploadSection::before {
+.uploadSection::before,
+.statusCard::before {
     content: '';
     position: absolute;
     top: 0;
@@ -139,40 +128,359 @@
     background: linear-gradient(180deg, var(--success-500), var(--success-600));
 }
 
-/* Certificates Section - Orange border */
-.certificatesSection {
-    border-left: 2px solid #f59e0b;
+/* NEW: CE Broker Section - Blue border to match design system */
+.ceBrokerSection {
+    background: white;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--gray-200);
+    padding: var(--space-8);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: var(--space-2);
+    border-left: 2px solid var(--primary-500);
 }
 
-.certificatesSection::before {
+.ceBrokerSection::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     width: 2px;
     height: 100%;
-    background: linear-gradient(180deg, #f59e0b, #d97706);
+    background: linear-gradient(180deg, var(--primary-500), var(--primary-600));
 }
 
-/* Section headers with consistent styling */
-.uploadSection h2,
-.certificatesSection h2,
-.periodSection h2 {
+/* CE Broker Header */
+.ceBrokerHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 0 var(--space-6) 0;
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid var(--gray-200);
+    flex-wrap: wrap;
+    gap: var(--space-3);
+}
+
+.headerLeft {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    margin: 0 0 var(--space-6) 0;
+    flex: 1;
+    min-width: 0;
+}
+
+.headerLeft h2 {
+    margin: 0;
     font-size: var(--text-xl);
     font-weight: 600;
     color: var(--gray-900);
-    padding-bottom: var(--space-4);
-    border-bottom: 1px solid var(--gray-200);
+}
+
+.periodLabel {
+    background: var(--primary-50);
+    color: var(--primary-700);
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    border: 1px solid var(--primary-200);
+    white-space: nowrap;
+}
+
+.headerRight {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-shrink: 0;
+}
+
+.periodSelector {
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    background: white;
+    color: var(--gray-700);
+    font-size: var(--text-sm);
+    cursor: pointer;
+    transition: border-color var(--transition-fast);
+    min-width: 200px;
+}
+
+.periodSelector:focus {
+    outline: none;
+    border-color: var(--primary-500);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.periodSelector:hover {
+    border-color: var(--gray-400);
 }
 
 .sectionIcon {
     width: 1.25rem;
     height: 1.25rem;
     color: var(--gray-600);
+}
+
+.refreshButton {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-sm);
+}
+
+/* Summary Grid */
+.summaryGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+}
+
+.summaryCard {
+    background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+    padding: var(--space-4);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    box-shadow: var(--shadow-sm);
+    transition: transform var(--transition-fast);
+}
+
+.summaryCard:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.summaryIcon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.summaryContent {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.summaryNumber {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--gray-900);
+}
+
+.summaryLabel {
+    font-size: var(--text-sm);
+    color: var(--gray-600);
+    font-weight: 500;
+}
+
+/* Ready Section */
+.readySection {
+    margin-bottom: var(--space-6);
+}
+
+.readySectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-4);
+    flex-wrap: wrap;
+    gap: var(--space-3);
+}
+
+.readySectionHeader h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.exportButtons {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+}
+
+.exportButton {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--text-sm);
+    white-space: nowrap;
+}
+
+/* Review Section */
+.reviewSection {
+    margin-bottom: var(--space-6);
+}
+
+.reviewSection h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0 0 var(--space-4) 0;
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+/* Records List */
+.recordsList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+}
+
+.recordCard {
+    background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow var(--transition-fast);
+}
+
+.recordCard:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.recordHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--space-3);
+    gap: var(--space-3);
+}
+
+.recordHeader h4 {
+    margin: 0;
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--gray-900);
+    flex: 1;
+    line-height: var(--leading-tight);
+}
+
+.recordDetails {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: var(--space-3);
+}
+
+.recordDetails p {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--gray-700);
+    line-height: var(--leading-relaxed);
+}
+
+.recordDetails strong {
+    color: var(--gray-900);
+    font-weight: 600;
+}
+
+.missingFields {
+    padding: var(--space-2);
+    background: var(--warning-50);
+    border: 1px solid var(--warning-200);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    color: var(--warning-800);
+    margin-top: var(--space-2);
+}
+
+.recordActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-2);
+}
+
+/* Bulk Actions */
+.bulkActions {
+    display: flex;
+    justify-content: center;
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--gray-200);
+}
+
+.markSubmittedButton {
+    padding: var(--space-3) var(--space-6);
+    font-weight: 600;
+}
+
+/* Instructions */
+.instructions {
+    background: linear-gradient(135deg, var(--blue-50) 0%, white 100%);
+    border-left: 4px solid var(--primary-500);
+    padding: var(--space-4);
+    border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+    margin-top: var(--space-6);
+}
+
+.instructions h4 {
+    margin: 0 0 var(--space-3) 0;
+    color: var(--gray-900);
+    font-size: var(--text-base);
+    font-weight: 600;
+}
+
+.instructions ol {
+    margin: 0;
+    padding-left: var(--space-5);
+    color: var(--gray-700);
+}
+
+.instructions li {
+    margin-bottom: 0.5rem;
+    line-height: var(--leading-relaxed);
+}
+
+.instructions a {
+    color: var(--primary-600);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.instructions a:hover {
+    text-decoration: underline;
+}
+
+/* No Records State */
+.noRecords,
+.noData {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-8);
+    text-align: center;
+}
+
+.noRecords h3,
+.noData h3 {
+    margin: var(--space-3) 0 var(--space-2) 0;
+    color: var(--gray-900);
+    font-size: var(--text-lg);
+    font-weight: 600;
+}
+
+.noRecords p,
+.noData p {
+    margin: 0;
+    color: var(--gray-600);
+    line-height: var(--leading-relaxed);
 }
 
 /* Loading and Error States */
@@ -183,10 +491,6 @@
     justify-content: center;
     padding: 3rem;
     text-align: center;
-    background: white;
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-lg);
-    border: 1px solid var(--gray-200);
 }
 
 .loading p {
@@ -221,9 +525,6 @@
     justify-content: center;
     padding: 3rem;
     text-align: center;
-    background: white;
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-lg);
     border: 1px solid var(--error-200);
     border-left: 4px solid var(--error-500);
 }
@@ -258,59 +559,6 @@
 
 .retryButton:hover {
     background-color: var(--primary-700);
-}
-
-.noData {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 3rem;
-    text-align: center;
-    background: white;
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-lg);
-    border: 1px solid var(--gray-200);
-}
-
-.noDataIcon {
-    width: 3rem;
-    height: 3rem;
-    color: #9ca3af;
-    margin-bottom: 1rem;
-}
-
-.noData h3 {
-    margin: 0 0 0.5rem 0;
-    color: #111827;
-}
-
-.noData p {
-    color: #6b7280;
-    margin: 0;
-}
-
-.noCertificates {
-    text-align: center;
-    padding: 3rem;
-    color: #6b7280;
-}
-
-.noCertificatesIcon {
-    width: 3rem;
-    height: 3rem;
-    color: #9ca3af;
-    margin: 0 auto 1rem;
-}
-
-.noCertificates h3 {
-    margin: 0 0 0.5rem 0;
-    color: #111827;
-    font-weight: 600;
-}
-
-.noCertificates p {
-    margin: 0;
 }
 
 /* Certificate Cards */
@@ -453,36 +701,6 @@
     font-weight: 500;
 }
 
-.periodAnalysis {
-    margin-top: 1.5rem;
-    padding: 1rem;
-    background-color: var(--gray-50);
-    border-radius: 0.375rem;
-    border: 1px solid #e5e7eb;
-}
-
-.periodAnalysis h3 {
-    margin: 0 0 1rem 0;
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: #111827;
-}
-
-.analysisContent {
-    background-color: #1f2937;
-    color: var(--gray-50);
-    padding: 1rem;
-    border-radius: 0.375rem;
-    font-family: 'Monaco', 'Courier New', monospace;
-    font-size: 0.875rem;
-    overflow-x: auto;
-}
-
-.analysisContent pre {
-    margin: 0;
-    white-space: pre-wrap;
-}
-
 /* Responsive Design */
 @media (max-width: 768px) {
     .dashboard {
@@ -513,9 +731,41 @@
 
     .uploadSection,
     .certificatesSection,
-    .periodSection {
+    .periodSection,
+    .statusCard,
+    .ceBrokerSection {
         padding: var(--space-6);
         margin-bottom: var(--space-1);
+    }
+
+    .summaryGrid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-3);
+    }
+
+    .readySectionHeader {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--space-3);
+    }
+
+    .exportButtons {
+        justify-content: stretch;
+    }
+
+    .exportButton {
+        flex: 1;
+        justify-content: center;
+    }
+
+    .recordHeader {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+
+    .recordActions {
+        justify-content: flex-start;
     }
 
     .certificateHeader {
@@ -542,11 +792,15 @@
 }
 
 @media (max-width: 480px) {
-    .header {
+
+    .header,
+    .cpaHeader {
         padding: var(--space-4);
     }
 
-    .cpaInfo h1 {
+    .cpaInfo h1,
+    .cpaHeader h1,
+    .cpaName {
         font-size: var(--text-2xl);
     }
 
@@ -572,7 +826,22 @@
 
     .uploadSection,
     .certificatesSection,
-    .periodSection {
+    .periodSection,
+    .statusCard,
+    .ceBrokerSection {
         padding: var(--space-4);
+    }
+
+    .summaryGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .exportButtons {
+        flex-direction: column;
+    }
+
+    .bulkActions {
+        flex-direction: column;
+        align-items: stretch;
     }
 }

@@ -1,49 +1,73 @@
-// src/components/compliance/ProfessionalCPEDashboard.js
+// src/components/compliance/ProfessionalCPEDashboard.js - Enhanced with CE Broker
 import React, { useState, useEffect } from 'react';
-import { Upload, CheckCircle } from 'lucide-react';
+import { Upload, CheckCircle, FileText, Download, Copy, Edit3, AlertCircle, RefreshCw, BarChart3 } from 'lucide-react';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
+import Badge from '../ui/Badge';
 import SubscriptionModal from './SubscriptionModal';
 import { apiService } from '../../services/api';
 import { formatDate } from '../../utils/dateUtils';
 import { toast } from 'react-hot-toast';
-import styles from '../../styles/pages/Dashboard.module.css';
+import styles from '../../styles/components/ProfessionalCPEDashboard.module.css';
 
 const ProfessionalCPEDashboard = ({ licenseNumber }) => {
-    // State management
+    // Existing state management
     const [cpa, setCpa] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [uploadStatus, setUploadStatus] = useState(null); // Enhanced status tracking
+    const [uploadStatus, setUploadStatus] = useState(null);
     const [uploading, setUploading] = useState(false);
     const [dragActive, setDragActive] = useState(false);
     const [showPaymentModal, setShowPaymentModal] = useState(false);
-    const [showExtendedOffer, setShowExtendedOffer] = useState(false); // New state for extended offer
+    const [showExtendedOffer, setShowExtendedOffer] = useState(false);
 
-    const MAX_FREE_UPLOADS = 30; // Updated to match backend TOTAL_FREE_UPLOADS
+    // NEW: CE Broker state
+    const [ceBrokerData, setCeBrokerData] = useState(null);
+    const [ceBrokerLoading, setCeBrokerLoading] = useState(false);
+    const [showCEBrokerSection, setShowCEBrokerSection] = useState(false);
+    const [selectedRecords, setSelectedRecords] = useState([]);
+    const [showUpdateModal, setShowUpdateModal] = useState(false);
+    const [editingRecord, setEditingRecord] = useState(null);
+    const [ceOptions, setCeOptions] = useState(null);
+    const [availablePeriods, setAvailablePeriods] = useState([]);
+    const [selectedPeriod, setSelectedPeriod] = useState(null);
 
-    // Effects
+    const MAX_FREE_UPLOADS = 30;
+
+    // Existing effects and functions remain the same...
     useEffect(() => {
         if (licenseNumber) {
             loadCPAData();
             loadUploadCount();
+            loadCEBrokerOptions();
+            loadAvailablePeriods();
         }
     }, [licenseNumber]);
 
-    // Data loading functions
+    // Load CE Broker data when upload is successful or period changes
+    useEffect(() => {
+        if (uploadStatus && uploadStatus.total_uploads_used > 0) {
+            setShowCEBrokerSection(true);
+        }
+    }, [uploadStatus]);
+
+    useEffect(() => {
+        if (selectedPeriod && showCEBrokerSection) {
+            loadCEBrokerDashboard();
+        }
+    }, [selectedPeriod, showCEBrokerSection]);
+
+    // ALL YOUR EXISTING FUNCTIONS STAY THE SAME
     const loadCPAData = async () => {
         try {
             setLoading(true);
             setError(null);
-
             console.log(`Loading CPA data for license: ${licenseNumber}`);
             const cpaData = await apiService.getCPA(licenseNumber);
             console.log('CPA data loaded:', cpaData);
-
             if (!cpaData?.license_number) {
                 throw new Error('Invalid CPA data received');
             }
-
             setCpa(cpaData);
         } catch (error) {
             console.error('Error loading CPA data:', error);
@@ -56,35 +80,25 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
     const loadUploadCount = async () => {
         try {
             console.log('📊 Loading upload status...');
-
-            // Use the authenticated endpoint instead of free-tier-status
             const status = await apiService.getUserUploadStatus(licenseNumber);
             console.log('📈 Upload status loaded:', status);
-
             setUploadStatus(status);
 
-            // Only show extended offer if:
-            // 1. User needs extended offer AND
-            // 2. User hasn't already accepted it AND
-            // 3. We're not already showing the modal
             if (status.needs_extended_offer &&
                 !status.accepted_extended_trial &&
                 status.upload_phase !== 'extended') {
                 setShowExtendedOffer(true);
             } else {
-                // Hide modal if user has accepted or is in extended phase
                 setShowExtendedOffer(false);
             }
         } catch (error) {
             console.error('Error loading upload status:', error);
-
-            // Fallback to free-tier-status if user is not authenticated
             if (error.response?.status === 401) {
                 console.log('User not authenticated, falling back to free-tier-status');
                 try {
                     const fallbackStatus = await apiService.getFreeTierStatus(licenseNumber);
                     setUploadStatus(fallbackStatus);
-                    setShowExtendedOffer(false); // Don't show extended offer for unauthenticated users
+                    setShowExtendedOffer(false);
                 } catch (fallbackError) {
                     console.error('Fallback also failed:', fallbackError);
                     setUploadStatus({
@@ -107,7 +121,140 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
         }
     };
 
-    // File handling functions
+    // NEW: Load available periods
+    const loadAvailablePeriods = async () => {
+        try {
+            const response = await fetch(`/api/time-windows/${licenseNumber}/available`);
+            if (response.ok) {
+                const data = await response.json();
+                const periods = data.available_windows || [];
+
+                const formattedPeriods = periods.map((window) => ({
+                    id: `${window.start_date}-${window.end_date}`,
+                    start_date: window.start_date,
+                    end_date: window.end_date,
+                    label: formatPeriodLabel(window.start_date, window.end_date),
+                    is_current: window.is_current,
+                    hours_required: window.hours_required || 80,
+                    ethics_required: window.ethics_required || 4
+                }));
+
+                setAvailablePeriods(formattedPeriods);
+
+                // Set current period as default
+                const currentPeriod = formattedPeriods.find(p => p.is_current);
+                if (currentPeriod) {
+                    setSelectedPeriod(currentPeriod);
+                }
+            }
+        } catch (error) {
+            console.error('Error loading periods:', error);
+        }
+    };
+
+    const formatPeriodLabel = (startDate, endDate) => {
+        const start = new Date(startDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+        const end = new Date(endDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+        return `${start} - ${end}`;
+    };
+    // NEW: CE Broker functions with period filtering
+    const loadCEBrokerDashboard = async () => {
+        try {
+            setCeBrokerLoading(true);
+
+            // Add period filtering to the API call
+            const params = new URLSearchParams();
+            if (selectedPeriod) {
+                params.append('date_from', selectedPeriod.start_date);
+                params.append('date_to', selectedPeriod.end_date);
+            }
+
+            const url = `/api/ce-broker/dashboard/${licenseNumber}${params.toString() ? '?' + params.toString() : ''}`;
+            const response = await fetch(url, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setCeBrokerData(data);
+            }
+        } catch (error) {
+            console.error('Error loading CE Broker dashboard:', error);
+        } finally {
+            setCeBrokerLoading(false);
+        }
+    };
+
+    const loadCEBrokerOptions = async () => {
+        try {
+            const options = await apiService.getCEBrokerOptions();
+            setCeOptions(options);
+        } catch (error) {
+            console.error('Error loading CE Broker options:', error);
+        }
+    };
+
+    const handleCEBrokerExport = async (format = 'clipboard') => {
+        try {
+            const options = { ready_only: true };
+            if (selectedPeriod) {
+                options.date_from = selectedPeriod.start_date;
+                options.date_to = selectedPeriod.end_date;
+            }
+
+            const exportData = await apiService.exportCEBrokerData(
+                licenseNumber,
+                format,
+                options
+            );
+
+            if (format === 'clipboard' && exportData.clipboard_text) {
+                await navigator.clipboard.writeText(exportData.clipboard_text);
+                toast.success('CE Broker data copied to clipboard! Paste into CE Broker website.');
+            } else if (format === 'csv' && exportData.csv_content) {
+                const blob = new Blob([exportData.csv_content], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = exportData.filename || 'ce_broker_export.csv';
+                a.click();
+                window.URL.revokeObjectURL(url);
+                toast.success('CSV file downloaded!');
+            }
+        } catch (error) {
+            console.error('Error exporting CE Broker data:', error);
+            toast.error('Failed to export data');
+        }
+    };
+
+    const handleUpdateRecord = async (recordId, updateData) => {
+        try {
+            await apiService.updateCEBrokerRecord(recordId, updateData);
+            toast.success('Record updated successfully!');
+            loadCEBrokerDashboard(); // Refresh data
+            setShowUpdateModal(false);
+            setEditingRecord(null);
+        } catch (error) {
+            console.error('Error updating record:', error);
+            toast.error('Failed to update record');
+        }
+    };
+
+    const handleMarkSubmitted = async (recordIds) => {
+        try {
+            await apiService.markCEBrokerExported(licenseNumber, recordIds);
+            toast.success(`Marked ${recordIds.length} record(s) as submitted!`);
+            loadCEBrokerDashboard();
+            setSelectedRecords([]);
+        } catch (error) {
+            console.error('Error marking records as submitted:', error);
+            toast.error('Failed to mark records as submitted');
+        }
+    };
+
+    // ALL YOUR EXISTING FILE HANDLING FUNCTIONS STAY THE SAME
     const handleFileSelect = (event) => {
         const file = event.target.files[0];
         if (file) {
@@ -130,27 +277,22 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
         e.preventDefault();
         e.stopPropagation();
         setDragActive(false);
-
         if (e.dataTransfer.files && e.dataTransfer.files[0]) {
             handleUpload(e.dataTransfer.files[0]);
         }
     };
 
-    // Upload function
     const handleUpload = async (file) => {
-        // Check upload limit first
         if (uploadStatus?.at_limit) {
             setShowPaymentModal(true);
             return;
         }
 
-        // If at initial limit but extended offer available, show offer
         if (uploadStatus?.needs_extended_offer) {
             setShowExtendedOffer(true);
             return;
         }
 
-        // Validate file
         if (!file.type.includes('pdf') && !file.type.includes('image')) {
             toast.error('Please upload a PDF or image file');
             return;
@@ -164,50 +306,23 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
         try {
             setUploading(true);
             toast.loading('Processing certificate...', { id: 'upload' });
-
             console.log('🚀 Starting upload for file:', file.name);
             console.log('📝 License number:', licenseNumber);
 
             const result = await apiService.uploadCertificateAuthenticated(licenseNumber, file);
-
             console.log('✅ Upload API response:', result);
 
             toast.success(`Certificate "${file.name}" uploaded successfully!`, { id: 'upload' });
-
-            // DISABLED: Duplicate detection (causing too many false positives)
-            // if (result.duplicate_warning) {
-            //     console.log('⚠️ Duplicate warning detected:', result.duplicate_warning);
-            //     setTimeout(() => {
-            //         toast.error(
-            //             `⚠️ ${result.duplicate_warning.message} Found ${result.duplicate_warning.similar_count} similar certificate(s).`,
-            //             { 
-            //                 duration: 6000,
-            //                 id: 'duplicate-warning'
-            //             }
-            //         );
-            //     }, 1000);
-            // }
-
-            console.log('📊 Upload result details:', {
-                hasParsingResult: !!result.parsing_result,
-                hasStorageInfo: !!result.storage_info,
-                hasComplianceTracking: !!result.compliance_tracking,
-                hasDuplicateWarning: !!result.duplicate_warning,
-                fullResult: result
-            });
-
             console.log('🔄 Refreshing upload status...');
             await loadUploadCount();
-            console.log('📈 New upload status:', uploadStatus?.total_uploads_used || 0, uploadStatus?.upload_phase || 'unknown');
+
+            // Refresh CE Broker data after successful upload
+            setTimeout(() => {
+                loadCEBrokerDashboard();
+            }, 1000);
 
         } catch (error) {
             console.error('💥 Upload error:', error);
-            console.error('📋 Error details:', {
-                status: error.response?.status,
-                data: error.response?.data,
-                message: error.message
-            });
-
             if (error.response?.status === 402) {
                 toast.error('Payment required - upgrade needed', { id: 'upload' });
             } else if (error.response?.status === 401) {
@@ -222,22 +337,15 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
         }
     };
 
-    // Extended offer handling
+    // ALL YOUR EXISTING HANDLER FUNCTIONS STAY THE SAME
     const handleAcceptExtendedOffer = async () => {
         try {
             console.log('🎯 Accepting extended trial offer...');
-
-            // Call the backend endpoint to accept extended trial
             const result = await apiService.acceptExtendedTrial(licenseNumber);
-
             console.log('✅ Extended trial accepted:', result);
-
             setShowExtendedOffer(false);
             toast.success('🎉 Extended trial activated! 20 additional uploads unlocked.');
-
-            // Refresh status to reflect extended phase
             await loadUploadCount();
-
         } catch (error) {
             console.error('❌ Error accepting extended trial:', error);
             toast.error('Failed to activate extended trial. Please try again.');
@@ -249,7 +357,6 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
         setShowPaymentModal(true);
     };
 
-    // Payment handling functions
     const handlePaymentSuccess = async () => {
         setShowPaymentModal(false);
         toast.success('🎉 Upgrade successful! You now have unlimited uploads.');
@@ -261,7 +368,6 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
         toast.info('You can upgrade anytime to continue uploading certificates.');
     };
 
-    // Helper function to get current progress info
     const getProgressInfo = () => {
         if (!uploadStatus) return { current: 0, total: 10, phase: 'initial' };
 
@@ -291,7 +397,7 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
         }
     };
 
-    // Loading state
+    // Loading and error states remain the same
     if (loading) {
         return (
             <div className={styles.basicDashboard}>
@@ -300,7 +406,6 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
         );
     }
 
-    // Error state
     if (error || !cpa) {
         return (
             <Card className={styles.errorCard}>
@@ -313,12 +418,11 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
         );
     }
 
-    // Main render
     const progressInfo = getProgressInfo();
 
     return (
         <div className={styles.basicDashboard}>
-            {/* CPA Header */}
+            {/* EXISTING CPA Header - NO CHANGES */}
             <div className={styles.cpaHeader}>
                 <h1 className={styles.cpaName}>{cpa.full_name}</h1>
                 <p className={styles.cpaCredentials}>
@@ -327,9 +431,8 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
                 </p>
             </div>
 
-            {/* Upload Section */}
+            {/* EXISTING Upload Section - NO CHANGES */}
             <Card className={styles.statusCard}>
-                {/* Progress indicator */}
                 {uploadStatus && uploadStatus.total_uploads_used > 0 && (
                     <div style={{ marginBottom: '20px' }}>
                         <div style={{
@@ -339,7 +442,7 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
                             overflow: 'hidden'
                         }}>
                             <div style={{
-                                background: progressInfo.phase === 'extended' ? '#10b981' : '#3b82f6', // Green for extended phase
+                                background: progressInfo.phase === 'extended' ? '#10b981' : '#3b82f6',
                                 height: '100%',
                                 width: `${(progressInfo.current / progressInfo.total) * 100}%`,
                                 transition: 'width 0.3s ease'
@@ -359,7 +462,7 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
                     </div>
                 )}
 
-                {/* Upload area */}
+                {/* Upload area - EXISTING CODE */}
                 <div
                     style={{
                         border: `2px dashed ${dragActive ? '#3b82f6' : '#d1d5db'}`,
@@ -432,7 +535,22 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
                 </div>
             </Card>
 
-            {/* Extended Offer Modal */}
+            {/* NEW: CE Broker Section - Added below upload */}
+            {showCEBrokerSection && (
+                <CEBrokerSection
+                    ceBrokerData={ceBrokerData}
+                    loading={ceBrokerLoading}
+                    availablePeriods={availablePeriods}
+                    selectedPeriod={selectedPeriod}
+                    onPeriodChange={setSelectedPeriod}
+                    onExport={handleCEBrokerExport}
+                    onUpdateRecord={handleUpdateRecord}
+                    onMarkSubmitted={handleMarkSubmitted}
+                    onRefresh={loadCEBrokerDashboard}
+                />
+            )}
+
+            {/* EXISTING Modals - NO CHANGES */}
             {showExtendedOffer && (
                 <div style={{
                     position: 'fixed',
@@ -483,7 +601,6 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
                 </div>
             )}
 
-            {/* Payment Modal */}
             {showPaymentModal && (
                 <SubscriptionModal
                     licenseNumber={licenseNumber}
@@ -494,6 +611,254 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
                 />
             )}
         </div>
+    );
+};
+
+// NEW: CE Broker Section Component with Period Selector
+const CEBrokerSection = ({
+    ceBrokerData,
+    loading,
+    availablePeriods,
+    selectedPeriod,
+    onPeriodChange,
+    onExport,
+    onUpdateRecord,
+    onMarkSubmitted,
+    onRefresh
+}) => {
+    if (loading) {
+        return (
+            <Card className={styles.ceBrokerSection}>
+                <div className={styles.ceBrokerHeader}>
+                    <FileText className={styles.sectionIcon} />
+                    <h2>CE Broker Export</h2>
+                </div>
+                <div className={styles.loading}>
+                    <RefreshCw className={styles.spinner} />
+                    <p>Loading CE Broker data...</p>
+                </div>
+            </Card>
+        );
+    }
+
+    if (!ceBrokerData) {
+        return (
+            <Card className={styles.ceBrokerSection}>
+                <div className={styles.ceBrokerHeader}>
+                    <FileText className={styles.sectionIcon} />
+                    <h2>CE Broker Export</h2>
+                </div>
+                <div className={styles.noData}>
+                    <AlertCircle size={48} color="#6b7280" />
+                    <h3>No Data Available</h3>
+                    <p>Upload some certificates to get started with CE Broker export.</p>
+                </div>
+            </Card>
+        );
+    }
+
+    const { summary, ready_records = [], needs_review = [] } = ceBrokerData;
+
+    return (
+        <Card className={styles.ceBrokerSection}>
+            <div className={styles.ceBrokerHeader}>
+                <div className={styles.headerLeft}>
+                    <FileText className={styles.sectionIcon} />
+                    <h2>CE Broker Export</h2>
+                    {selectedPeriod && (
+                        <span className={styles.periodLabel}>
+                            {selectedPeriod.label}
+                        </span>
+                    )}
+                </div>
+                <div className={styles.headerRight}>
+                    {availablePeriods.length > 0 && (
+                        <select
+                            className={styles.periodSelector}
+                            value={selectedPeriod?.id || ''}
+                            onChange={(e) => {
+                                const period = availablePeriods.find(p => p.id === e.target.value);
+                                onPeriodChange(period);
+                            }}
+                        >
+                            {availablePeriods.map((period) => (
+                                <option key={period.id} value={period.id}>
+                                    {period.label} {period.is_current ? '(Current)' : ''}
+                                </option>
+                            ))}
+                        </select>
+                    )}
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={onRefresh}
+                        className={styles.refreshButton}
+                    >
+                        <RefreshCw size={16} />
+                        Refresh
+                    </Button>
+                </div>
+            </div>
+
+            {/* Summary Cards */}
+            <div className={styles.summaryGrid}>
+                <div className={styles.summaryCard}>
+                    <div className={styles.summaryIcon}>📚</div>
+                    <div className={styles.summaryContent}>
+                        <span className={styles.summaryNumber}>{summary.total_certificates || 0}</span>
+                        <span className={styles.summaryLabel}>Total Certificates</span>
+                    </div>
+                </div>
+                <div className={styles.summaryCard}>
+                    <div className={styles.summaryIcon}>✅</div>
+                    <div className={styles.summaryContent}>
+                        <span className={styles.summaryNumber}>{summary.ready_for_export || 0}</span>
+                        <span className={styles.summaryLabel}>Ready for Export</span>
+                    </div>
+                </div>
+                <div className={styles.summaryCard}>
+                    <div className={styles.summaryIcon}>⏳</div>
+                    <div className={styles.summaryContent}>
+                        <span className={styles.summaryNumber}>{summary.needs_review || 0}</span>
+                        <span className={styles.summaryLabel}>Need Review</span>
+                    </div>
+                </div>
+                <div className={styles.summaryCard}>
+                    <div className={styles.summaryIcon}>⏰</div>
+                    <div className={styles.summaryContent}>
+                        <span className={styles.summaryNumber}>{summary.total_cpe_hours || 0}</span>
+                        <span className={styles.summaryLabel}>
+                            Hours {selectedPeriod ? `(${selectedPeriod.hours_required} required)` : ''}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            {/* Export Ready Section */}
+            {ready_records.length > 0 && (
+                <div className={styles.readySection}>
+                    <div className={styles.readySectionHeader}>
+                        <h3>
+                            <CheckCircle size={20} color="#059669" />
+                            Ready for CE Broker ({ready_records.length})
+                        </h3>
+                        <div className={styles.exportButtons}>
+                            <Button
+                                variant="primary"
+                                onClick={() => onExport('clipboard')}
+                                className={styles.exportButton}
+                            >
+                                <Copy size={16} />
+                                Copy to Clipboard
+                            </Button>
+                            <Button
+                                variant="outline"
+                                onClick={() => onExport('csv')}
+                                className={styles.exportButton}
+                            >
+                                <Download size={16} />
+                                Download CSV
+                            </Button>
+                        </div>
+                    </div>
+
+                    <div className={styles.recordsList}>
+                        {ready_records.map((record) => (
+                            <div key={record.certificate_id} className={styles.recordCard}>
+                                <div className={styles.recordHeader}>
+                                    <h4>{record.course_name}</h4>
+                                    <Badge variant="success">Ready</Badge>
+                                </div>
+                                <div className={styles.recordDetails}>
+                                    <p><strong>Provider:</strong> {record.provider_name}</p>
+                                    <p><strong>Date:</strong> {record.completion_date}</p>
+                                    <p><strong>Hours:</strong> {record.cpe_hours} CPE + {record.ethics_hours} Ethics</p>
+                                    <p><strong>Subject Areas:</strong> {record.subject_areas?.join(', ') || 'None'}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {ready_records.length > 0 && (
+                        <div className={styles.bulkActions}>
+                            <Button
+                                variant="outline"
+                                onClick={() => onMarkSubmitted(ready_records.map(r => r.certificate_id))}
+                                className={styles.markSubmittedButton}
+                            >
+                                Mark All as Submitted to CE Broker
+                            </Button>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* Needs Review Section */}
+            {needs_review.length > 0 && (
+                <div className={styles.reviewSection}>
+                    <h3>
+                        <AlertCircle size={20} color="#f59e0b" />
+                        Need Review ({needs_review.length})
+                    </h3>
+                    <div className={styles.recordsList}>
+                        {needs_review.map((record) => (
+                            <div key={record.certificate_id} className={styles.recordCard}>
+                                <div className={styles.recordHeader}>
+                                    <h4>{record.course_name}</h4>
+                                    <Badge variant="warning">Needs Review</Badge>
+                                </div>
+                                <div className={styles.recordDetails}>
+                                    <p><strong>Provider:</strong> {record.provider_name}</p>
+                                    <p><strong>Date:</strong> {record.completion_date}</p>
+                                    <p><strong>Hours:</strong> {record.cpe_hours} CPE</p>
+                                    {record.missing_fields && record.missing_fields.length > 0 && (
+                                        <div className={styles.missingFields}>
+                                            <strong>Missing:</strong> {record.missing_fields.join(', ')}
+                                        </div>
+                                    )}
+                                </div>
+                                <div className={styles.recordActions}>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => onUpdateRecord(record.certificate_id, {
+                                            subject_areas: ['Finance', 'Business management and organization'],
+                                            course_type: 'anytime',
+                                            delivery_method: 'Computer-Based Training (ie: online courses)'
+                                        })}
+                                    >
+                                        <Edit3 size={14} />
+                                        Quick Fix
+                                    </Button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* No Records State */}
+            {ready_records.length === 0 && needs_review.length === 0 && (
+                <div className={styles.noRecords}>
+                    <FileText size={48} color="#6b7280" />
+                    <h3>No CPE Records Found</h3>
+                    <p>Upload some CPE certificates to get started with CE Broker export.</p>
+                </div>
+            )}
+
+            {/* Instructions */}
+            <div className={styles.instructions}>
+                <h4>How to Submit to CE Broker:</h4>
+                <ol>
+                    <li>Click "Copy to Clipboard" above to copy your ready records</li>
+                    <li>Visit <a href="https://www.cebroker.com" target="_blank" rel="noopener noreferrer">cebroker.com</a> and log in</li>
+                    <li>Navigate to "Report CE" for your NH CPA license</li>
+                    <li>Paste the course information into the CE Broker form fields</li>
+                    <li>Submit each course individually</li>
+                    <li>Return here and mark records as submitted when complete</li>
+                </ol>
+            </div>
+        </Card>
     );
 };
 
