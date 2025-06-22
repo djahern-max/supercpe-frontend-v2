@@ -56,7 +56,9 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
     const loadUploadCount = async () => {
         try {
             console.log('📊 Loading upload status...');
-            const status = await apiService.getFreeTierStatus(licenseNumber);
+
+            // Use the authenticated endpoint instead of free-tier-status
+            const status = await apiService.getUserUploadStatus(licenseNumber);
             console.log('📈 Upload status loaded:', status);
 
             setUploadStatus(status);
@@ -75,13 +77,33 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
             }
         } catch (error) {
             console.error('Error loading upload status:', error);
-            setUploadStatus({
-                total_uploads_used: 0,
-                upload_phase: 'initial',
-                at_limit: false,
-                needs_extended_offer: false
-            });
-            setShowExtendedOffer(false);
+
+            // Fallback to free-tier-status if user is not authenticated
+            if (error.response?.status === 401) {
+                console.log('User not authenticated, falling back to free-tier-status');
+                try {
+                    const fallbackStatus = await apiService.getFreeTierStatus(licenseNumber);
+                    setUploadStatus(fallbackStatus);
+                    setShowExtendedOffer(false); // Don't show extended offer for unauthenticated users
+                } catch (fallbackError) {
+                    console.error('Fallback also failed:', fallbackError);
+                    setUploadStatus({
+                        total_uploads_used: 0,
+                        upload_phase: 'initial',
+                        at_limit: false,
+                        needs_extended_offer: false
+                    });
+                    setShowExtendedOffer(false);
+                }
+            } else {
+                setUploadStatus({
+                    total_uploads_used: 0,
+                    upload_phase: 'initial',
+                    at_limit: false,
+                    needs_extended_offer: false
+                });
+                setShowExtendedOffer(false);
+            }
         }
     };
 

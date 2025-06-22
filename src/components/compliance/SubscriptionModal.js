@@ -1,7 +1,7 @@
 // src/components/compliance/SubscriptionModal.js
 import React, { useState } from 'react';
 import { toast } from 'react-hot-toast';
-import { Shield, Check, ArrowRight, Star, X } from 'lucide-react';
+import { Shield, Check, ArrowRight, Star, X, Clock } from 'lucide-react';
 import { apiService } from '../../services/api';
 import styles from '../../styles/components/SubscriptionModal.module.css';
 
@@ -26,6 +26,7 @@ const SubscriptionModal = ({
             period: '/month',
             annual_price: '$120/year',
             description: 'Perfect for ongoing CPE management',
+            flexible: true, // Add badge for monthly plan
             features: [
                 'Unlimited certificate uploads',
                 'Advanced compliance reports',
@@ -156,6 +157,13 @@ const SubscriptionModal = ({
                                         </div>
                                     )}
 
+                                    {plan.flexible && (
+                                        <div className={styles.flexibleBadge}>
+                                            <Clock size={16} />
+                                            Cancel Anytime
+                                        </div>
+                                    )}
+
                                     <div className={styles.planHeader}>
                                         <h3>{plan.name}</h3>
                                         <div className={styles.planPrice}>
@@ -189,18 +197,18 @@ const SubscriptionModal = ({
                             ))}
                         </div>
 
-                        {/* Trust Indicators */}
+                        {/* Trust Indicators - Updated with colors and removed Cancel Anytime */}
                         <div className={styles.trustIndicators}>
                             <div className={styles.trustItem}>
-                                <Shield size={16} />
+                                <div className={styles.trustIcon}>
+                                    <Shield size={16} />
+                                </div>
                                 <span>Secure Payment via Stripe</span>
                             </div>
                             <div className={styles.trustItem}>
-                                <Check size={16} />
-                                <span>Cancel Anytime</span>
-                            </div>
-                            <div className={styles.trustItem}>
-                                <Star size={16} />
+                                <div className={styles.trustIcon}>
+                                    <Star size={16} />
+                                </div>
                                 <span>30-Day Money Back Guarantee</span>
                             </div>
                         </div>

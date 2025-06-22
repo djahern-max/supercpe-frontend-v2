@@ -392,6 +392,14 @@ export const apiService = {
     },
 
     /**
+ * Get authenticated user upload status (REQUIRES AUTHENTICATION)
+ */
+    async getUserUploadStatus(licenseNumber) {
+        const response = await apiClient.get(`/api/upload/user-upload-status/${licenseNumber}`);
+        return response.data;
+    },
+
+    /**
      * Upload and save certificate with authentication
      */
     async uploadCertificateAuthenticated(licenseNumber, file) {
