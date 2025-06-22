@@ -8,7 +8,7 @@ import AuthSyncProvider from './components/AuthSyncProvider';
 // Import your actual page components
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
-import ComplianceDashboard from './pages/ComplianceDashboard';
+
 import Upload from './pages/Upload';
 import SecurityPage from './pages/SecurityPage';
 import Privacy from './pages/Privacy';
@@ -57,7 +57,7 @@ function App() {
                             <Routes>
                                 <Route path="/" element={<Home />} />
                                 <Route path="/dashboard/:licenseNumber" element={<Dashboard />} />
-                                <Route path="/compliance/:licenseNumber" element={<ComplianceDashboard />} />
+
                                 <Route path="/upload/:licenseNumber" element={<Upload />} />
                                 <Route path="/security" element={<SecurityPage />} />
                                 <Route path="/privacy" element={<Privacy />} />

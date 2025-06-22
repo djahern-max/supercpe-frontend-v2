@@ -346,6 +346,14 @@ export const apiService = {
     },
 
     /**
+ * Accept extended trial offer (REQUIRES AUTHENTICATION)
+ */
+    async acceptExtendedTrial(licenseNumber) {
+        const response = await apiClient.post(`/api/upload/accept-extended-trial/${licenseNumber}`);
+        return response.data;
+    },
+
+    /**
      * Analyze certificate for preview (PUBLIC - Free analysis)
      */
     async analyzeCertificatePreview(licenseNumber, file) {
