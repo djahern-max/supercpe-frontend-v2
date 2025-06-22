@@ -15,6 +15,7 @@ import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
 import AuthCallback from './pages/AuthCallback';
 import InactivityWarning from './components/InactivityWarning';
+import PaymentSuccessPage from './pages/PaymentSuccessPage';
 
 // Import your layout components
 import Header from './components/layout/Header';
@@ -64,6 +65,9 @@ function App() {
                                 <Route path="/terms" element={<Terms />} />
                                 <Route path="/auth/callback" element={<AuthCallback />} />
                                 <Route path="/auth/error" element={<AuthErrorPage />} />
+                                <Route path="/payment/success" element={<PaymentSuccessPage />} />
+
+
                             </Routes>
                         </main>
 

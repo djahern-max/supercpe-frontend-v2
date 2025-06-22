@@ -543,6 +543,14 @@ export const apiService = {
     },
 
     /**
+ * Create subscription for already authenticated user (REQUIRES AUTHENTICATION)
+ */
+    async createSubscriptionForAuthenticatedUser(data) {
+        const response = await apiClient.post('/api/payments/create-subscription-authenticated', data);
+        return response.data;
+    },
+
+    /**
      * Get pricing plans (PUBLIC)
      */
     async getPricingPlans() {
