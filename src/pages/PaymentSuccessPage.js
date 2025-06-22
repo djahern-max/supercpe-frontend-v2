@@ -31,22 +31,9 @@ const PaymentSuccessPage = () => {
                 console.log('Waiting for webhook processing...');
                 await new Promise(resolve => setTimeout(resolve, 3000));
 
-                // Optionally verify the payment was processed by calling our test endpoint
-                try {
-                    const testResult = await fetch('https://nh.supercpe.com/api/payments/test-webhook', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ session_id: sessionId })
-                    });
-
-                    if (testResult.ok) {
-                        console.log('Payment processed successfully via test endpoint');
-                    }
-                } catch (error) {
-                    console.log('Test endpoint call failed, but continuing...');
-                }
+                // Don't call test webhook - let the actual Stripe webhook handle processing
+                // The webhook should have already processed the payment
+                console.log('Allowing Stripe webhook time to process...');
 
                 // Show success
                 setStatus('success');
