@@ -24,7 +24,8 @@ const PasscodeEntry = () => {
 
         setLoading(true);
         try {
-            const response = await fetch(`/api/cpas/lookup-passcode/${passcode}`);
+            // Keep the working API call - don't change this part!
+            const response = await fetch(`/api/cpas/lookup-passcode/${encodeURIComponent(passcode)}`);
 
             if (response.ok) {
                 const data = await response.json();
