@@ -433,7 +433,7 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
 
             {/* EXISTING Upload Section - NO CHANGES */}
             <Card className={styles.statusCard}>
-                {uploadStatus && uploadStatus.total_uploads_used > 0 && (
+                {uploadStatus && !uploadStatus.has_premium_subscription && (
                     <div style={{ marginBottom: '20px' }}>
                         <div style={{
                             background: '#e5e7eb',
