@@ -16,7 +16,7 @@ import Terms from './pages/Terms';
 import AuthCallback from './pages/AuthCallback';
 import InactivityWarning from './components/InactivityWarning';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
-
+import CertificateManager from './components/CertificateManager';
 // Import your layout components
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
@@ -66,6 +66,8 @@ function App() {
                                 <Route path="/auth/callback" element={<AuthCallback />} />
                                 <Route path="/auth/error" element={<AuthErrorPage />} />
                                 <Route path="/payment/success" element={<PaymentSuccessPage />} />
+                                <Route path="/certificate-manager" element={<CertificateManager />} />
+
 
 
                             </Routes>

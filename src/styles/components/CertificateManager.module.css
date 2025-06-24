@@ -1,0 +1,448 @@
+/* src/styles/components/CertificateManager.module.css */
+
+.certificateManager {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Header Section */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.headerContent h2 {
+    margin: 0 0 0.5rem 0;
+    color: var(--gray-900);
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.headerContent p {
+    margin: 0;
+    color: var(--gray-600);
+    font-size: 0.875rem;
+}
+
+.headerActions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+/* Stats Grid */
+.statsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.statCard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1.5rem 1rem;
+    border-radius: var(--radius-lg);
+    transition: all 0.2s ease;
+}
+
+.statCard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.statIcon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.statNumber {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0.25rem 0;
+    color: var(--gray-900);
+}
+
+.statLabel {
+    font-size: 0.875rem;
+    color: var(--gray-600);
+    font-weight: 500;
+}
+
+/* Stat Card Colors */
+.stat-blue {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    border: 1px solid #93c5fd;
+}
+
+.stat-green {
+    background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+    border: 1px solid #86efac;
+}
+
+.stat-orange {
+    background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%);
+    border: 1px solid #fb923c;
+}
+
+.stat-purple {
+    background: linear-gradient(135deg, #e9d5ff 0%, #d8b4fe 100%);
+    border: 1px solid #c084fc;
+}
+
+/* Period Selector */
+.periodSelector {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: var(--gray-50);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--gray-200);
+}
+
+.periodSelector label {
+    font-weight: 500;
+    color: var(--gray-700);
+    font-size: 0.875rem;
+}
+
+.periodSelect {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    background: white;
+    font-size: 0.875rem;
+    color: var(--gray-700);
+    min-width: 250px;
+}
+
+.periodSelect:focus {
+    outline: none;
+    border-color: var(--primary-500);
+    box-shadow: 0 0 0 3px var(--primary-100);
+}
+
+/* Certificates List */
+.certificatesList {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.certificateCard {
+    transition: all 0.2s ease;
+    border-left: 4px solid var(--green-500);
+}
+
+.certificateCard.needsReview {
+    border-left-color: var(--orange-500);
+    background: #fffbeb;
+}
+
+.certificateCard:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.cardTitle {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.cardTitle h4 {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--gray-900);
+    line-height: 1.4;
+}
+
+.cardContent {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.certificateDetails {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.75rem;
+}
+
+.certificateDetails p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--gray-700);
+}
+
+.certificateDetails strong {
+    color: var(--gray-900);
+    font-weight: 500;
+}
+
+.missingFields {
+    padding: 0.75rem;
+    background: #fef3c7;
+    border: 1px solid #f59e0b;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    color: #92400e;
+}
+
+.cardActions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--gray-200);
+}
+
+/* Export Instructions */
+.exportInstructions {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border: 1px solid #0284c7;
+    border-left: 4px solid var(--blue-500);
+}
+
+.exportInstructions h4 {
+    margin: 0 0 0.75rem 0;
+    color: var(--gray-900);
+    font-size: 1.125rem;
+}
+
+.exportInstructions p {
+    margin: 0 0 1rem 0;
+    color: var(--gray-700);
+    line-height: 1.5;
+}
+
+.instructionActions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+/* Loading and Error States */
+.loadingCard,
+.errorCard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+    text-align: center;
+}
+
+.loadingSpinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--gray-200);
+    border-top: 3px solid var(--primary-600);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.errorCard h3 {
+    margin: 0 0 0.5rem 0;
+    color: var(--red-600);
+}
+
+.errorCard p {
+    margin: 0 0 1.5rem 0;
+    color: var(--gray-600);
+}
+
+/* Empty State */
+.emptyState {
+    text-align: center;
+    padding: 3rem 2rem;
+}
+
+.emptyContent h3 {
+    margin: 0 0 0.75rem 0;
+    color: var(--gray-700);
+    font-size: 1.25rem;
+}
+
+.emptyContent p {
+    margin: 0;
+    color: var(--gray-500);
+    line-height: 1.5;
+}
+
+/* Quick Fix Modal */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+}
+
+.modal {
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    max-width: 500px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 1.5rem 0 1.5rem;
+    border-bottom: 1px solid var(--gray-200);
+    margin-bottom: 1.5rem;
+}
+
+.modalHeader h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.modalContent {
+    padding: 0 1.5rem;
+}
+
+.modalContent p {
+    margin: 0 0 1.5rem 0;
+    color: var(--gray-600);
+    line-height: 1.5;
+}
+
+.formField {
+    margin-bottom: 1rem;
+}
+
+.formField label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--gray-700);
+    font-size: 0.875rem;
+}
+
+.formField input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    transition: border-color 0.2s ease;
+}
+
+.formField input:focus {
+    outline: none;
+    border-color: var(--primary-500);
+    box-shadow: 0 0 0 3px var(--primary-100);
+}
+
+.formRow {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.modalActions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    padding: 1.5rem;
+    border-top: 1px solid var(--gray-200);
+    margin-top: 1.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .headerActions {
+        justify-content: stretch;
+    }
+
+    .statsGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .certificateDetails {
+        grid-template-columns: 1fr;
+    }
+
+    .cardActions {
+        justify-content: stretch;
+    }
+
+    .instructionActions {
+        flex-direction: column;
+    }
+
+    .formRow {
+        grid-template-columns: 1fr;
+    }
+
+    .modalActions {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 480px) {
+    .statsGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .periodSelector {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .periodSelect {
+        min-width: auto;
+    }
+}
