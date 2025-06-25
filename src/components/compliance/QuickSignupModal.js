@@ -1,4 +1,4 @@
-// src/components/compliance/QuickSignupModal.js - Enhanced with password setup flow
+// src/components/compliance/QuickSignupModal.js - Fixed field name mismatch
 import React, { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { X, Shield, CheckCircle, BarChart3, Clock, Lock } from 'lucide-react';
@@ -23,8 +23,6 @@ const QuickSignupModal = ({
     const [temporaryPassword, setTemporaryPassword] = useState(null);
 
     const { createAccountWithEmail, setAuthToken } = useAuth();
-
-
 
     const handleEmailSignup = async (e) => {
         e.preventDefault();
@@ -59,7 +57,7 @@ const QuickSignupModal = ({
                 console.log('Using passcode flow - making request to:', '/api/auth/signup-with-passcode');
                 console.log('Request body:', {
                     email: email.trim(),
-                    name: name.trim(),
+                    full_name: name.trim(), // ✅ FIXED: Using full_name instead of name
                     passcode: cpaData.passcode,
                 });
 
@@ -71,18 +69,13 @@ const QuickSignupModal = ({
                     },
                     body: JSON.stringify({
                         email: email.trim(),
-                        name: name.trim(),
+                        full_name: name.trim(), // ✅ FIXED: Changed from 'name' to 'full_name'
                         passcode: cpaData.passcode,
                     }),
                 });
 
                 console.log('Response status:', response.status);
                 console.log('Response ok:', response.ok);
-
-
-
-                // Add this debugging to your QuickSignupModal.js handleEmailSignup function
-                // Replace the section after "if (response.ok)" with this:
 
                 if (response.ok) {
                     const data = await response.json();
@@ -120,20 +113,7 @@ const QuickSignupModal = ({
                     }
 
                     result = { success: true };
-                }
-
-
-
-
-
-
-
-
-
-
-
-
-                else {
+                } else {
                     const errorData = await response.json();
                     console.error('❌ PASSCODE SIGNUP ERROR:', errorData);
                     result = { success: false, error: errorData.detail || 'Signup failed' };
@@ -172,9 +152,6 @@ const QuickSignupModal = ({
             setIsSubmitting(false);
         }
     };
-
-
-
 
     const handlePasswordSetupSuccess = () => {
         setShowPasswordSetup(false);
@@ -220,7 +197,6 @@ const QuickSignupModal = ({
                 {/* Enhanced Header */}
                 <div className={styles.modalHeader}>
                     <h2 className={styles.modalTitle}>Create Your Professional Account</h2>
-
                 </div>
 
                 {/* Minimalist Benefits Row */}
@@ -305,8 +281,6 @@ const QuickSignupModal = ({
                     </div>
                 )}
 
-
-
                 {/* Close Button */}
                 <button
                     onClick={onClose}
@@ -319,6 +293,5 @@ const QuickSignupModal = ({
         </div>
     );
 };
-
 
 export default QuickSignupModal;
