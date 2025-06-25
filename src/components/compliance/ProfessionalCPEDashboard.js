@@ -1,4 +1,4 @@
-// src/components/compliance/ProfessionalCPEDashboard.js - REBUILT & SIMPLIFIED
+// src/components/compliance/ProfessionalCPEDashboard.js - COMPLETE FIXED VERSION
 import React, { useState, useEffect } from 'react';
 import { Upload, CheckCircle } from 'lucide-react';
 import Card from '../ui/Card';
@@ -21,11 +21,13 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [showExtendedOffer, setShowExtendedOffer] = useState(false);
     const [showCertificateManager, setShowCertificateManager] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [checkingAuth, setCheckingAuth] = useState(true);
 
     useEffect(() => {
         if (licenseNumber) {
+            checkAuthStatus();
             loadCPAData();
-            loadUploadCount();
         }
     }, [licenseNumber]);
 
@@ -35,6 +37,41 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
             setShowCertificateManager(true);
         }
     }, [uploadStatus]);
+
+    // Load upload count after auth check is complete
+    useEffect(() => {
+        if (!checkingAuth && licenseNumber) {
+            loadUploadCount();
+        }
+    }, [checkingAuth, licenseNumber]);
+
+    const checkAuthStatus = async () => {
+        try {
+            setCheckingAuth(true);
+            const token = localStorage.getItem('access_token');
+
+            if (!token) {
+                console.log('No access token found');
+                setIsAuthenticated(false);
+                return;
+            }
+
+            // Verify token is still valid
+            const response = await apiService.getCurrentUser();
+            console.log('User authenticated successfully');
+            setIsAuthenticated(true);
+
+        } catch (error) {
+            console.log('Auth check failed:', error);
+            setIsAuthenticated(false);
+
+            // Clear stale tokens
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+        } finally {
+            setCheckingAuth(false);
+        }
+    };
 
     const loadCPAData = async () => {
         try {
@@ -58,44 +95,88 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
     const loadUploadCount = async () => {
         try {
             console.log('📊 Loading upload status...');
-            const status = await apiService.getUserUploadStatus(licenseNumber);
-            console.log('📈 Upload status loaded:', status);
-            setUploadStatus(status);
 
-            if (status.needs_extended_offer &&
-                !status.accepted_extended_trial &&
-                status.upload_phase !== 'extended') {
-                setShowExtendedOffer(true);
-            } else {
-                setShowExtendedOffer(false);
-            }
-        } catch (error) {
-            console.error('Error loading upload status:', error);
-            if (error.response?.status === 401) {
-                console.log('User not authenticated, falling back to free-tier-status');
+            // Check if user is authenticated first
+            if (!isAuthenticated) {
+                console.log('User not authenticated, using free tier status');
                 try {
-                    const fallbackStatus = await apiService.getFreeTierStatus(licenseNumber);
-                    setUploadStatus(fallbackStatus);
+                    const status = await apiService.getFreeTierStatus(licenseNumber);
+                    setUploadStatus(status);
                     setShowExtendedOffer(false);
-                } catch (fallbackError) {
-                    console.error('Fallback also failed:', fallbackError);
+                } catch (error) {
+                    console.error('Error loading free tier status:', error);
+                    // Set fallback status for unauthenticated users
                     setUploadStatus({
                         total_uploads_used: 0,
                         upload_phase: 'initial',
                         at_limit: false,
-                        needs_extended_offer: false
+                        needs_extended_offer: false,
+                        initial_uploads_used: 0,
+                        remaining_uploads: 10,
+                        has_premium_subscription: false
                     });
+                }
+                return;
+            }
+
+            // User is authenticated - try to get their full status
+            try {
+                const status = await apiService.getUserUploadStatus(licenseNumber);
+                console.log('📈 Authenticated upload status loaded:', status);
+                setUploadStatus(status);
+
+                if (status.needs_extended_offer &&
+                    !status.accepted_extended_trial &&
+                    status.upload_phase !== 'extended') {
+                    setShowExtendedOffer(true);
+                } else {
                     setShowExtendedOffer(false);
                 }
-            } else {
-                setUploadStatus({
-                    total_uploads_used: 0,
-                    upload_phase: 'initial',
-                    at_limit: false,
-                    needs_extended_offer: false
-                });
-                setShowExtendedOffer(false);
+            } catch (authError) {
+                if (authError.response?.status === 403 || authError.response?.status === 401) {
+                    console.log('Authentication failed during upload status check');
+
+                    // Update auth state and clear tokens
+                    setIsAuthenticated(false);
+                    localStorage.removeItem('access_token');
+                    localStorage.removeItem('refresh_token');
+
+                    // Fall back to free tier status
+                    try {
+                        const fallbackStatus = await apiService.getFreeTierStatus(licenseNumber);
+                        setUploadStatus(fallbackStatus);
+                    } catch (fallbackError) {
+                        console.error('Fallback also failed:', fallbackError);
+                        setUploadStatus({
+                            total_uploads_used: 0,
+                            upload_phase: 'initial',
+                            at_limit: false,
+                            needs_extended_offer: false,
+                            initial_uploads_used: 0,
+                            remaining_uploads: 10,
+                            has_premium_subscription: false
+                        });
+                    }
+                    setShowExtendedOffer(false);
+                } else {
+                    throw authError; // Re-throw other errors
+                }
             }
+
+        } catch (error) {
+            console.error('Error loading upload status:', error);
+
+            // Ultimate fallback - show basic upload interface
+            setUploadStatus({
+                total_uploads_used: 0,
+                upload_phase: 'initial',
+                at_limit: false,
+                needs_extended_offer: false,
+                initial_uploads_used: 0,
+                remaining_uploads: 10,
+                has_premium_subscription: false
+            });
+            setShowExtendedOffer(false);
         }
     };
 
@@ -128,6 +209,7 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
     };
 
     const handleUpload = async (file) => {
+        // Check upload limits first
         if (uploadStatus?.at_limit) {
             setShowPaymentModal(true);
             return;
@@ -138,6 +220,7 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
             return;
         }
 
+        // Validate file
         if (!file.type.includes('pdf') && !file.type.includes('image')) {
             toast.error('Please upload a PDF or image file');
             return;
@@ -153,23 +236,59 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
             toast.loading('Processing certificate...', { id: 'upload' });
             console.log('🚀 Starting upload for file:', file.name);
 
-            const result = await apiService.uploadCertificateAuthenticated(licenseNumber, file);
-            console.log('✅ Upload API response:', result);
+            // Check if user is authenticated
+            if (!isAuthenticated) {
+                // Use free tier analysis (no save)
+                console.log('User not authenticated, using free analysis');
+                try {
+                    const result = await apiService.analyzeCertificatePreview(licenseNumber, file);
+                    console.log('Analysis result:', result);
 
-            toast.success(`Certificate "${file.name}" uploaded successfully!`, { id: 'upload' });
-            console.log('🔄 Refreshing upload status...');
-            await loadUploadCount();
+                    toast.success(`Certificate analyzed! Sign in to save results.`, { id: 'upload' });
 
-            // Show certificate manager after first upload
-            setShowCertificateManager(true);
+                    // You could show a modal here with the analysis results
+                    // For now, just log the results
+                } catch (analysisError) {
+                    console.error('Analysis error:', analysisError);
+                    toast.error('Analysis failed. Please try again.', { id: 'upload' });
+                }
+                return;
+            }
+
+            // User is authenticated, try to upload and save
+            try {
+                const result = await apiService.uploadCertificateAuthenticated(licenseNumber, file);
+                console.log('✅ Upload API response:', result);
+
+                toast.success(`Certificate "${file.name}" uploaded successfully!`, { id: 'upload' });
+                console.log('🔄 Refreshing upload status...');
+                await loadUploadCount();
+
+                // Show certificate manager after first upload
+                setShowCertificateManager(true);
+
+            } catch (uploadError) {
+                if (uploadError.response?.status === 401 || uploadError.response?.status === 403) {
+                    // Authentication expired during upload
+                    console.log('Authentication expired, clearing tokens');
+                    setIsAuthenticated(false);
+                    localStorage.removeItem('access_token');
+                    localStorage.removeItem('refresh_token');
+
+                    toast.error('Your session expired. Please sign in to save certificates.', { id: 'upload' });
+
+                } else if (uploadError.response?.status === 402) {
+                    toast.error('Payment required - upgrade needed', { id: 'upload' });
+                    setShowPaymentModal(true);
+                } else {
+                    throw uploadError; // Re-throw other errors
+                }
+            }
 
         } catch (error) {
             console.error('💥 Upload error:', error);
-            if (error.response?.status === 402) {
-                toast.error('Payment required - upgrade needed', { id: 'upload' });
-            } else if (error.response?.status === 401) {
-                toast.error('Authentication required', { id: 'upload' });
-            } else if (error.response?.data?.detail) {
+
+            if (error.response?.data?.detail) {
                 toast.error(`Upload failed: ${error.response.data.detail}`, { id: 'upload' });
             } else {
                 toast.error(`Upload failed: ${error.message}`, { id: 'upload' });
@@ -180,6 +299,11 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
     };
 
     const handleAcceptExtendedOffer = async () => {
+        if (!isAuthenticated) {
+            toast.error('Please sign in to accept the extended trial.');
+            return;
+        }
+
         try {
             console.log('🎯 Accepting extended trial offer...');
             const result = await apiService.acceptExtendedTrial(licenseNumber);
@@ -189,7 +313,14 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
             await loadUploadCount();
         } catch (error) {
             console.error('❌ Error accepting extended trial:', error);
-            toast.error('Failed to activate extended trial. Please try again.');
+            if (error.response?.status === 401 || error.response?.status === 403) {
+                setIsAuthenticated(false);
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('refresh_token');
+                toast.error('Your session expired. Please sign in again.');
+            } else {
+                toast.error('Failed to activate extended trial. Please try again.');
+            }
         }
     };
 
@@ -210,30 +341,30 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
     };
 
     const getProgressInfo = () => {
-        if (!uploadStatus) return { current: 0, total: 10, phase: 'initial' };
+        if (!uploadStatus) return { current: 0, total: 10, phase: 'initial', label: '0 of 10 free uploads used' };
 
         const { upload_phase, initial_uploads_used, extended_uploads_used, total_uploads_used } = uploadStatus;
 
         if (upload_phase === 'initial') {
             return {
-                current: initial_uploads_used,
+                current: initial_uploads_used || 0,
                 total: 10,
                 phase: 'initial',
-                label: `${initial_uploads_used} of 10 free uploads used`
+                label: `${initial_uploads_used || 0} of 10 free uploads used`
             };
         } else if (upload_phase === 'extended') {
             return {
-                current: extended_uploads_used,
+                current: extended_uploads_used || 0,
                 total: 20,
                 phase: 'extended',
-                label: `${extended_uploads_used} of 20 extended uploads used`
+                label: `${extended_uploads_used || 0} of 20 extended uploads used`
             };
         } else {
             return {
-                current: total_uploads_used,
+                current: total_uploads_used || 0,
                 total: 30,
                 phase: 'complete',
-                label: `${total_uploads_used} total uploads used`
+                label: `${total_uploads_used || 0} total uploads used`
             };
         }
     };
@@ -241,6 +372,76 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
     // Callback to refresh data when certificates are updated
     const handleCertificateManagerRefresh = () => {
         loadUploadCount();
+    };
+
+    // Render upload zone based on authentication status
+    const renderUploadZone = () => {
+        if (checkingAuth) {
+            return (
+                <div className={styles.uploadingState}>
+                    <div className={styles.uploadSpinner}></div>
+                    <h4>Checking authentication...</h4>
+                    <p>Please wait while we verify your session</p>
+                </div>
+            );
+        }
+
+        if (uploading) {
+            return (
+                <div className={styles.uploadingState}>
+                    <div className={styles.uploadSpinner}></div>
+                    <h4>Processing your certificate...</h4>
+                    <p>AI is extracting CPE data from your document</p>
+                </div>
+            );
+        }
+
+        if (uploadStatus?.at_limit) {
+            return (
+                <div className={styles.upgradePrompt}>
+                    <CheckCircle size={48} color="#059669" />
+                    <h4>Ready to Upgrade?</h4>
+                    <p>You've experienced everything SuperCPE offers with 30 free uploads!</p>
+                    <Button
+                        variant="primary"
+                        onClick={() => setShowPaymentModal(true)}
+                        className={styles.upgradeButton}
+                    >
+                        Upgrade Now
+                    </Button>
+                </div>
+            );
+        }
+
+        return (
+            <div className={styles.uploadPrompt}>
+                <Upload size={48} color="#6b7280" />
+                <h4>{dragActive ? 'Drop to upload certificate' : 'Click or drag to upload certificate'}</h4>
+                <p className={styles.uploadHint}>
+                    PDF, PNG, JPG • Max 10MB
+                    {!isAuthenticated && <br />}
+                    {!isAuthenticated && <span style={{ color: '#f59e0b', fontWeight: 'bold' }}>Sign in to save results</span>}
+                </p>
+                <Button
+                    variant="primary"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        document.getElementById('certificate-upload').click();
+                    }}
+                >
+                    Choose File
+                </Button>
+                {!isAuthenticated && (
+                    <Button
+                        variant="outline"
+                        onClick={() => window.location.href = '/'}
+                        style={{ marginTop: '0.5rem' }}
+                    >
+                        Sign In to Save Results
+                    </Button>
+                )}
+            </div>
+        );
     };
 
     // Loading and error states
@@ -275,6 +476,7 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
                 <p className={styles.cpaCredentials}>
                     License: {cpa.license_number} • Renews: {formatDate(new Date(cpa.license_expiration_date))} •
                     {Math.ceil((new Date(cpa.license_expiration_date) - new Date()) / (1000 * 60 * 60 * 24))} days remaining
+                    {!isAuthenticated && <span style={{ color: '#f59e0b', marginLeft: '10px' }}>• Not signed in</span>}
                 </p>
             </div>
 
@@ -318,48 +520,12 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
                         disabled={uploading || uploadStatus?.at_limit}
                     />
 
-                    {uploading ? (
-                        <div className={styles.uploadingState}>
-                            <div className={styles.uploadSpinner}></div>
-                            <h4>Processing your certificate...</h4>
-                            <p>AI is extracting CPE data from your document</p>
-                        </div>
-                    ) : uploadStatus?.at_limit ? (
-                        <div className={styles.upgradePrompt}>
-                            <CheckCircle size={48} color="#059669" />
-                            <h4>Ready to Upgrade?</h4>
-                            <p>You've experienced everything SuperCPE offers with 30 free uploads!</p>
-                            <Button
-                                variant="primary"
-                                onClick={() => setShowPaymentModal(true)}
-                                className={styles.upgradeButton}
-                            >
-                                Upgrade Now
-                            </Button>
-                        </div>
-                    ) : (
-                        <div className={styles.uploadPrompt}>
-                            <Upload size={48} color="#6b7280" />
-                            <h4>{dragActive ? 'Drop to upload certificate' : 'Click or drag to upload certificate'}</h4>
-                            <p className={styles.uploadHint}>
-                                PDF, PNG, JPG • Max 10MB
-                            </p>
-                            <Button
-                                variant="primary"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    document.getElementById('certificate-upload').click();
-                                }}
-                            >
-                                Choose File
-                            </Button>
-                        </div>
-                    )}
+                    {renderUploadZone()}
                 </div>
             </Card>
 
-            {/* Certificate Manager - Replaces CE Broker Section */}
-            {showCertificateManager && (
+            {/* Certificate Manager - Only show if authenticated and has certificates */}
+            {isAuthenticated && showCertificateManager && (
                 <CertificateManager
                     licenseNumber={licenseNumber}
                     onRefresh={handleCertificateManagerRefresh}
@@ -382,6 +548,7 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
                             <Button
                                 variant="primary"
                                 onClick={handleAcceptExtendedOffer}
+                                disabled={!isAuthenticated}
                             >
                                 Accept 20 More Uploads
                             </Button>
@@ -392,6 +559,11 @@ const ProfessionalCPEDashboard = ({ licenseNumber }) => {
                                 Upgrade Instead
                             </Button>
                         </div>
+                        {!isAuthenticated && (
+                            <p style={{ color: '#f59e0b', marginTop: '1rem', fontSize: '0.875rem' }}>
+                                Please sign in to accept the extended trial.
+                            </p>
+                        )}
                     </div>
                 </div>
             )}

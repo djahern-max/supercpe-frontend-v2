@@ -157,14 +157,7 @@ export const apiService = {
 
     // ===== AUTHENTICATION METHODS =====
 
-    /**
-     * Get Google OAuth URL
-     */
-    async getGoogleAuthUrl() {
-        // ✅ CORRECT endpoint that matches your backend
-        const response = await apiClient.get('/api/auth/google');
-        return response.data;
-    },
+
 
     /**
      * Create account with email and password (signup)
@@ -591,6 +584,333 @@ export const apiService = {
     async getAvailableWindows(licenseNumber) {
         return this.getAvailablePeriods(licenseNumber);
     },
+
+    /**
+     * Get certificates with enhanced smart review data
+     */
+    async getCertificatesWithReviewData(licenseNumber, period = 'current') {
+        try {
+            console.log(`🔍 Fetching certificates with smart review data for ${licenseNumber}`);
+
+            // For now, use your existing compliance dashboard endpoint and enhance the data
+            const response = await this.getComplianceDashboard(licenseNumber);
+
+            // Transform certificates to include smart review structure
+            const certificates = (response.certificates || []).map(cert => ({
+                ...cert,
+                // Ensure boolean fields are properly typed
+                needs_review: !cert.course_title || !cert.provider_name || cert.cpe_credits === 0 || !cert.completion_date,
+                is_verified: Boolean(cert.is_verified),
+                is_complete: Boolean(cert.course_title && cert.provider_name && cert.cpe_credits > 0 && cert.completion_date),
+
+                // Map legacy field names
+                provider: cert.provider_name || cert.provider,
+
+                // Initialize smart review fields (will be populated when backend is ready)
+                suggestions: [],
+                review_flags: [],
+                smart_insights: {},
+
+                // Computed status
+                review_status: this.computeReviewStatus(cert),
+
+                // Processing method display
+                processing_method: cert.ai_extracted ? 'smart_review' : 'manual',
+                confidence_score: cert.confidence_score || 0
+            }));
+
+            console.log(`📊 Loaded ${certificates.length} enhanced certificates`);
+
+            return {
+                certificates,
+                stats: this.computeCertificateStats(certificates)
+            };
+
+        } catch (error) {
+            console.error('Error fetching enhanced certificates:', error);
+            throw error;
+        }
+    },
+
+    /**
+     * Get detailed review data for a specific certificate
+     */
+    async getCertificateReviewData(certificateId) {
+        try {
+            console.log(`🔍 Fetching review data for certificate ${certificateId}`);
+
+            // TODO: Replace with actual backend endpoint when ready
+            // For now, return mock structure
+            return {
+                id: certificateId,
+                filename: "certificate.pdf",
+                processing_method: "smart_review",
+                confidence_score: 0.85,
+                needs_review: true,
+                current_data: {
+                    course_title: "Sample Course",
+                    provider: "Sample Provider",
+                    cpe_credits: 8,
+                    ethics_credits: 0,
+                    completion_date: new Date().toISOString().split('T')[0],
+                    certificate_number: "CERT123"
+                },
+                smart_insights: {},
+                suggestions: [],
+                review_flags: [],
+                raw_text: "Sample raw text from OCR...",
+                raw_text_preview: "Sample raw text from OCR..."
+            };
+
+        } catch (error) {
+            console.error('Error fetching certificate review data:', error);
+            throw error;
+        }
+    },
+
+    /**
+     * Update certificate after review
+     */
+    async updateCertificateFromReview(certificateId, updateData) {
+        try {
+            console.log(`💾 Updating certificate ${certificateId} from review`);
+
+            // TODO: Replace with actual backend endpoint when ready
+            // For now, use the existing save reviewed certificate method
+            const response = await this.saveReviewedCertificate(certificateId, updateData);
+
+            console.log('✅ Certificate updated successfully');
+            return response;
+
+        } catch (error) {
+            console.error('Error updating certificate:', error);
+            throw error;
+        }
+    },
+
+    /**
+     * Handle specific review actions (accept suggestion, etc.)
+     */
+    async handleReviewAction(certificateId, action, field, value, suggestionIndex = null) {
+        try {
+            console.log(`🎯 Handling review action: ${action} for field ${field}`);
+
+            // TODO: Replace with actual backend endpoint when ready
+            // For now, treat as a regular update
+            const updateData = { [field]: value };
+            const response = await this.updateCertificateFromReview(certificateId, updateData);
+
+            console.log('✅ Review action completed successfully');
+            return response;
+
+        } catch (error) {
+            console.error('Error handling review action:', error);
+            throw error;
+        }
+    },
+
+    /**
+     * Get all certificates needing review
+     */
+    async getCertificatesNeedingReview(licenseNumber) {
+        try {
+            console.log('🔍 Fetching certificates needing review');
+
+            // Use existing method and filter for those needing review
+            const allCerts = await this.getCertificatesWithReviewData(licenseNumber);
+            const needingReview = allCerts.certificates.filter(cert => cert.needs_review);
+
+            return needingReview.map(cert => ({
+                id: cert.id,
+                filename: cert.original_filename || cert.document_filename,
+                confidence_score: cert.confidence_score,
+                review_flags: cert.review_flags,
+                suggestions_count: cert.suggestions.length,
+                created_at: cert.created_at,
+                preview: {
+                    course_title: cert.course_title,
+                    provider: cert.provider,
+                    cpe_credits: cert.cpe_credits
+                }
+            }));
+
+        } catch (error) {
+            console.error('Error fetching certificates needing review:', error);
+            throw error;
+        }
+    },
+
+    /**
+     * Get review statistics for dashboard
+     */
+    async getReviewStatistics(licenseNumber) {
+        try {
+            console.log(`📊 Fetching review statistics for ${licenseNumber}`);
+
+            const data = await this.getCertificatesWithReviewData(licenseNumber);
+            return data.stats;
+
+        } catch (error) {
+            console.error('Error fetching review statistics:', error);
+            throw error;
+        }
+    },
+
+    /**
+     * Export certificates with enhanced data to CSV
+     */
+    async exportCertificatesCSV(licenseNumber, includeReviewData = false) {
+        try {
+            console.log(`📤 Exporting certificates CSV for ${licenseNumber}`);
+
+            // Get the certificates data
+            const data = await this.getCertificatesWithReviewData(licenseNumber);
+
+            // Create CSV content
+            const headers = [
+                'License_Number',
+                'Course_Title',
+                'Provider',
+                'CPE_Credits',
+                'Ethics_Credits',
+                'Total_Credits',
+                'Completion_Date',
+                'Certificate_Number',
+                'Verified',
+                'Upload_Date'
+            ];
+
+            if (includeReviewData) {
+                headers.push('Confidence_Score', 'Processing_Method', 'Review_Status');
+            }
+
+            const csvContent = [
+                headers.join(','),
+                ...data.certificates.map(cert => {
+                    const row = [
+                        licenseNumber,
+                        `"${cert.course_title || ''}"`,
+                        `"${cert.provider || ''}"`,
+                        cert.cpe_credits || 0,
+                        cert.ethics_credits || 0,
+                        (cert.cpe_credits || 0) + (cert.ethics_credits || 0),
+                        cert.completion_date || '',
+                        `"${cert.certificate_number || ''}"`,
+                        cert.is_verified ? 'Yes' : 'No',
+                        cert.created_at ? new Date(cert.created_at).toLocaleDateString() : ''
+                    ];
+
+                    if (includeReviewData) {
+                        row.push(
+                            cert.confidence_score || 0,
+                            cert.processing_method || 'manual',
+                            cert.review_status || 'unknown'
+                        );
+                    }
+
+                    return row.join(',');
+                })
+            ].join('\n');
+
+            // Create blob
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            console.log('✅ CSV export completed');
+
+            return blob;
+
+        } catch (error) {
+            console.error('Error exporting CSV:', error);
+            throw error;
+        }
+    },
+
+    /**
+     * Mark certificate as reviewed without changes
+     */
+    async markCertificateAsReviewed(certificateId) {
+        try {
+            console.log(`✅ Marking certificate ${certificateId} as reviewed`);
+
+            // TODO: Replace with actual backend endpoint when ready
+            const response = await this.updateCertificateFromReview(certificateId, {
+                is_verified: true,
+                needs_review: false
+            });
+
+            return response;
+
+        } catch (error) {
+            console.error('Error marking certificate as reviewed:', error);
+            throw error;
+        }
+    },
+
+    // Helper methods for enhanced certificate manager
+    computeReviewStatus(certificate) {
+        if (certificate.is_verified) {
+            return 'verified';
+        } else if (certificate.needs_review) {
+            if (certificate.review_started_at) {
+                return 'in_review';
+            } else {
+                return 'needs_review';
+            }
+        } else if (certificate.is_complete) {
+            return 'complete';
+        } else {
+            return 'incomplete';
+        }
+    },
+
+    computeCertificateStats(certificates) {
+        const stats = {
+            total: certificates.length,
+            complete: 0,
+            needs_review: 0,
+            verified: 0,
+            in_review: 0,
+            incomplete: 0,
+            total_cpe_credits: 0,
+            total_ethics_credits: 0,
+            avg_confidence: 0,
+            smart_extracted: 0
+        };
+
+        let totalConfidence = 0;
+        let confidenceCount = 0;
+
+        certificates.forEach(cert => {
+            // Status counts
+            if (cert.is_verified) stats.verified++;
+            if (cert.needs_review) stats.needs_review++;
+            if (cert.is_complete) stats.complete++;
+            if (cert.review_status === 'in_review') stats.in_review++;
+            if (cert.review_status === 'incomplete') stats.incomplete++;
+
+            // Credit totals
+            stats.total_cpe_credits += cert.cpe_credits || 0;
+            stats.total_ethics_credits += cert.ethics_credits || 0;
+
+            // Confidence tracking
+            if (cert.confidence_score && cert.confidence_score > 0) {
+                totalConfidence += cert.confidence_score;
+                confidenceCount++;
+            }
+
+            // Smart extraction count
+            if (cert.processing_method === 'smart_review' || cert.processing_method === 'google_vision') {
+                stats.smart_extracted++;
+            }
+        });
+
+        // Calculate average confidence
+        if (confidenceCount > 0) {
+            stats.avg_confidence = totalConfidence / confidenceCount;
+        }
+
+        return stats;
+    },
+
 
 };
 
